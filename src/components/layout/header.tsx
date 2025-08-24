@@ -24,8 +24,9 @@ export function Header() {
         <nav className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="flex items-center space-x-8 font-headline text-base uppercase tracking-[2px]">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="transition-colors hover:text-primary">
-                {link.label}
+              <Link key={link.href} href={link.href} className="relative group text-foreground transition-colors hover:text-primary">
+                <span>{link.label}</span>
+                <span className="absolute bottom-0 left-1/2 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full group-hover:left-0"></span>
               </Link>
             ))}
           </div>
