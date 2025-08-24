@@ -5,75 +5,74 @@ import Link from 'next/link';
 
 const pricingTiers = [
   {
-    name: 'Classic Digital',
-    price: '$250',
-    description: 'A beautiful, high-resolution digital portrait.',
+    name: 'Digital Portrait',
+    price: '$39',
+    description: 'High-resolution file, ready in 48h.',
     features: [
-      '8" x 10" Digital File',
-      'Head & Shoulders',
-      'Simple Color Background',
-      '2 Week Turnaround'
+      'High-resolution digital file',
+      'Perfect for social media',
+      'Print it yourself',
+      'Delivered in 48 hours'
     ],
-    cta: 'Order Now'
+    cta: 'Start with Digital'
   },
   {
-    name: 'Premium Canvas',
-    price: '$450',
-    description: 'A stunning physical portrait on gallery-quality canvas.',
+    name: 'Canvas Portrait 12x16"',
+    price: '$79',
+    description: 'Premium canvas, ready to hang.',
     features: [
-      '12" x 16" Stretched Canvas',
-      'Full Body Portrait',
-      'Detailed Scenery Background',
-      '4 Week Turnaround'
+      'Gallery-quality canvas',
+      'Vibrant, fade-resistant ink',
+      'Ready to hang',
+      'Includes digital version'
     ],
     isFeatured: true,
-    cta: 'Choose Premium'
+    cta: 'Choose Canvas'
   },
   {
-    name: 'Luxe Oil Painting',
-    price: '$800',
-    description: 'An exquisite, timeless oil painting on linen.',
+    name: 'Canvas Portrait 18x24"',
+    price: '$119',
+    description: 'Gallery size, museum-quality print.',
     features: [
-      '16" x 20" Fine Linen Canvas',
-      'Full Custom Composition',
-      'Artist Signature & Varnish',
-      '8 Week Turnaround'
+      'Large museum-quality canvas',
+      'Statement piece for your home',
+      'Hand-stretched on a wooden frame',
+      'Includes digital version'
     ],
-    cta: 'Select Luxe'
+    cta: 'Go for Gallery'
   }
 ];
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-20 lg:py-28 bg-card">
-      <div className="container">
+    <section id="pricing" className="py-20 lg:py-28 bg-background">
+      <div className="container max-w-5xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold font-headline text-primary">Pricing & Options</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Choose the perfect package to honor your pet. Custom sizes and add-ons are available upon request.
+          <h2 className="text-4xl font-bold font-headline text-foreground">Choose Your Portrait Format</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            Each artwork is carefully crafted by a professional artist and delivered with love.
           </p>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           {pricingTiers.map((tier) => (
-            <Card key={tier.name} className={`flex flex-col h-full ${tier.isFeatured ? 'border-primary border-2 shadow-2xl scale-105' : ''}`}>
-              <CardHeader className="items-center">
-                {tier.isFeatured && <div className="text-sm font-bold text-primary-foreground bg-primary px-3 py-1 rounded-full mb-4 -mt-8">Most Popular</div>}
-                <CardTitle className="text-3xl font-headline">{tier.name}</CardTitle>
-                <p className="text-4xl font-bold text-primary mt-4">{tier.price}</p>
-                <CardDescription className="mt-2 h-12">{tier.description}</CardDescription>
+            <Card key={tier.name} className={`flex flex-col h-full bg-card/50 rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${tier.isFeatured ? 'border-primary border-2' : 'border'}`}>
+              <CardHeader className="items-center text-center">
+                <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
+                <CardDescription className="mt-1 h-12">{tier.description}</CardDescription>
+                <p className="text-5xl font-bold text-primary mt-4">{tier.price}</p>
               </CardHeader>
               <CardContent className="flex-grow">
-                <ul className="space-y-3">
+                <ul className="space-y-3 text-sm">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-center">
-                      <CheckCircle2 className="h-5 w-5 text-accent mr-3" />
-                      <span className="text-foreground/80">{feature}</span>
+                      <CheckCircle2 className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
+                      <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button asChild className="w-full text-lg" size="lg" variant={tier.isFeatured ? 'default' : 'outline'}>
+                <Button asChild className="w-full text-lg py-6" size="lg" variant={tier.isFeatured ? 'default' : 'outline'}>
                     <Link href="#contact">{tier.cta}</Link>
                 </Button>
               </CardFooter>

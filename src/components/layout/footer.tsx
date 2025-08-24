@@ -1,20 +1,16 @@
-import { Paintbrush } from 'lucide-react';
 import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="w-full border-t bg-card">
-      <div className="container flex flex-col items-center justify-between gap-4 py-8 md:flex-row">
-        <div className="flex items-center gap-2">
-          <Paintbrush className="h-6 w-6 text-primary" />
-          <p className="text-xl font-bold text-primary font-headline tracking-wider">
-            Pet Masterpiece
-          </p>
+    <footer className="w-full bg-background border-t">
+      <div className="container mx-auto py-6 px-4 md:px-6 flex flex-col md:flex-row items-center justify-between">
+        <div className="text-center md:text-left mb-4 md:mb-0">
+          <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
         </div>
-        <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground md:flex-row md:gap-4">
-          <p>&copy; {new Date().getFullYear()} Pet Masterpiece. All rights reserved.</p>
-          <div className="hidden md:block">|</div>
-          <p>Crafted with love for our furry friends</p>
+        <div className="flex items-center space-x-4">
+          <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy</Link>
+          <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Refunds</Link>
+          <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link>
         </div>
       </div>
     </footer>

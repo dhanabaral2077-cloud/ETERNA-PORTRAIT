@@ -4,36 +4,57 @@ import Link from 'next/link';
 
 export function Hero() {
   return (
-    <section id="hero" className="relative w-full overflow-hidden bg-card">
-      <div className="container grid lg:grid-cols-2 gap-10 items-center py-20 md:py-32">
-        <div className="flex flex-col items-start space-y-6 text-left">
-          <h1 className="text-4xl font-bold tracking-tight text-primary md:text-5xl lg:text-6xl font-headline">
-            Immortalize Your Beloved Pet in a Timeless Portrait
-          </h1>
-          <p className="max-w-xl text-lg text-foreground/80 md:text-xl">
-            Experience the joy of seeing your pet's unique personality captured in a stunning, hand-crafted masterpiece. Our artist pours heart and soul into every brushstroke to create a portrait you'll cherish forever.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild size="lg" className="text-lg">
-              <Link href="#contact">Commission a Portrait</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg">
-              <Link href="#portfolio">View Gallery</Link>
-            </Button>
-          </div>
-        </div>
-        <div className="relative h-80 lg:h-full w-full rounded-lg overflow-hidden shadow-2xl group">
+    <section id="hero" className="relative w-full h-screen min-h-[700px] flex items-center justify-center bg-background overflow-hidden">
+        <div className="absolute inset-0 z-0">
             <Image
-                src="https://placehold.co/800x1000.png"
-                alt="Artist painting a pet portrait"
+                src="https://placehold.co/1920x1080.png"
+                alt="Elegant portrait of a pet in a frame"
                 layout="fill"
                 objectFit="cover"
-                className="transition-transform duration-500 ease-in-out group-hover:scale-105"
-                data-ai-hint="artist painting"
+                className="opacity-20"
+                data-ai-hint="elegant portrait"
+                priority
             />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+        </div>
+      <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
+        <div className="flex flex-col items-center space-y-6">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold tracking-tight text-foreground leading-tight animate-fade-in-up">
+            A Timeless Portrait of Your Beloved Pet.
+          </h1>
+          <p className="max-w-2xl text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-300">
+            Handcrafted digital art & museum-quality prints that celebrate your companion for a lifetime.
+          </p>
+          <div className="animate-fade-in-up animation-delay-600">
+            <Button asChild size="lg" className="text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform hover:scale-105 transition-transform">
+              <Link href="#contact">Commission Your Portrait</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+// Add this to your globals.css for the animations
+/*
+@keyframes-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: keyframes-fade-in-up 0.8s ease-out forwards;
+}
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+*/

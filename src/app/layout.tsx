@@ -1,10 +1,21 @@
 import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
+import { Playfair_Display, Inter } from 'next/font/google';
 import './globals.css';
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair-display',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: 'Pet Masterpiece',
-  description: 'Custom pet portrait artist website',
+  description: 'Handcrafted digital art & museum-quality prints that celebrate your companion for a lifetime.',
 };
 
 export default function RootLayout({
@@ -14,12 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="!scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
+      <body className={`${playfairDisplay.variable} ${inter.variable} font-body bg-background text-foreground antialiased`}>
         {children}
         <Toaster />
       </body>
