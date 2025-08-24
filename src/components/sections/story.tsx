@@ -16,8 +16,13 @@ export function Story() {
         const { top, height } = element.getBoundingClientRect();
         const windowHeight = window.innerHeight;
         
-        // Calculate the progress of scrolling through the component
-        const progress = Math.max(0, Math.min(1, 1 - (top + height * 0.8) / windowHeight));
+        // Starts when the top of the section is 1/3 down from the top of the viewport,
+        // and ends when the bottom of the section is 1/3 up from the bottom of the viewport.
+        // This gives the animation more room to play out in the center of the screen.
+        const start = top - windowHeight * (2/3);
+        const end = top + height - windowHeight * (1/3);
+
+        const progress = Math.max(0, Math.min(1, 1 - (end / (end - start))));
         setScrollProgress(progress);
       }
     };
@@ -29,8 +34,13 @@ export function Story() {
   }, []);
 
   const textOpacity = (start: number, end: number) => {
-    return Math.max(0, Math.min(1, (scrollProgress - start) / (end - start)));
+    const midpoint = (start + end) / 2;
+    if (scrollProgress < start || scrollProgress > end) return 0;
+    if (scrollProgress < midpoint) return (scrollProgress - start) / (midpoint - start);
+    return 1 - (scrollProgress - midpoint) / (end - midpoint);
   };
+  
+  const maskSize = Math.max(0, (scrollProgress - 0.2) * 200);
 
   return (
     <section ref={sectionRef} id="story" className="relative py-20 lg:py-32 bg-background h-[300vh]">
@@ -59,10 +69,10 @@ export function Story() {
             className="absolute inset-0 object-cover rounded-lg"
             style={{
               maskImage: 'url(/brush-mask.svg)',
-              maskSize: `${(scrollProgress * 200)}%`,
+              maskSize: `${maskSize}%`,
               maskPosition: 'center',
               WebkitMaskImage: 'url(/brush-mask.svg)',
-              WebkitMaskSize: `${(scrollProgress * 400)}%`,
+              WebkitMaskSize: `${maskSize}%`,
               WebkitMaskPosition: 'center',
             }}
             data-ai-hint="pet portrait"
@@ -77,13 +87,13 @@ export function Story() {
         </div>
 
         <div className="absolute bottom-10 left-10 max-w-sm text-left">
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500" style={{ opacity: textOpacity(0.1, 0.3) - textOpacity(0.4, 0.5) }}>
+           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500" style={{ opacity: textOpacity(0.0, 0.3) }}>
              It starts with a photo, a cherished memory.
            </p>
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.4, 0.6) - textOpacity(0.7, 0.8)}}>
+           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.35, 0.65)}}>
              Our artists transform it into a masterpiece.
            </p>
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.7, 0.9) }}>
+           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.7, 1.0) }}>
              A timeless heirloom, framed for eternity.
            </p>
         </div>
