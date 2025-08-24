@@ -16,8 +16,8 @@ export function Showcase() {
           {portfolioData.map((item, index) => (
             <Card
               key={item.id}
-              className="overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-0 rounded-lg animate-fade-in-up"
-              style={{ animationDelay: `${index * 150}ms` }}
+              className="overflow-hidden group transform transition-all duration-300 hover:scale-102 hover:shadow-xl border-0 rounded-lg animate-fade-in-up"
+              style={{ animation: `fade-in-up 0.8s ease-out forwards, zoom-out 0.8s ease-out forwards`, animationDelay: `${index * 150}ms` }}
             >
               <CardContent className="p-0">
                 <div className="relative aspect-[3/4]">

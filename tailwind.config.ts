@@ -116,7 +116,11 @@ export default {
         'ken-burns': {
           '0%': { transform: 'scale(1) translateY(0)', transformOrigin: 'center center' },
           '100%': { transform: 'scale(1.1) translateY(-15px)', transformOrigin: 'center center' },
-        }
+        },
+        'zoom-out': {
+          'from': { transform: 'scale(1.06)' },
+          'to': { transform: 'scale(1)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -125,6 +129,7 @@ export default {
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
         'shake': 'shake 0.4s ease-in-out',
         'ken-burns': 'ken-burns 10s ease-out forwards',
+        'zoom-out': 'zoom-out 0.8s ease-out forwards',
       },
       transitionDuration: {
         'fast': '120ms',
@@ -134,6 +139,12 @@ export default {
       transitionTimingFunction: {
         'ease-out-quad': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         'ease-in-out-quad': 'cubic-bezier(0.455, 0.03, 0.515, 0.955)',
+      },
+      transform: {
+        'scale-102': 'scale(1.02)',
+      },
+      scale: {
+        '102': '1.02',
       }
     },
   },
