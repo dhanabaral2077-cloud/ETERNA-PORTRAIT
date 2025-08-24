@@ -16,13 +16,12 @@ export function Story() {
         const { top, height } = element.getBoundingClientRect();
         const windowHeight = window.innerHeight;
         
-        // Starts when the top of the section is 1/3 down from the top of the viewport,
-        // and ends when the bottom of the section is 1/3 up from the bottom of the viewport.
-        // This gives the animation more room to play out in the center of the screen.
-        const start = top - windowHeight * (2/3);
-        const end = top + height - windowHeight * (1/3);
+        // Animation starts when the top of the section hits the top of the viewport.
+        // It uses the full height of the section for the scroll progress.
+        const start = top;
+        const end = top + height - windowHeight;
 
-        const progress = Math.max(0, Math.min(1, 1 - (end / (end - start))));
+        const progress = Math.max(0, Math.min(1, 1 - (end / (end-start))));
         setScrollProgress(progress);
       }
     };
@@ -44,7 +43,7 @@ export function Story() {
 
   return (
     <section ref={sectionRef} id="story" className="relative py-20 lg:py-32 bg-background h-[300vh]">
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden">
+      <div className="sticky top-20 h-[calc(100vh-5rem)] flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: scrollProgress > 0.5 ? 1 : 0, backgroundColor: 'hsl(var(--card))' }}>
         </div>
 
