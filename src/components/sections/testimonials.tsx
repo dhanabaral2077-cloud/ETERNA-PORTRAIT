@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { Star } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 const testimonialsData = [
@@ -48,13 +48,14 @@ export function Testimonials() {
       return
     }
 
-    setCurrent(api.selectedScrollSnap())
-
     const onSelect = () => {
       setCurrent(api.selectedScrollSnap())
     }
 
     api.on("select", onSelect)
+    
+    // Set initial state
+    onSelect();
 
     return () => {
       api.off("select", onSelect)
@@ -85,13 +86,16 @@ export function Testimonials() {
                 <div className="p-4 h-full">
                   <Card className="h-full flex flex-col justify-between p-6 bg-background rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
                     <CardContent className="p-0 flex-grow flex flex-col items-center text-center">
-                        <div className={cn("relative w-24 h-24 mb-4 transition-all duration-300 ease-in-out", current === index ? 'opacity-100 scale-100 delay-100' : 'opacity-0 scale-95')}>
+                        <div className="relative w-24 h-24 mb-4">
                              <Image 
                                 src={testimonial.image}
                                 alt={`Photo of ${testimonial.name}`} 
                                 width={100}
                                 height={100}
-                                className="rounded-full object-cover"
+                                className={cn(
+                                    "rounded-full object-cover transition-all duration-500 ease-out",
+                                    current === index ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                                )}
                                 data-ai-hint={testimonial.aiHint}
                              />
                         </div>
@@ -101,13 +105,13 @@ export function Testimonials() {
                             key={i} 
                             className={cn(
                                 "h-5 w-5 text-primary fill-primary transition-all duration-300 ease-in-out",
-                                current === index ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                                current === index ? 'animate-star-animation' : 'opacity-0 scale-0'
                             )}
-                            style={{ transitionDelay: `${(current === index ? i * 100 : 0)}ms` }}
+                            style={{ animationDelay: `${(current === index ? i * 100 : 0)}ms` }}
                            />
                         ))}
                       </div>
-                      <div className={cn("transition-opacity duration-300 ease-in-out", current === index ? 'opacity-100' : 'opacity-0')}>
+                      <div className={cn("transition-opacity duration-500 ease-in-out", current === index ? 'opacity-100 delay-300' : 'opacity-0')}>
                         <p className="text-lg italic text-foreground/80 mb-4 flex-grow">"{testimonial.quote}"</p>
                         <p className="font-semibold text-foreground">{testimonial.name}</p>
                       </div>
