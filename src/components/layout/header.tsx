@@ -7,26 +7,33 @@ export function Header() {
   const navLinks = [
     { href: '#gallery', label: 'Gallery' },
     { href: '#process', label: 'Process' },
+    { href: '#story', label: 'Our Story' },
     { href: '#testimonials', label: 'Testimonials' },
     { href: '#pricing', label: 'Pricing' },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-2xl font-headline font-bold text-foreground">
-          Pet Masterpiece
-        </Link>
-        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
-          {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-primary">
-              {link.label}
-            </Link>
-          ))}
+      <div className="container flex h-14 md:h-[72px] items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-start">
+          <Link href="/" className="text-2xl font-headline font-bold text-foreground">
+            Pet Masterpiece
+          </Link>
+        </div>
+
+        <nav className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex items-center space-x-8 text-sm font-medium">
+            {navLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="transition-colors hover:text-primary">
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </nav>
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center justify-end gap-4">
            <Button asChild className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
-            <Link href="#contact">Commission Your Portrait</Link>
+            <Link href="#contact">Order Now</Link>
           </Button>
           <div className="md:hidden">
             <Sheet>
@@ -36,20 +43,22 @@ export function Header() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right">
-                <nav className="flex flex-col items-center space-y-6 pt-12">
-                   <Link href="/" className="text-2xl font-bold font-headline mb-6">Pet Masterpiece</Link>
-                  {navLinks.map((link) => (
-                     <SheetTrigger asChild key={link.href}>
-                      <Link href={link.href} className="text-lg transition-colors hover:text-primary">
-                        {link.label}
-                      </Link>
-                    </SheetTrigger>
-                  ))}
-                  <Button asChild size="lg" className="mt-4 rounded-full">
-                      <Link href="#contact">Commission Your Portrait</Link>
-                  </Button>
-                </nav>
+              <SheetContent side="right" className="w-full h-full bg-background p-0">
+                <div className="flex flex-col items-center justify-center h-full">
+                  <nav className="flex flex-col items-center space-y-8">
+                    <Link href="/" className="text-3xl font-bold font-headline mb-8">Pet Masterpiece</Link>
+                    {navLinks.map((link) => (
+                       <SheetTrigger asChild key={link.href}>
+                        <Link href={link.href} className="text-2xl transition-colors hover:text-primary">
+                          {link.label}
+                        </Link>
+                      </SheetTrigger>
+                    ))}
+                    <Button asChild size="lg" className="mt-8 rounded-full text-lg px-8 py-6">
+                        <Link href="#contact">Order Now</Link>
+                    </Button>
+                  </nav>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
