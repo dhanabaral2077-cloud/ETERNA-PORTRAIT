@@ -29,7 +29,7 @@ export function Testimonials() {
   return (
     <section id="testimonials" className="py-20 lg:py-28 bg-card">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 animate-fade-in-up">
           <h2 className="font-bold font-headline text-foreground">Loved by Pet Parents Everywhere</h2>
            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             We're honored to have created so many cherished memories.
@@ -40,7 +40,7 @@ export function Testimonials() {
             align: 'start',
             loop: true,
           }}
-          className="w-full max-w-4xl mx-auto"
+          className="w-full max-w-4xl mx-auto animate-fade-in-up"
         >
           <CarouselContent>
             {testimonialsData.map((testimonial) => (

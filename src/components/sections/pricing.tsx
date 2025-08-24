@@ -47,15 +47,15 @@ export function Pricing() {
   return (
     <section id="pricing" className="py-20 lg:py-28 bg-background">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 animate-fade-in-up">
           <h2 className="font-bold font-headline text-foreground">Choose Your Portrait Format</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Each artwork is carefully crafted by a professional artist and delivered with love.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {pricingTiers.map((tier) => (
-            <Card key={tier.name} className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${tier.isFeatured ? 'border-primary border-2' : 'border'}`}>
+          {pricingTiers.map((tier, index) => (
+            <Card key={tier.name} className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2' : 'border'}`} style={{ animationDelay: `${index * 200}ms` }}>
               <CardHeader className="items-center text-center">
                 <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
                 <CardDescription className="mt-1 h-12">{tier.description}</CardDescription>

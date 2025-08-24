@@ -23,12 +23,12 @@ export function HowItWorks() {
   return (
     <section id="process" className="py-20 lg:py-28 bg-card">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 animate-fade-in-up">
           <h2 className="font-bold font-headline text-foreground">Your Masterpiece in Three Simple Steps</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {processSteps.map((step, index) => (
-            <div key={index} className="text-center flex flex-col items-center">
+            <div key={index} className="text-center flex flex-col items-center animate-fade-in-up" style={{ animationDelay: `${index * 200}ms` }}>
                 <div className="bg-primary/10 p-4 rounded-full mb-6">
                   {step.icon}
                 </div>
