@@ -23,9 +23,9 @@ export function Showcase() {
                   <Image
                     src={item.src}
                     alt={item.title}
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-transform duration-300 group-hover:scale-110"
+                    width={600}
+                    height={800}
+                    className="transition-transform duration-300 group-hover:scale-110 object-cover w-full h-full"
                     data-ai-hint={item.aiHint}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>

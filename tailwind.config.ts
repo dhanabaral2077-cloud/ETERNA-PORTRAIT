@@ -103,13 +103,28 @@ export default {
         'fade-in-up': {
           'from': { opacity: '0', transform: 'translateY(20px)' },
           'to': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
+        'fade-in-up': 'fade-in-up 0.7s ease-in-out forwards',
+        'shake': 'shake 0.4s ease-in-out',
       },
+      transitionDuration: {
+        'fast': '120ms',
+        'medium': '240ms',
+        'slow': '400ms',
+      },
+      transitionTimingFunction: {
+        'ease-out-quad': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        'ease-in-out-quad': 'cubic-bezier(0.455, 0.03, 0.515, 0.955)',
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

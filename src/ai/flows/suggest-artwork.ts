@@ -41,10 +41,11 @@ async () => {
   // For this example, we return some dummy data.
   return [
     'portrait_01.jpg',
-    'landscape_02.jpg',
     'pet_03.jpg',
-    'abstract_04.jpg',
-    'seascape_05.jpg',
+    'golden_retriever.jpg',
+    'tabby_cat.jpg',
+    'german_shepherd.jpg',
+    'puppy_portrait.jpg'
   ];
 });
 
