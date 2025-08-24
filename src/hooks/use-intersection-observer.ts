@@ -27,9 +27,7 @@ export function useIntersectionObserver(
               observer.unobserve(targetRef.current);
             }
           } else {
-            if (!triggerOnce) {
-              setIsIntersecting(false);
-            }
+            setIsIntersecting(false);
           }
         });
       },
