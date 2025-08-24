@@ -8,7 +8,7 @@ export function Header() {
     { href: '#gallery', label: 'Gallery' },
     { href: '#process', label: 'Process' },
     { href: '#story', label: 'Our Story' },
-    { href: '#testimonials', label: 'Testimonials' },
+    { href: '#testimonials', 'label': 'Testimonials' },
     { href: '#pricing', label: 'Pricing' },
   ];
 
@@ -22,7 +22,7 @@ export function Header() {
         </div>
 
         <nav className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex items-center space-x-8 text-sm font-medium">
+          <div className="flex items-center space-x-8 font-headline text-base uppercase tracking-[2px]">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className="transition-colors hover:text-primary">
                 {link.label}
@@ -49,7 +49,7 @@ export function Header() {
                     <Link href="/" className="text-3xl font-bold font-headline mb-8">Pet Masterpiece</Link>
                     {navLinks.map((link) => (
                        <SheetTrigger asChild key={link.href}>
-                        <Link href={link.href} className="text-2xl transition-colors hover:text-primary">
+                        <Link href={link.href} className="text-xl font-headline uppercase tracking-wider transition-colors hover:text-primary">
                           {link.label}
                         </Link>
                       </SheetTrigger>
