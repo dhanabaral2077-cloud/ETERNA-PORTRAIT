@@ -83,11 +83,11 @@ export function Testimonials() {
             align: 'start',
             loop: true,
           }}
-          className="w-full max-w-4xl mx-auto"
+          className="w-full max-w-md mx-auto"
         >
           <CarouselContent className="-ml-4">
             {testimonialsData.map((testimonial, index) => (
-              <CarouselItem key={testimonial.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
+              <CarouselItem key={testimonial.id} className="pl-4">
                 <div className="p-4 h-full">
                   <Card className="h-full flex flex-col justify-between p-6 bg-background rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
                     <CardContent className="p-0 flex-grow flex flex-col items-center text-center">
