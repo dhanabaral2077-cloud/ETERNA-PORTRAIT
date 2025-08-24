@@ -1,7 +1,12 @@
+
+"use client";
+
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 const testimonialsData = [
     {
@@ -35,36 +40,58 @@ const testimonialsData = [
 ];
 
 export function Testimonials() {
+  const [api, setApi] = React.useState<CarouselApi>()
+  const [current, setCurrent] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!api) {
+      return
+    }
+
+    setCurrent(api.selectedScrollSnap())
+
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap())
+    }
+
+    api.on("select", onSelect)
+
+    return () => {
+      api.off("select", onSelect)
+    }
+  }, [api])
+
+
   return (
-    <section id="testimonials" className="py-20 lg:py-28 bg-card">
+    <section id="testimonials" className="py-20 lg:py-28 bg-card overflow-hidden">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12 animate-fade-in-up">
+        <div className="text-center mb-12">
           <h2 className="font-bold font-headline text-foreground">Loved by Pet Parents Everywhere</h2>
            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             We're honored to have created so many cherished memories.
           </p>
         </div>
         <Carousel
+          setApi={setApi}
           opts={{
             align: 'start',
             loop: true,
-            duration: 30,
           }}
-          className="w-full max-w-4xl mx-auto animate-fade-in-up"
+          className="w-full max-w-4xl mx-auto"
         >
           <CarouselContent className="-ml-4">
-            {testimonialsData.map((testimonial) => (
+            {testimonialsData.map((testimonial, index) => (
               <CarouselItem key={testimonial.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
                 <div className="p-4 h-full">
                   <Card className="h-full flex flex-col justify-between p-6 bg-background rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
                     <CardContent className="p-0 flex-grow flex flex-col items-center text-center">
-                        <div className="relative w-24 h-24 mb-4">
+                        <div className={cn("relative w-24 h-24 mb-4 transition-all duration-300 ease-in-out", current === index ? 'opacity-100 scale-100 delay-100' : 'opacity-0 scale-95')}>
                              <Image 
                                 src={testimonial.image}
                                 alt={`Photo of ${testimonial.name}`} 
                                 width={100}
                                 height={100}
-                                className="rounded-full object-cover transition-all duration-500 ease-in-out transform group-hover:scale-105"
+                                className="rounded-full object-cover"
                                 data-ai-hint={testimonial.aiHint}
                              />
                         </div>
@@ -72,13 +99,18 @@ export function Testimonials() {
                         {[...Array(5)].map((_, i) => (
                            <Star 
                             key={i} 
-                            className="h-5 w-5 text-primary fill-primary transition-all duration-300 ease-in-out" 
-                            style={{ animation: `star-animation 0.5s ease-in-out forwards ${i * 0.1}s` }}
+                            className={cn(
+                                "h-5 w-5 text-primary fill-primary transition-all duration-300 ease-in-out",
+                                current === index ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                            )}
+                            style={{ transitionDelay: `${(current === index ? i * 100 : 0)}ms` }}
                            />
                         ))}
                       </div>
-                      <p className="text-lg italic text-foreground/80 mb-4 flex-grow">"{testimonial.quote}"</p>
-                      <p className="font-semibold text-foreground">{testimonial.name}</p>
+                      <div className={cn("transition-opacity duration-300 ease-in-out", current === index ? 'opacity-100' : 'opacity-0')}>
+                        <p className="text-lg italic text-foreground/80 mb-4 flex-grow">"{testimonial.quote}"</p>
+                        <p className="font-semibold text-foreground">{testimonial.name}</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
