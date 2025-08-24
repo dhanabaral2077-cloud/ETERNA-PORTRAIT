@@ -3,7 +3,7 @@ import { Hero } from '@/components/sections/hero';
 import { Gallery } from '@/components/sections/gallery';
 import { HowItWorks } from '@/components/sections/how-it-works';
 import { Story } from '@/components/sections/story';
-import { Testimonials } from '@/components/sections/testimonials';
+import Testimonials from '@/components/sections/testimonials';
 import { Pricing } from '@/components/sections/pricing';
 import { CTA } from '@/components/sections/cta';
 import { Footer } from '@/components/layout/footer';

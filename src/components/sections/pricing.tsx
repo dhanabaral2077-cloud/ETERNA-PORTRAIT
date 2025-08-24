@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const pricingTiers = [
@@ -69,7 +69,7 @@ export function Pricing() {
                 <ul className="space-y-3 text-sm">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-center">
-                      <CheckCircle2 className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
                       <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}

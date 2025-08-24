@@ -1,15 +1,12 @@
-
-"use client";
-
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
-export function Testimonials() {
+export default function Testimonials() {
   const testimonials = [
     {
-      src: "https://placehold.co/80x80.png",
+      src: "/client1.jpg",
       quote:
         "The portrait of Bella is the centerpiece of our home. It feels like museum art.",
       name: "Sophia L.",
@@ -17,7 +14,7 @@ export function Testimonials() {
       aiHint: "woman portrait",
     },
     {
-      src: "https://placehold.co/80x80.png",
+      src: "/client2.jpg",
       quote:
         "Max’s portrait captures his soul. It’s more than art—it’s a family heirloom.",
       name: "Jonathan M.",
@@ -25,7 +22,7 @@ export function Testimonials() {
       aiHint: "man portrait",
     },
     {
-      src: "https://placehold.co/80x80.png",
+      src: "/client3.jpg",
       quote:
         "When guests visit, they always ask about Luna’s painting. It has elevated our home.",
       name: "Elena R.",
@@ -35,7 +32,7 @@ export function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="bg-card py-24 px-6 md:px-16">
+    <section id="testimonials" className="bg-[#F5F2EB] py-24 px-6 md:px-16">
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
@@ -43,7 +40,7 @@ export function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-foreground"
+          className="font-serif text-4xl md:text-5xl text-gray-900"
         >
           What Our Collectors Say
         </motion.h2>
@@ -52,7 +49,7 @@ export function Testimonials() {
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full origin-left"
+          className="h-1 w-24 bg-[#C9A227] mx-auto mt-4 rounded-full origin-left"
         />
       </div>
 
@@ -65,20 +62,18 @@ export function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.2, duration: 0.6 }}
             viewport={{ once: true }}
-            className="rounded-2xl bg-background shadow-lg p-8 flex flex-col items-center text-center border border-border hover:border-primary transition"
+            className="rounded-2xl bg-white shadow-lg p-8 flex flex-col items-center text-center border border-[#e5e1d8] hover:border-[#C9A227] transition"
           >
-            <Image
-              src={t.src}
+            <img
+              src="https://placehold.co/80x80.png"
               alt={t.name}
-              width={80}
-              height={80}
-              className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-primary"
+              className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-[#C9A227]"
               data-ai-hint={t.aiHint}
             />
-            <p className="font-serif italic text-lg text-muted-foreground leading-relaxed mb-6">
+            <p className="font-serif italic text-lg text-gray-700 leading-relaxed mb-6">
               “{t.quote}”
             </p>
-            <p className="font-sans text-sm uppercase tracking-wide text-muted-foreground/80">
+            <p className="font-sans text-sm uppercase tracking-wide text-gray-500">
               {t.name} — {t.location}
             </p>
           </motion.div>
@@ -87,7 +82,7 @@ export function Testimonials() {
 
       {/* CTA */}
       <div className="text-center mt-16">
-        <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg transition">
+        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg transition">
           <Link href="#contact">Commission Your Portrait</Link>
         </Button>
       </div>
