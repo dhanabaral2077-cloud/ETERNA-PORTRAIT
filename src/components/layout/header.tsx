@@ -31,18 +31,18 @@ export function Header() {
     <>
       {/* Desktop / Tablet Navbar */}
       <motion.nav
-        initial={{ y: -100 }}
+        initial={{ y: -80 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-        className={`fixed top-0 w-full z-50 flex items-center justify-between px-8 transition-all duration-300 ${
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className={`fixed top-0 w-full z-50 flex items-center justify-between px-8 transition-all duration-500 ${
           scrolled
-            ? "backdrop-blur-xl bg-background/80 shadow-md h-16"
+            ? "backdrop-blur-md bg-white/80 shadow-md h-16"
             : "bg-transparent h-20"
         }`}
       >
         {/* Logo */}
         <motion.div
-          className="font-headline text-xl tracking-[0.2em] text-foreground uppercase"
+          className="font-serif text-xl tracking-[0.15em] text-gray-900"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -51,39 +51,36 @@ export function Header() {
         </motion.div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-10 font-headline text-sm uppercase" style={{ letterSpacing: '2px' }}>
+        <div className="hidden md:flex gap-10 font-serif text-sm uppercase tracking-widest">
           {navItems.map((item, idx) => (
             <motion.a
               key={idx}
               href={item.href}
-              className="relative text-foreground transition-colors hover:text-primary group"
+              className="relative text-gray-900 hover:text-[#C9A227] transition-colors"
               whileHover="hover"
             >
-              <span>{item.label}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+              {item.label}
+              <motion.span
+                className="absolute left-0 -bottom-1 w-full h-[1px] bg-[#C9A227]"
+                initial={{ scaleX: 0 }}
+                variants={{ hover: { scaleX: 1 } }}
+                transition={{ duration: 0.3 }}
+                style={{ originX: 0.5 }}
+              />
             </motion.a>
           ))}
         </div>
 
         {/* CTA Button */}
-        <Button 
-            asChild 
-            className="hidden md:flex rounded-full bg-primary text-primary-foreground px-6 py-2 text-sm uppercase tracking-wider shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transform transition-all"
-        >
+        <Button asChild className="hidden md:block rounded-full bg-[#C9A227] text-white px-6 py-2 text-sm shadow-md hover:shadow-lg transition">
           <Link href="#contact">Order Now</Link>
         </Button>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">
-          <motion.button 
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle Menu"
-            className="z-50 relative"
-          >
-            <AnimatePresence initial={false}>
-                {menuOpen ? <X size={28} /> : <Menu size={28} />}
-            </AnimatePresence>
-          </motion.button>
+          <button onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
       </motion.nav>
 
@@ -93,20 +90,18 @@ export function Header() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-40"
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white flex flex-col items-center justify-center z-40"
           >
-            <div className="flex flex-col gap-8 text-center">
+            <div className="flex flex-col gap-8 font-serif text-2xl uppercase tracking-widest">
               {navItems.map((item, idx) => (
                 <motion.a
                   key={idx}
                   href={item.href}
-                  className="font-headline text-2xl uppercase text-foreground transition-colors hover:text-primary"
-                  style={{ letterSpacing: '2px' }}
+                  className="text-gray-900 hover:text-[#C9A227]"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * idx + 0.2, ease: 'easeInOut' }}
+                  transition={{ delay: 0.1 * idx }}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.label}
@@ -114,14 +109,9 @@ export function Header() {
               ))}
             </div>
 
-            <div className="absolute bottom-10 w-full px-8">
-              <Button 
-                asChild 
-                className="w-full rounded-full bg-primary text-primary-foreground px-8 py-6 text-lg uppercase tracking-wider shadow-lg hover:shadow-primary/40"
-              >
-                <Link href="#contact" onClick={() => setMenuOpen(false)}>Order Now</Link>
-              </Button>
-            </div>
+            <Button asChild className="mt-12 rounded-full bg-[#C9A227] text-white px-8 py-3 text-lg shadow-md hover:shadow-lg transition">
+              <Link href="#contact" onClick={() => setMenuOpen(false)}>Order Now</Link>
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
