@@ -3,7 +3,8 @@
 
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay";
 import { Star } from 'lucide-react';
 import React from 'react';
 import { cn } from '@/lib/utils';
@@ -62,6 +63,9 @@ export function Testimonials() {
     }
   }, [api])
 
+  const plugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  )
 
   return (
     <section id="testimonials" className="py-20 lg:py-28 bg-card overflow-hidden">
@@ -74,6 +78,7 @@ export function Testimonials() {
         </div>
         <Carousel
           setApi={setApi}
+          plugins={[plugin.current]}
           opts={{
             align: 'start',
             loop: true,
@@ -121,8 +126,6 @@ export function Testimonials() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="hidden sm:flex" />
-          <CarouselNext className="hidden sm:flex" />
         </Carousel>
       </div>
     </section>
