@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { getArtSuggestions } from '@/app/actions';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -28,7 +29,7 @@ function SubmitButton() {
 
 export function CTA() {
   const { toast } = useToast();
-  const [state, formAction] = useFormState(getArtSuggestions, null);
+  const [state, formAction] = useActionState(getArtSuggestions, null);
   const [suggestedArt, setSuggestedArt] = useState<PortfolioItem[]>([]);
 
   useEffect(() => {
