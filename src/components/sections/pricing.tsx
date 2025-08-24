@@ -1,88 +1,118 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+'use client';
+
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { CheckCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 
-const pricingTiers = [
-  {
-    name: 'Digital Portrait',
-    price: '$39',
-    description: 'High-resolution file, ready in 48h.',
-    features: [
-      'High-resolution digital file',
-      'Perfect for social media',
-      'Print it yourself',
-      'Delivered in 48 hours'
-    ],
-    cta: 'Start with Digital'
-  },
-  {
-    name: 'Canvas Portrait 12x16"',
-    price: '$79',
-    description: 'Premium canvas, ready to hang.',
-    features: [
-      'Gallery-quality canvas',
-      'Vibrant, fade-resistant ink',
-      'Ready to hang',
-      'Includes digital version'
-    ],
-    isFeatured: true,
-    cta: 'Choose Canvas'
-  },
-  {
-    name: 'Canvas Portrait 18x24"',
-    price: '$119',
-    description: 'Gallery size, museum-quality print.',
-    features: [
-      'Large museum-quality canvas',
-      'Statement piece for your home',
-      'Hand-stretched on a wooden frame',
-      'Includes digital version'
-    ],
-    cta: 'Go for Gallery'
-  }
-];
-
 export function Pricing() {
+  const tiers = [
+    {
+      name: 'Classic',
+      price: '$450',
+      description: 'For those seeking timeless elegance in a smaller format.',
+      features: [
+        'High-resolution digital file',
+        'One pet included',
+        'Fine art canvas print (12x16)',
+      ],
+      highlight: false,
+    },
+    {
+      name: 'Signature',
+      price: '$950',
+      description: 'Our most popular commission — premium and refined.',
+      features: [
+        'High-resolution digital file',
+        'Up to two pets',
+        'Premium canvas print (18x24)',
+        'Hand-finished brush details',
+      ],
+      highlight: true,
+    },
+    {
+      name: 'Masterpiece',
+      price: '$1800',
+      description: 'For collectors who demand the grandest expression.',
+      features: [
+        'High-resolution digital file',
+        'Up to three pets',
+        'Large-format canvas (24x36)',
+        'Luxury gilded frame',
+        'Priority commission',
+      ],
+      highlight: false,
+    },
+  ];
+
   return (
-    <section id="pricing" className="py-20 lg:py-28 bg-background">
-      <div className="container max-w-5xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12 animate-fade-in-up">
-          <h2 className="font-bold font-headline text-foreground">Choose Your Portrait Format</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            Each artwork is carefully crafted by a professional artist and delivered with love.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {pricingTiers.map((tier, index) => (
-            <Card 
-              key={tier.name} 
-              className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-180 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2 animate-pulse-glow' : 'border'}`}
-              style={{ animationDelay: `${index * 200}ms`, animationDuration: '700ms' }}
+    <section id="pricing" className="bg-card py-24 px-6 md:px-16">
+      {/* Section Heading */}
+      <div className="text-center mb-16">
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="font-serif text-4xl md:text-5xl text-foreground"
+        >
+          Commission Your Portrait
+        </motion.h2>
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full origin-left"
+        />
+      </div>
+
+      {/* Pricing Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
+        {tiers.map((tier, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.2, duration: 0.7, type: 'spring' }}
+            viewport={{ once: true }}
+            className={`relative rounded-2xl bg-background p-10 shadow-lg border transition-transform hover:-translate-y-2 ${
+              tier.highlight
+                ? 'border-primary scale-105'
+                : 'border-border hover:border-primary'
+            }`}
+          >
+            {tier.highlight && (
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-sm font-semibold px-4 py-1 rounded-full shadow-md">
+                Most Popular
+              </div>
+            )}
+
+            <h3 className="font-serif text-2xl text-foreground mb-4">{tier.name}</h3>
+            <p className="text-4xl font-serif text-foreground/90 mb-2">{tier.price}</p>
+            <p className="text-muted-foreground mb-6 h-12">{tier.description}</p>
+
+            <ul className="text-foreground/80 space-y-3 mb-8">
+              {tier.features.map((feature, i) => (
+                <li key={i} className="flex items-center">
+                  <Check className="text-primary mr-2 h-5 w-5" /> {feature}
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              asChild
+              size="lg"
+              className={`rounded-full w-full py-7 text-lg shadow-md transition-all ${
+                tier.highlight
+                  ? 'bg-primary text-primary-foreground hover:shadow-lg hover:bg-primary/90'
+                  : 'bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground'
+              }`}
             >
-              <CardHeader className="items-center text-center">
-                <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
-                <CardDescription className="mt-1 h-12">{tier.description}</CardDescription>
-                <p className="text-5xl font-bold text-primary mt-4">{tier.price}</p>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <ul className="space-y-3 text-sm">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-center">
-                      <CheckCircle className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full text-lg py-6 rounded-full" size="lg" variant={tier.isFeatured ? 'default' : 'outline'}>
-                    <Link href="#contact">{tier.cta}</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+              <Link href="#contact">Commission Now</Link>
+            </Button>
+          </motion.div>
+        ))}
       </div>
     </section>
   );
