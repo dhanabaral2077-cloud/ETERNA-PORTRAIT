@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,8 +20,7 @@ export function Header() {
 
   const navItems = [
     { href: '#gallery', label: 'Gallery' },
-    { href: '#process', label: 'Our Process' },
-    { href: '#story', label: 'Our Story' },
+    { href: '#how-it-works', label: 'How It Works' },
     { href: '#testimonials', 'label': 'Testimonials' },
     { href: '#pricing', label: 'Pricing' },
   ];
@@ -47,7 +45,7 @@ export function Header() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Link href="/">Pet Masterpiece</Link>
+          <Link href="/">ETERNA PORTRAITS</Link>
         </motion.div>
 
         {/* Desktop Menu */}
