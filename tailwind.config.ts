@@ -108,6 +108,10 @@ export default {
           'from': { opacity: '0', transform: 'translateY(20px)' },
           'to': { opacity: '1', transform: 'translateY(0)' },
         },
+        'fade-in-left': {
+          'from': { opacity: '0', transform: 'translateX(-20px)' },
+          'to': { opacity: '1', transform: 'translateX(0)' },
+        },
         'shake': {
           '0%, 100%': { transform: 'translateX(0)' },
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
@@ -127,6 +131,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 1.2s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
+        'fade-in-left': 'fade-in-left 0.8s ease-out forwards',
         'shake': 'shake 0.4s ease-in-out',
         'ken-burns': 'ken-burns 10s ease-out forwards',
         'zoom-out': 'zoom-out 0.8s ease-out forwards',

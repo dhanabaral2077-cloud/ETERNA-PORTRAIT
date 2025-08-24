@@ -28,7 +28,11 @@ export function HowItWorks() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {processSteps.map((step, index) => (
-            <div key={index} className="text-center flex flex-col items-center animate-fade-in-up" style={{ animationDelay: `${index * 200}ms` }}>
+            <div 
+              key={index} 
+              className="text-center flex flex-col items-center p-6 rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-2 animate-fade-in-left" 
+              style={{ animationDelay: `${index * 200}ms` }}
+            >
                 <div className="bg-primary/10 p-4 rounded-full mb-6">
                   {step.icon}
                 </div>
