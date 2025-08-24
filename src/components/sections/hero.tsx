@@ -51,7 +51,7 @@ export function Hero() {
             <Button asChild size="lg" className="text-lg px-8 py-6 bg-[#C9A227] text-white hover:bg-[#C9A227]/90 shadow-lg transform transition-transform rounded-full hover:scale-105 hover:shadow-primary/40 hover:shadow-2xl">
               <Link href="#contact">Order Your Portrait</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg rounded-full border-gray-900 text-gray-900 hover:border-[#C9A227] hover:text-[#C9A227] transition">
+            <Button asChild variant="outline" className="rounded-full border-gray-900 text-gray-900 px-8 py-3 text-lg hover:border-[#C9A227] hover:text-[#C9A227] transition">
               <Link href="#gallery">View Gallery</Link>
             </Button>
           </motion.div>
