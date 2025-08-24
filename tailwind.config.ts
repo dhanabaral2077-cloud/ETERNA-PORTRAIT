@@ -125,6 +125,10 @@ export default {
           'from': { transform: 'scale(1.06)' },
           'to': { transform: 'scale(1)' },
         },
+        'draw-in': {
+          'from': { 'stroke-dashoffset': '1000' },
+          'to': { 'stroke-dashoffset': '0' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -135,6 +139,7 @@ export default {
         'shake': 'shake 0.4s ease-in-out',
         'ken-burns': 'ken-burns 10s ease-out forwards',
         'zoom-out': 'zoom-out 0.8s ease-out forwards',
+        'draw-in': 'draw-in 1.5s ease-in-out forwards',
       },
       transitionDuration: {
         'fast': '120ms',
