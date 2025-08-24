@@ -1,35 +1,119 @@
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+
+'use client';
+
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Hero() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+
+  // Scroll-driven transforms
+  const photoOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const paintingOpacity = useTransform(scrollYProgress, [0.2, 0.7], [0, 1]);
+  const roomOpacity = useTransform(scrollYProgress, [0.6, 1], [0, 1]);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+
   return (
-    <section id="hero" className="relative w-full h-screen min-h-[700px] flex items-center justify-center bg-background overflow-hidden">
-        <div className="absolute inset-0 z-0 animate-fade-in-slow">
-            <Image
-                src="https://placehold.co/1920x1080.png"
-                alt="Elegant portrait of a pet in a frame"
-                fill
-                className="object-cover animate-ken-burns"
-                data-ai-hint="elegant portrait"
-                priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-        </div>
-      <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
-        <div className="flex flex-col items-center space-y-6">
-          <h1 className="font-headline font-bold tracking-tight text-foreground leading-tight animate-slide-up-slow">
-            A Timeless Portrait of Your Beloved Pet.
-          </h1>
-          <p className="max-w-2xl md:text-xl text-muted-foreground animate-fade-in animation-delay-300">
-            Handcrafted digital art & museum-quality prints that celebrate your companion for a lifetime.
-          </p>
-          <div className="animate-fade-in animation-delay-600">
+    <section
+      ref={ref}
+      id="hero"
+      className="relative h-[200vh] w-full bg-background"
+    >
+      <div className="sticky top-0 h-screen w-full grid grid-cols-1 md:grid-cols-2">
+        {/* Left Column - Text */}
+        <div className="flex flex-col justify-center items-start px-8 md:px-16 z-10">
+          <motion.h1
+            className="font-headline font-bold tracking-tight text-foreground leading-tight text-5xl md:text-6xl"
+            style={{ y: textY }}
+          >
+            Transform Your Pet’s Photo Into Timeless Art.
+          </motion.h1>
+
+          <motion.p
+            className="mt-6 text-lg text-muted-foreground max-w-lg"
+            style={{ y: textY }}
+          >
+            Commission a handcrafted portrait, created with museum-grade materials
+            and designed to last for generations.
+          </motion.p>
+
+          <motion.div
+            className="mt-8 flex gap-4"
+            style={{ y: textY }}
+          >
             <Button asChild size="lg" className="text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform transition-transform rounded-full hover:scale-105 hover:shadow-primary/40 hover:shadow-2xl">
-              <Link href="#contact">Commission Your Portrait</Link>
+              <Link href="#contact">Order Your Portrait</Link>
             </Button>
-          </div>
+            <Button asChild variant="outline" size="lg" className="text-lg rounded-full border-foreground hover:border-primary hover:text-primary transition">
+              <Link href="#gallery">View Gallery</Link>
+            </Button>
+          </motion.div>
         </div>
+
+        {/* Right Column - Scroll Animation */}
+        <div className="relative flex items-center justify-center overflow-hidden">
+          {/* Stage 1: Dog Photo */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ opacity: photoOpacity }}
+          >
+            <Image
+              src="https://placehold.co/800x1200.png"
+              alt="Dog Photo"
+              width={800}
+              height={1200}
+              className="object-cover w-full h-full"
+              data-ai-hint="dog photo"
+            />
+          </motion.div>
+
+          {/* Stage 2: Dog Painting */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ opacity: paintingOpacity }}
+          >
+            <Image
+              src="https://placehold.co/800x1200.png"
+              alt="Dog Painting"
+              width={800}
+              height={1200}
+              className="object-cover w-full h-full"
+              data-ai-hint="dog painting"
+            />
+          </motion.div>
+
+          {/* Stage 3: Painting in Room */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ opacity: roomOpacity }}
+          >
+            <Image
+              src="https://placehold.co/800x1200.png"
+              alt="Dog Painting in Room"
+              width={800}
+              height={1200}
+              className="object-cover w-full h-full"
+              data-ai-hint="art gallery"
+            />
+          </motion.div>
+        </div>
+
+        {/* Scroll Cue */}
+        <motion.div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground text-sm"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ repeat: Infinity, duration: 1.8 }}
+          style={{ opacity: photoOpacity }}
+        >
+          ↓ Scroll
+        </motion.div>
       </div>
     </section>
   );
