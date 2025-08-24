@@ -25,7 +25,7 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
-           <Button asChild className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90">
+           <Button asChild className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
             <Link href="#contact">Commission Your Portrait</Link>
           </Button>
           <div className="md:hidden">
@@ -46,7 +46,7 @@ export function Header() {
                       </Link>
                     </SheetTrigger>
                   ))}
-                  <Button asChild size="lg" className="mt-4">
+                  <Button asChild size="lg" className="mt-4 rounded-full">
                       <Link href="#contact">Commission Your Portrait</Link>
                   </Button>
                 </nav>

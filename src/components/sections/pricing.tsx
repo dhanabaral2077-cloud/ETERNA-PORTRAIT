@@ -48,14 +48,14 @@ export function Pricing() {
     <section id="pricing" className="py-20 lg:py-28 bg-background">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold font-headline text-foreground">Choose Your Portrait Format</h2>
+          <h2 className="font-bold font-headline text-foreground">Choose Your Portrait Format</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Each artwork is carefully crafted by a professional artist and delivered with love.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           {pricingTiers.map((tier) => (
-            <Card key={tier.name} className={`flex flex-col h-full bg-card/50 rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${tier.isFeatured ? 'border-primary border-2' : 'border'}`}>
+            <Card key={tier.name} className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${tier.isFeatured ? 'border-primary border-2' : 'border'}`}>
               <CardHeader className="items-center text-center">
                 <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
                 <CardDescription className="mt-1 h-12">{tier.description}</CardDescription>
@@ -72,7 +72,7 @@ export function Pricing() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button asChild className="w-full text-lg py-6" size="lg" variant={tier.isFeatured ? 'default' : 'outline'}>
+                <Button asChild className="w-full text-lg py-6 rounded-full" size="lg" variant={tier.isFeatured ? 'default' : 'outline'}>
                     <Link href="#contact">{tier.cta}</Link>
                 </Button>
               </CardFooter>

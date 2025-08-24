@@ -27,10 +27,10 @@ const testimonialsData = [
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-20 lg:py-28 bg-card/50">
+    <section id="testimonials" className="py-20 lg:py-28 bg-card">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold font-headline text-foreground">Loved by Pet Parents Everywhere</h2>
+          <h2 className="font-bold font-headline text-foreground">Loved by Pet Parents Everywhere</h2>
            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             We're honored to have created so many cherished memories.
           </p>
@@ -53,7 +53,7 @@ export function Testimonials() {
                            <Star key={i} className="h-5 w-5 text-primary fill-primary" />
                         ))}
                       </div>
-                      <p className="text-base text-foreground/80 mb-4">"{testimonial.quote}"</p>
+                      <p className="text-xl italic text-foreground/80 mb-4">"{testimonial.quote}"</p>
                       <p className="font-semibold text-foreground">{testimonial.name}</p>
                     </CardContent>
                   </Card>

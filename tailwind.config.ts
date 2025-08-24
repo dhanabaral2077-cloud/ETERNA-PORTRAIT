@@ -20,6 +20,9 @@ export default {
         body: ['var(--font-inter)', 'sans-serif'],
         headline: ['var(--font-playfair-display)', 'serif'],
       },
+      lineHeight: {
+        'extra-loose': '1.6',
+       },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -76,6 +79,9 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        xl: 'calc(var(--radius) + 4px)',
+        '2xl': 'calc(var(--radius) + 8px)',
+        '3xl': 'calc(var(--radius) + 16px)',
       },
       keyframes: {
         'accordion-down': {

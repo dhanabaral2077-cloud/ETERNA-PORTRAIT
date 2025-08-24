@@ -21,10 +21,10 @@ const processSteps = [
 
 export function HowItWorks() {
   return (
-    <section id="process" className="py-20 lg:py-28 bg-card/50">
+    <section id="process" className="py-20 lg:py-28 bg-card">
       <div className="container max-w-5xl mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold font-headline text-foreground">Your Masterpiece in Three Simple Steps</h2>
+          <h2 className="font-bold font-headline text-foreground">Your Masterpiece in Three Simple Steps</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {processSteps.map((step, index) => (

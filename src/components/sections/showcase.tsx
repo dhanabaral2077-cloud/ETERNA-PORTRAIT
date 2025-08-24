@@ -7,7 +7,7 @@ export function Showcase() {
     <section id="gallery" className="py-20 lg:py-28 bg-background">
       <div className="container max-w-6xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold font-headline text-foreground">Crafted With Love, Framed With Elegance.</h2>
+          <h2 className="font-bold font-headline text-foreground">Crafted With Love, Framed With Elegance.</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Each portrait is uniquely created to capture your pet’s personality, expression, and soul.
           </p>
