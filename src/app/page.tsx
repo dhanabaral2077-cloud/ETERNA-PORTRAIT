@@ -21,10 +21,10 @@ export default function Home() {
         <AnimatedSection>
           <HowItWorks />
         </AnimatedSection>
-        <Story />
         <AnimatedSection>
           <Testimonials />
         </AnimatedSection>
+        <Story />
         <AnimatedSection>
           <Pricing />
         </AnimatedSection>
