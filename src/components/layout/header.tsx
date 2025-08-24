@@ -54,7 +54,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center justify-end gap-4">
-           <Button asChild className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
+           <Button asChild className="hidden md:inline-flex rounded-full transition-all duration-200 ease-out hover:shadow-lg hover:-translate-y-0.5">
             <Link href="#contact">Order Now</Link>
           </Button>
           <div className="md:hidden">
@@ -84,17 +84,18 @@ export function Header() {
                         </Link>
                       </SheetClose>
                     ))}
+                  </nav>
+                   <div className="absolute bottom-8 w-full px-8">
                     <SheetClose asChild>
                         <Button 
                             asChild 
                             size="lg" 
-                            className="mt-8 rounded-full text-lg px-8 py-6 animate-fade-in-up"
-                            style={{ animationDelay: `${150 + navLinks.length * 100}ms` }}
+                            className="w-full rounded-full text-lg py-6"
                         >
                             <Link href="#contact" onClick={() => setIsMenuOpen(false)}>Order Now</Link>
                         </Button>
                     </SheetClose>
-                  </nav>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
