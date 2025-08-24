@@ -19,7 +19,7 @@ function SubmitButton() {
     <Button 
       type="submit" 
       size="lg" 
-      className="w-full text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform hover:scale-105 hover:shadow-xl hover:shadow-amber-400/50 transition-all rounded-full"
+      className="w-full text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform hover:scale-105 hover:shadow-xl hover:shadow-amber-400/50 transition-all rounded-full animate-pulse-glow"
       disabled={pending}
     >
       {pending ? 'Getting suggestions...' : 'Get Style Suggestions'}
