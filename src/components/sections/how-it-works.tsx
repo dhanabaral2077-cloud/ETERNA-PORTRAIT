@@ -30,8 +30,8 @@ export function HowItWorks() {
           {processSteps.map((step, index) => (
             <div 
               key={index} 
-              className="text-center flex flex-col items-center p-6 rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-2 animate-fade-in-left" 
-              style={{ animationDelay: `${index * 200}ms` }}
+              className="text-center flex flex-col items-center p-6 rounded-lg transition-all duration-180 hover:shadow-xl hover:-translate-y-2 animate-fade-in-left" 
+              style={{ animationDelay: `${index * 200}ms`, animationDuration: '700ms' }}
             >
                 <div className="bg-primary/10 p-4 rounded-full mb-6">
                   {step.icon}

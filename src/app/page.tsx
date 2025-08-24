@@ -7,6 +7,7 @@ import { Testimonials } from '@/components/sections/testimonials';
 import { Pricing } from '@/components/sections/pricing';
 import { CTA } from '@/components/sections/cta';
 import { Footer } from '@/components/layout/footer';
+import { AnimatedSection } from '@/components/animated-section';
 
 export default function Home() {
   return (
@@ -14,12 +15,22 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
-        <Showcase />
-        <HowItWorks />
+        <AnimatedSection>
+          <Showcase />
+        </AnimatedSection>
+        <AnimatedSection>
+          <HowItWorks />
+        </AnimatedSection>
         <Story />
-        <Testimonials />
-        <Pricing />
-        <CTA />
+        <AnimatedSection>
+          <Testimonials />
+        </AnimatedSection>
+        <AnimatedSection>
+          <Pricing />
+        </AnimatedSection>
+        <AnimatedSection>
+          <CTA />
+        </AnimatedSection>
       </main>
       <Footer />
     </div>

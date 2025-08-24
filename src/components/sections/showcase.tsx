@@ -6,7 +6,7 @@ export function Showcase() {
   return (
     <section id="gallery" className="py-20 lg:py-28 bg-background">
       <div className="container max-w-6xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12 animate-fade-in-up">
+        <div className="text-center mb-12">
           <h2 className="font-bold font-headline text-foreground">Crafted With Love, Framed With Elegance.</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Each portrait is uniquely created to capture your pet’s personality, expression, and soul.
@@ -17,7 +17,7 @@ export function Showcase() {
             <Card
               key={item.id}
               className="overflow-hidden group transform transition-all duration-300 hover:scale-102 hover:shadow-xl border-0 rounded-lg animate-fade-in-up"
-              style={{ animation: `fade-in-up 0.8s ease-out forwards, zoom-out 0.8s ease-out forwards`, animationDelay: `${index * 150}ms` }}
+              style={{ animationDelay: `${index * 150}ms`, animationDuration: '700ms' }}
             >
               <CardContent className="p-0">
                 <div className="relative aspect-[3/4]">

@@ -57,8 +57,8 @@ export function Pricing() {
           {pricingTiers.map((tier, index) => (
             <Card 
               key={tier.name} 
-              className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2 animate-pulse-glow' : 'border'}`}
-              style={{ animationDelay: `${index * 200}ms` }}
+              className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-180 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2 animate-pulse-glow' : 'border'}`}
+              style={{ animationDelay: `${index * 200}ms`, animationDuration: '700ms' }}
             >
               <CardHeader className="items-center text-center">
                 <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
