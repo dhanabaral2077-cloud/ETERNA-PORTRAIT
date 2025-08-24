@@ -55,7 +55,11 @@ export function Pricing() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           {pricingTiers.map((tier, index) => (
-            <Card key={tier.name} className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2' : 'border'}`} style={{ animationDelay: `${index * 200}ms` }}>
+            <Card 
+              key={tier.name} 
+              className={`flex flex-col h-full bg-card rounded-lg shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up ${tier.isFeatured ? 'border-primary border-2 animate-pulse-glow' : 'border'}`}
+              style={{ animationDelay: `${index * 200}ms` }}
+            >
               <CardHeader className="items-center text-center">
                 <CardTitle className="text-2xl font-headline">{tier.name}</CardTitle>
                 <CardDescription className="mt-1 h-12">{tier.description}</CardDescription>

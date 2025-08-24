@@ -128,6 +128,10 @@ export default {
         'draw-in': {
           'from': { 'stroke-dashoffset': '1000' },
           'to': { 'stroke-dashoffset': '0' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { borderColor: 'hsl(var(--primary))', boxShadow: '0 0 0 0 hsl(var(--primary) / 0.4)' },
+          '50%': { borderColor: 'hsl(var(--primary))', boxShadow: '0 0 12px 3px hsl(var(--primary) / 0.4)' },
         }
       },
       animation: {
@@ -140,6 +144,7 @@ export default {
         'ken-burns': 'ken-burns 10s ease-out forwards',
         'zoom-out': 'zoom-out 0.8s ease-out forwards',
         'draw-in': 'draw-in 1.5s ease-in-out forwards',
+        'pulse-glow': 'pulse-glow 2.5s infinite ease-in-out',
       },
       transitionDuration: {
         'fast': '120ms',
