@@ -24,20 +24,20 @@ export function Hero() {
     <section
       ref={ref}
       id="hero"
-      className="relative h-[200vh] w-full bg-background"
+      className="relative h-[200vh] w-full bg-[#F5F2EB]"
     >
       <div className="sticky top-0 h-screen w-full grid grid-cols-1 md:grid-cols-2">
         {/* Left Column - Text */}
         <div className="flex flex-col justify-center items-start px-8 md:px-16 z-10">
           <motion.h1
-            className="font-headline font-bold tracking-tight text-foreground leading-tight text-5xl md:text-6xl"
+            className="font-serif text-5xl md:text-6xl text-gray-900 leading-tight"
             style={{ y: textY }}
           >
             Transform Your Pet’s Photo Into Timeless Art.
           </motion.h1>
 
           <motion.p
-            className="mt-6 text-lg text-muted-foreground max-w-lg"
+            className="mt-6 text-lg text-gray-600 max-w-lg"
             style={{ y: textY }}
           >
             Commission a handcrafted portrait, created with museum-grade materials
@@ -48,10 +48,10 @@ export function Hero() {
             className="mt-8 flex gap-4"
             style={{ y: textY }}
           >
-            <Button asChild size="lg" className="text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform transition-transform rounded-full hover:scale-105 hover:shadow-primary/40 hover:shadow-2xl">
+            <Button asChild size="lg" className="text-lg px-8 py-6 bg-[#C9A227] text-white hover:bg-[#C9A227]/90 shadow-lg transform transition-transform rounded-full hover:scale-105 hover:shadow-primary/40 hover:shadow-2xl">
               <Link href="#contact">Order Your Portrait</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg rounded-full border-foreground hover:border-primary hover:text-primary transition">
+            <Button asChild variant="outline" size="lg" className="text-lg rounded-full border-gray-900 text-gray-900 hover:border-[#C9A227] hover:text-[#C9A227] transition">
               <Link href="#gallery">View Gallery</Link>
             </Button>
           </motion.div>
@@ -107,7 +107,7 @@ export function Hero() {
 
         {/* Scroll Cue */}
         <motion.div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground text-sm"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-gray-600 text-sm"
           animate={{ y: [0, 6, 0] }}
           transition={{ repeat: Infinity, duration: 1.8 }}
           style={{ opacity: photoOpacity }}
