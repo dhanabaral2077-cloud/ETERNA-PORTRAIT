@@ -13,7 +13,7 @@ type IntersectionObserverOptions = {
 export function useIntersectionObserver(
   options: IntersectionObserverOptions = {}
 ): [React.RefObject<HTMLDivElement>, boolean] {
-  const { threshold = 0.1, root = null, rootMargin = '0px', triggerOnce = true } = options;
+  const { threshold = 0.1, root = null, rootMargin = '0px', triggerOnce = false } = options;
   const targetRef = useRef<HTMLDivElement>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
