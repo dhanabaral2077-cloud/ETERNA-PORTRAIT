@@ -1,6 +1,6 @@
 import { Header } from '@/components/layout/header';
 import { Hero } from '@/components/sections/hero';
-import { Showcase } from '@/components/sections/showcase';
+import { Gallery } from '@/components/sections/gallery';
 import { HowItWorks } from '@/components/sections/how-it-works';
 import { Story } from '@/components/sections/story';
 import { Testimonials } from '@/components/sections/testimonials';
@@ -16,7 +16,7 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <AnimatedSection>
-          <Showcase />
+          <Gallery />
         </AnimatedSection>
         <AnimatedSection>
           <HowItWorks />
