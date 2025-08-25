@@ -17,8 +17,14 @@ export function Story() {
   // Scale subtle zoom in/out for luxury feel
   const scale = useTransform(scrollYProgress, [0, 1], [1.05, 1]);
 
+  // Animate text opacity along with its corresponding image
+  const textAnimation = (opacity: any) => ({
+    opacity,
+    y: useTransform(opacity, [0, 1], [20, 0]),
+  });
+
   return (
-    <section ref={ref} id="story" className="relative h-[400vh] bg-background">
+    <section ref={ref} className="relative h-[400vh] bg-background">
       {/* Sticky container */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         
@@ -36,9 +42,7 @@ export function Story() {
           </motion.div>
           <motion.p
             className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: photoOpacity === 0 ? 0: 1 }}
-            transition={{ duration: 0.8 }}
+            style={textAnimation(photoOpacity)}
           >
             It starts with your favorite memory.
           </motion.p>
@@ -58,9 +62,7 @@ export function Story() {
           </motion.div>
           <motion.p
             className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: paintingOpacity === 0 ? 0: 1 }}
-            transition={{ duration: 0.8 }}
+            style={textAnimation(paintingOpacity)}
           >
             Hand-painted with care by our artists.
           </motion.p>
@@ -80,9 +82,7 @@ export function Story() {
           </motion.div>
           <motion.p
             className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: portraitOpacity === 0 ? 0: 1 }}
-            transition={{ duration: 0.8 }}
+            style={textAnimation(portraitOpacity)}
           >
             A timeless masterpiece.
           </motion.p>
@@ -101,9 +101,7 @@ export function Story() {
             </motion.div>
              <motion.div
                 className="absolute inset-0 flex items-center justify-center"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: roomOpacity === 0 ? 0: 1 }}
-                transition={{ duration: 0.8 }}
+                style={textAnimation(roomOpacity)}
             >
               <p
                 className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
