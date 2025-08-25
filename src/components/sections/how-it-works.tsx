@@ -78,10 +78,13 @@ export function HowItWorks() {
             transition={{ delay: idx * 0.3, duration: 0.6 }}
             viewport={{ once: true }}
           >
-            {/* Numbered Circle */}
+            {/* Numbered Circle with pulse */}
             <motion.div
               className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center mb-4 shadow-md relative"
               whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
+              whileInView={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+              viewport={{ once: false }}
             >
               <span className="absolute top-1 text-xs font-serif opacity-80">0{idx + 1}</span>
               {step.icon}
