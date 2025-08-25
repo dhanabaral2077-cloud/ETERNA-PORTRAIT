@@ -65,7 +65,7 @@ export function Hero() {
             style={{ opacity: photoOpacity }}
           >
             <Image
-              src="/portfolio/portrait_001.jpg"
+              src="https://placehold.co/800x1200.png"
               alt="Dog Photo"
               width={800}
               height={1200}
@@ -80,7 +80,7 @@ export function Hero() {
             style={{ opacity: paintingOpacity }}
           >
             <Image
-              src="/portfolio/portrait_002.jpg"
+              src="https://placehold.co/800x1200.png"
               alt="Dog Painting"
               width={800}
               height={1200}
@@ -95,7 +95,7 @@ export function Hero() {
             style={{ opacity: roomOpacity }}
           >
             <Image
-              src="/portfolio/portrait_003.jpg"
+              src="https://placehold.co/800x1200.png"
               alt="Dog Painting in Room"
               width={800}
               height={1200}

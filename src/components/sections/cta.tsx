@@ -10,7 +10,7 @@ export function CTA() {
   const [offsetY, setOffsetY] = useState(0);
   const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2 });
   const [displayedText, setDisplayedText] = useState('');
-  const fullText = "RReady to Immortalize Your Pet?";
+  const fullText = "Ready to Immortalize Your Pet?";
 
   const handleScroll = () => {
     if (ref.current) {
@@ -61,7 +61,7 @@ export function CTA() {
     <section id="contact" ref={ref} className="relative py-20 lg:py-32 bg-card overflow-hidden">
        <div className="absolute inset-0 z-0">
         <Image
-          src="/portfolio/portrait_01.jpg"
+          src="https://placehold.co/1920x1080.png"
           alt="Framed pet portrait on a wall"
           layout="fill"
           objectFit="cover"
