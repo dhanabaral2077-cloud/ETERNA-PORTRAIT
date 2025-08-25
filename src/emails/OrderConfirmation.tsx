@@ -1,5 +1,8 @@
-// src/emails/OrderConfirmation.tsx
+// /emails/OrderConfirmation.tsx
 import * as React from 'react';
+
+// NOTE: Remember to set NEXT_PUBLIC_BASE_URL in your Vercel environment variables.
+// It should be the full URL of your deployed site. (e.g., https://your-site.vercel.app)
 
 type OrderConfirmationProps = {
   name: string;
@@ -10,67 +13,104 @@ type OrderConfirmationProps = {
   petName?: string;
 };
 
-export const OrderConfirmation: React.FC<Readonly<OrderConfirmationProps>> = ({
-  name,
-  orderId,
-  style,
-  format,
-  size,
-  petName,
-}) => (
-  <div style={container}>
-    <h1 style={heading}>Your Commission Has Begun, {name}!</h1>
-    <p style={paragraph}>
-      Thank you for your order. We are thrilled to begin crafting a timeless portrait for you{petName && ` and ${petName}`}. Below are the details of your commission.
-    </p>
-    <div style={card}>
-      <p><strong>Order ID:</strong> {orderId}</p>
-      <p><strong>Style:</strong> {style}</p>
-      <p><strong>Format:</strong> {format}</p>
-      <p><strong>Size:</strong> {size}</p>
-      {petName && <p><strong>Pet's Name:</strong> {petName}</p>}
-    </div>
-    <p style={paragraph}>
-      You will receive another email once your payment is successfully processed. In the meantime, our artists are reviewing your submission.
-    </p>
-    <p style={footer}>
-      Eterna Portraits
-    </p>
-  </div>
-);
+export default function OrderConfirmation({ name, orderId, style, format, size, petName }: OrderConfirmationProps) {
+  const previewText = `Your Eterna Portraits commission for ${petName || 'your pet'} has begun!`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-export default OrderConfirmation;
-
-
-// Styles
-const container: React.CSSProperties = {
-  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-  padding: '40px',
-  backgroundColor: '#f9f9f9',
-  color: '#333',
-};
-
-const heading: React.CSSProperties = {
-  fontSize: '24px',
-  color: '#0B0B0C',
-};
-
-const paragraph: React.CSSProperties = {
-  fontSize: '16px',
-  lineHeight: '1.5',
-};
-
-const card: React.CSSProperties = {
-  backgroundColor: '#ffffff',
-  border: '1px solid #e0e0e0',
-  borderRadius: '8px',
-  padding: '20px',
-  margin: '20px 0',
-  textTransform: 'capitalize',
-};
-
-const footer: React.CSSProperties = {
-  marginTop: '30px',
-  fontSize: '14px',
-  color: '#888',
-};
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Your Commission Has Begun</title>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap');
+          body {
+            margin: 0;
+            background-color: #FAF9F7;
+          }
+          .container {
+            padding: 24px;
+            font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+            background-color: #FAF9F7;
+          }
+          .heading {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+            color: #111;
+            margin: 0;
+            font-size: 28px;
+          }
+          .accent-line {
+            height: 3px;
+            width: 56px;
+            background-color: #C9A227;
+            border-radius: 9999px;
+            margin: 12px 0 24px;
+          }
+          .paragraph {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+          }
+          .details {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+            background-color: #FFFFFF;
+            border: 1px solid #EAE8E4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          }
+          .button {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            background-color: #C9A227;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+          }
+          .footer {
+            color: #999;
+            margin-top: 24px;
+            font-size: 14px;
+          }
+        `}</style>
+      </head>
+      <body>
+        <div role="article" aria-roledescription="email" lang="en">
+          <div style={{ display: 'none' }}>{previewText}</div>
+          <div className="container">
+            <h1 className="heading">
+              Your Commission Has Begun
+            </h1>
+            <div className="accent-line" />
+            <p className="paragraph">
+              Hi {name || "there"},
+            </p>
+            <p className="paragraph">
+              We are honored to begin the journey of immortalizing {petName ? `the wonderful ${petName}` : "your cherished pet"}. Our artists are already filled with inspiration.
+            </p>
+            <div className="details">
+              <strong>Order Details:</strong><br />
+              <span style={{ textTransform: 'capitalize' }}>{style} · {format} {size ? `· ${size}` : ""}</span><br/>
+              <strong>Order ID:</strong> {orderId}
+            </div>
+            <a
+              href={`${baseUrl}/track?order=${orderId}`}
+              className="button"
+            >
+              View Order Status
+            </a>
+            <p className="footer">
+              Eterna Portraits • Hand-Finished Artworks
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  );
+}
