@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useAnimation } from "framer-motion";
 import { Upload, Brush, Frame } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 
 export function HowItWorks() {
@@ -11,21 +11,30 @@ export function HowItWorks() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
+  // shimmer animation controller
+  const shimmerControls = useAnimation();
+  useEffect(() => {
+    shimmerControls.start({
+      opacity: [0.6, 1, 0.6],
+      transition: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+    });
+  }, [shimmerControls]);
+
   const steps = [
     {
       title: "Upload Your Pet's Photo",
       desc: "Simply share your favorite photo.",
-      icon: <Upload size={32} />,
+      icon: <Upload size={24} />,
     },
     {
       title: "Select Your Style & Size",
       desc: "Choose from Classic, Signature, or Masterpiece.",
-      icon: <Brush size={32} />,
+      icon: <Brush size={24} />,
     },
     {
       title: "We Create & Deliver",
       desc: "Receive your hand-finished artwork, ready to display.",
-      icon: <Frame size={32} />,
+      icon: <Frame size={24} />,
     },
   ];
 
@@ -53,11 +62,11 @@ export function HowItWorks() {
 
       {/* Steps */}
       <div className="relative flex flex-col md:flex-row items-center justify-between max-w-5xl mx-auto gap-20">
-        {/* Connecting Line */}
-        <div className="absolute top-10 md:top-1/2 left-1/2 md:left-0 -translate-x-1/2 md:-translate-x-0 w-[2px] md:w-full md:h-[2px] h-full bg-primary/30" />
+        {/* Connecting Line with shimmer */}
         <motion.div
-          className="absolute top-10 md:top-1/2 left-1/2 md:left-0 -translate-x-1/2 md:-translate-x-0 w-[2px] md:w-full md:h-[2px] h-full bg-primary origin-top md:origin-left"
-          style={{ scaleY: lineScale, scaleX: lineScale }}
+          animate={shimmerControls}
+          className="absolute md:top-1/2 top-16 left-10 md:left-0 w-[2px] md:w-full md:h-[2px] h-full bg-primary origin-top md:origin-left"
+          style={{ scaleY: lineScale, scaleX: lineScale, opacity: 0.8 }}
         />
 
         {steps.map((step, idx) => (
@@ -71,16 +80,11 @@ export function HowItWorks() {
           >
             {/* Numbered Circle */}
             <motion.div
-              className="w-24 h-24 rounded-full bg-background border border-border flex items-center justify-center mb-4 shadow-md relative"
-              whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.2)" }}
+              className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center mb-4 shadow-md relative"
+              whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
             >
-              <div className="absolute inset-0 bg-primary/10 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300" />
-              <div className="relative text-primary">
-                {step.icon}
-              </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm border-2 border-background">
-                {idx + 1}
-              </div>
+              <span className="absolute top-1 text-xs font-serif opacity-80">0{idx + 1}</span>
+              {step.icon}
             </motion.div>
             <h3 className="font-serif text-xl text-gray-900 mb-2">{step.title}</h3>
             <p className="font-sans text-gray-600 max-w-xs">{step.desc}</p>
@@ -94,7 +98,7 @@ export function HowItWorks() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.9 }}
         viewport={{ once: true }}
-        className="text-center mt-20"
+        className="text-center mt-16"
       >
         <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg transition">
           <Link href="#contact">Start Your Portrait</Link>
