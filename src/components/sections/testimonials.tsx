@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function Testimonials() {
   const testimonials = [
     {
-      src: "/client1.jpg",
+      src: "https://placehold.co/80x80.png",
       quote:
         "The portrait of Bella is the centerpiece of our home. It feels like museum art.",
       name: "Sophia L.",
@@ -16,7 +16,7 @@ export default function Testimonials() {
       aiHint: "woman portrait",
     },
     {
-      src: "/client2.jpg",
+      src: "https://placehold.co/80x80.png",
       quote:
         "Max’s portrait captures his soul. It’s more than art—it’s a family heirloom.",
       name: "Jonathan M.",
@@ -24,7 +24,7 @@ export default function Testimonials() {
       aiHint: "man portrait",
     },
     {
-      src: "/client3.jpg",
+      src: "https://placehold.co/80x80.png",
       quote:
         "When guests visit, they always ask about Luna’s painting. It has elevated our home.",
       name: "Elena R.",
@@ -34,7 +34,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="bg-[#F5F2EB] py-24 px-6 md:px-16">
+    <section id="testimonials" className="bg-[#FAF9F7] py-24 px-6 md:px-16">
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
@@ -42,7 +42,7 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-gray-900"
+          className="font-serif text-4xl md:text-5xl text-gray-800"
         >
           What Our Collectors Say
         </motion.h2>
@@ -67,7 +67,7 @@ export default function Testimonials() {
             className="rounded-2xl bg-white shadow-lg p-8 flex flex-col items-center text-center border border-[#e5e1d8] hover:border-[#C9A227] transition"
           >
             <img
-              src="https://placehold.co/80x80.png"
+              src={t.src}
               alt={t.name}
               className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-[#C9A227]"
               data-ai-hint={t.aiHint}
@@ -84,7 +84,7 @@ export default function Testimonials() {
 
       {/* CTA */}
       <div className="text-center mt-16">
-        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg transition">
+        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-[#b8921d] transition">
           <Link href="#contact">Commission Your Portrait</Link>
         </Button>
       </div>

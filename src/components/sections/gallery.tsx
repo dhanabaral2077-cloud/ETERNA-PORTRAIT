@@ -17,7 +17,7 @@ export function Gallery() {
   ];
 
   return (
-    <section id="gallery" className="bg-background py-24 px-6 md:px-16">
+    <section id="gallery" className="bg-[#FAF9F7] py-24 px-6 md:px-16">
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
@@ -25,7 +25,7 @@ export function Gallery() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-gray-900"
+          className="font-serif text-4xl md:text-5xl text-gray-800"
         >
           Our Portrait Gallery
         </motion.h2>
@@ -34,7 +34,7 @@ export function Gallery() {
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full origin-left"
+          className="h-1 w-24 bg-[#C9A227] mx-auto mt-4 rounded-full origin-left"
         />
       </div>
 
@@ -66,7 +66,7 @@ export function Gallery() {
 
       {/* CTA */}
       <div className="text-center mt-16">
-        <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg transition">
+        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-[#b8921d] transition">
           <Link href="#contact">Commission Your Portrait</Link>
         </Button>
       </div>

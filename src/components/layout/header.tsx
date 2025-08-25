@@ -54,12 +54,12 @@ export function Header() {
             <motion.a
               key={idx}
               href={item.href}
-              className="relative text-gray-900 hover:text-[#C9A227] transition-colors"
+              className="relative text-gray-900 hover:text-primary transition-colors"
               whileHover="hover"
             >
               {item.label}
               <motion.span
-                className="absolute left-0 -bottom-1 w-full h-[1px] bg-[#C9A227]"
+                className="absolute left-0 -bottom-1 w-full h-[1px] bg-primary"
                 initial={{ scaleX: 0 }}
                 variants={{ hover: { scaleX: 1 } }}
                 transition={{ duration: 0.3 }}
@@ -70,7 +70,7 @@ export function Header() {
         </div>
 
         {/* CTA Button */}
-        <Button asChild className="hidden md:block rounded-full bg-[#C9A227] text-white px-6 py-2 text-sm shadow-md hover:shadow-lg transition">
+        <Button asChild className="hidden md:block rounded-full bg-[#C9A227] text-white px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-[#b8921d] transition">
           <Link href="#contact">Order Now</Link>
         </Button>
 
@@ -96,7 +96,7 @@ export function Header() {
                 <motion.a
                   key={idx}
                   href={item.href}
-                  className="text-gray-900 hover:text-[#C9A227]"
+                  className="text-gray-900 hover:text-primary"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * idx }}
@@ -107,7 +107,7 @@ export function Header() {
               ))}
             </div>
 
-            <Button asChild className="mt-12 rounded-full bg-[#C9A227] text-white px-8 py-3 text-lg shadow-md hover:shadow-lg transition">
+            <Button asChild className="mt-12 rounded-full bg-[#C9A227] text-white px-8 py-3 text-lg shadow-md hover:shadow-lg transition hover:bg-[#b8921d]">
               <Link href="#contact" onClick={() => setMenuOpen(false)}>Order Now</Link>
             </Button>
           </motion.div>
