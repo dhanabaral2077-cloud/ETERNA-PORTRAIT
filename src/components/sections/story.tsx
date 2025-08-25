@@ -21,66 +21,96 @@ export function Story() {
     <section ref={ref} id="story" className="relative h-[400vh] bg-background">
       {/* Sticky container */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+        
         {/* Stage 1: Pet Photo */}
-        <motion.div
-            className="absolute w-full h-full"
-            style={{ opacity: photoOpacity, scale }}
-        >
+        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: photoOpacity }}>
+           <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
             <Image
                 src="https://placehold.co/800x1200.png"
                 alt="Pet Photo"
                 layout="fill"
                 objectFit="contain"
-                className="rounded-xl shadow-lg"
+                className="rounded-xl"
                 data-ai-hint="pet photo"
             />
+          </motion.div>
+          <motion.p
+            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: photoOpacity === 0 ? 0: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            It starts with your favorite memory.
+          </motion.p>
         </motion.div>
 
-
         {/* Stage 2: Painting In Progress */}
-        <motion.div
-            className="absolute w-full h-full"
-            style={{ opacity: paintingOpacity, scale }}
-        >
+        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: paintingOpacity }}>
+          <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
             <Image
                 src="https://placehold.co/800x1200.png"
                 alt="Painting in Progress"
                 layout="fill"
                 objectFit="contain"
-                className="rounded-xl shadow-lg"
+                className="rounded-xl"
                 data-ai-hint="painting process"
             />
+          </motion.div>
+          <motion.p
+            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: paintingOpacity === 0 ? 0: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            Hand-painted with care by our artists.
+          </motion.p>
         </motion.div>
 
-
         {/* Stage 3: Final Portrait */}
-        <motion.div
-            className="absolute w-full h-full p-20"
-            style={{ opacity: portraitOpacity, scale }}
-        >
+        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: portraitOpacity }}>
+          <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
             <Image
                 src="https://placehold.co/800x1200.png"
                 alt="Final Portrait"
                 layout="fill"
                 objectFit="contain"
-                className="rounded-xl shadow-lg border-8 border-primary"
+                className="rounded-xl border-8 border-primary"
                 data-ai-hint="pet portrait"
             />
+          </motion.div>
+          <motion.p
+            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: portraitOpacity === 0 ? 0: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            A timeless masterpiece.
+          </motion.p>
         </motion.div>
 
-
         {/* Stage 4: Interior Showcase */}
-        <motion.div
-            className="absolute w-full h-full"
-            style={{ opacity: roomOpacity, scale }}
-        >
-            <Image
-                src="https://placehold.co/1200x800.png"
-                alt="Portrait in Room"
-                layout="fill"
-                objectFit="cover"
-                data-ai-hint="art gallery"
-            />
+        <motion.div className="absolute w-full h-full" style={{ opacity: roomOpacity }}>
+            <motion.div style={{ scale }} className="relative w-full h-full">
+              <Image
+                  src="https://placehold.co/1200x800.png"
+                  alt="Portrait in Room"
+                  layout="fill"
+                  objectFit="cover"
+                  data-ai-hint="art gallery"
+              />
+            </motion.div>
+             <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: roomOpacity === 0 ? 0: 1 }}
+                transition={{ duration: 0.8 }}
+            >
+              <p
+                className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+              >
+                Ready to elevate your space.
+              </p>
+            </motion.div>
         </motion.div>
       </div>
     </section>
