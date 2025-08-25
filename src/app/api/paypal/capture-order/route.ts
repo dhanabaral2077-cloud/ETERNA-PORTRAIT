@@ -1,7 +1,6 @@
 
 import { NextResponse } from "next/server";
 // Note: You would import your actual database client and email service here.
-// For this example, we'll use placeholder comments.
 // import { createClient } from "@supabase/supabase-js";
 // import { Resend } from "resend";
 // import ProductionKickoff from "@/emails/ProductionKickoff";
@@ -73,4 +72,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-
