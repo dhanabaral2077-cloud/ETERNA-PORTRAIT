@@ -15,9 +15,9 @@ export function Hero() {
   });
 
   // Scroll-driven transforms
-  const photoOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const paintingOpacity = useTransform(scrollYProgress, [0.2, 0.7], [0, 1]);
-  const roomOpacity = useTransform(scrollYProgress, [0.6, 1], [0, 1]);
+  const photoOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
+  const paintingOpacity = useTransform(scrollYProgress, [0.2, 0.5], [0, 1]);
+  const roomOpacity = useTransform(scrollYProgress, [0.45, 0.75], [0, 1]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
@@ -65,7 +65,7 @@ export function Hero() {
             style={{ opacity: photoOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="/portfolio/portrait_001.jpg"
               alt="Dog Photo"
               width={800}
               height={1200}
@@ -80,7 +80,7 @@ export function Hero() {
             style={{ opacity: paintingOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="/portfolio/portrait_002.jpg"
               alt="Dog Painting"
               width={800}
               height={1200}
@@ -95,7 +95,7 @@ export function Hero() {
             style={{ opacity: roomOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="/portfolio/portrait_003.jpg"
               alt="Dog Painting in Room"
               width={800}
               height={1200}

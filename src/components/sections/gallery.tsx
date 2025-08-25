@@ -8,12 +8,12 @@ import Link from "next/link";
 
 export function Gallery() {
   const portraits = [
-    { src: "https://placehold.co/600x800.png", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
-    { src: "https://placehold.co/600x800.png", title: "Max in Classic Oil", aiHint: "cat oil" },
-    { src: "https://placehold.co/600x800.png", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
-    { src: "https://placehold.co/600x800.png", title: "Charlie in Regal Style", aiHint: "dog regal" },
-    { src: "https://placehold.co/600x800.png", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
-    { src: "https://placehold.co/600x800.png", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
+    { src: "/portfolio/portrait_0001.jpg", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
+    { src: "/portfolio/portrait_0002.jpg", title: "Max in Classic Oil", aiHint: "cat oil" },
+    { src: "/portfolio/portrait_00003.jpg", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
+    { src: "/portfolio/portrait_0004.jpg", title: "Charlie in Regal Style", aiHint: "dog regal" },
+    { src: "/portfolio/portrait_0005.jpg", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
+    { src: "/portfolio/portrait_0006.jpg", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
   ];
 
   return (
