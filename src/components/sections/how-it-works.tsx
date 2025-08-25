@@ -46,8 +46,24 @@ export function HowItWorks() {
       whileInView={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, ease: "easeOut" }}
       viewport={{ once: true }}
-      className="relative py-24 px-6 md:px-16 bg-card"
+      className="relative py-24 px-6 md:px-16 overflow-hidden"
     >
+        <motion.div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 rounded-lg"
+            style={{
+                background: "linear-gradient(120deg, #FAF9F7, #F5E8C7, #FAF9F7)",
+                backgroundSize: "300% 300%",
+            }}
+            animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            }}
+            transition={{
+                duration: 60,
+                ease: "linear",
+                repeat: Infinity,
+            }}
+        />
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
