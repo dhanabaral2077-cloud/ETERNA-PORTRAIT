@@ -72,6 +72,14 @@ export default function OrderConfirmation({ name, orderId, style, format, size, 
             text-decoration: none;
             font-weight: 600;
             font-size: 16px;
+            border: 1px solid #b38f1e;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.2s ease-in-out;
+          }
+          .button:hover {
+            background-color: #b38f1e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.2);
           }
           .footer {
             color: #999;
