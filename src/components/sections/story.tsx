@@ -29,63 +29,73 @@ export function Story() {
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         
         {/* Stage 1: Pet Photo */}
-        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: photoOpacity }}>
-           <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
+        <motion.div className="absolute w-full h-full" style={{ opacity: photoOpacity }}>
+           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/800x1200.png"
+                src="https://placehold.co/1200x800.png"
                 alt="Pet Photo"
                 layout="fill"
-                objectFit="contain"
-                className="rounded-xl"
+                objectFit="cover"
                 data-ai-hint="pet photo"
             />
           </motion.div>
-          <motion.p
-            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(photoOpacity)}
           >
-            It starts with your favorite memory.
-          </motion.p>
+            <p
+              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+            >
+              It starts with your favorite memory.
+            </p>
+          </motion.div>
         </motion.div>
 
         {/* Stage 2: Painting In Progress */}
-        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: paintingOpacity }}>
-          <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
+        <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
+          <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/800x1200.png"
+                src="https://placehold.co/1200x800.png"
                 alt="Painting in Progress"
                 layout="fill"
-                objectFit="contain"
-                className="rounded-xl"
+                objectFit="cover"
                 data-ai-hint="painting process"
             />
           </motion.div>
-          <motion.p
-            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(paintingOpacity)}
           >
-            Hand-painted with care by our artists.
-          </motion.p>
+            <p
+              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+            >
+              Hand-painted with care by our artists.
+            </p>
+          </motion.div>
         </motion.div>
 
         {/* Stage 3: Final Portrait */}
-        <motion.div className="absolute flex flex-col items-center text-center" style={{ opacity: portraitOpacity }}>
-          <motion.div style={{ scale }} className="relative w-[400px] h-[600px] rounded-xl shadow-lg">
+        <motion.div className="absolute w-full h-full" style={{ opacity: portraitOpacity }}>
+          <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/800x1200.png"
+                src="https://placehold.co/1200x800.png"
                 alt="Final Portrait"
                 layout="fill"
-                objectFit="contain"
-                className="rounded-xl border-8 border-primary"
+                objectFit="cover"
+                className="border-8 border-primary"
                 data-ai-hint="pet portrait"
             />
           </motion.div>
-          <motion.p
-            className="mt-6 text-muted-foreground font-serif text-xl max-w-md"
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(portraitOpacity)}
           >
-            A timeless masterpiece.
-          </motion.p>
+            <p
+              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+            >
+              A timeless masterpiece.
+            </p>
+          </motion.div>
         </motion.div>
 
         {/* Stage 4: Interior Showcase */}
