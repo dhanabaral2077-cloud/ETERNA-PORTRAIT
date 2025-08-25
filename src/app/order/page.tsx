@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2, Gem, Brush, Sparkles } from "lucide-react";
+import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2 } from "lucide-react";
 import Script from "next/script";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
@@ -32,9 +32,9 @@ const prices: Record<string, number> = {
 };
 
 const styleOptions = [
-    { id: 'classic', name: 'Classic', description: 'Timeless & Elegant', icon: Brush },
-    { id: 'signature', name: 'Signature', description: 'Rich & Expressive', icon: Sparkles },
-    { id: 'masterpiece', name: 'Masterpiece', description: 'Grand & Ornate', icon: Gem },
+    { id: 'classic', name: 'Classic', description: 'Timeless & Elegant' },
+    { id: 'signature', name: 'Signature', description: 'Rich & Expressive' },
+    { id: 'masterpiece', name: 'Masterpiece', description: 'Grand & Ornate' },
 ]
 
 export default function OrderPage() {
@@ -192,26 +192,22 @@ export default function OrderPage() {
                 )}
 
                 {step === 1 && (
-                    <div className="space-y-8">
-                        <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
-                        <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {styleOptions.map((s) => {
-                                const Icon = s.icon;
-                                return (
-                                <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
-                                    <Card className="text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/5 transition-all duration-300 ease-in-out-quad hover:shadow-xl hover:-translate-y-1.5">
-                                    <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
-                                    <CardContent className="p-0 flex flex-col items-center justify-center gap-4">
-                                        <Icon className="w-10 h-10 text-accent group-has-[:checked]:text-accent-foreground group-has-[:checked]:bg-accent p-2 rounded-full transition-colors duration-300" />
-                                        <h3 className="font-headline text-2xl text-foreground">{s.name}</h3>
-                                        <p className="text-sm text-muted-foreground">{s.description}</p>
-                                    </CardContent>
-                                    </Card>
-                                </Label>
-                                );
-                            })}
-                        </RadioGroup>
-                    </div>
+                  <div className="space-y-8">
+                    <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
+                    <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {styleOptions.map((s) => (
+                        <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
+                          <Card className="text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/5 transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
+                            <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
+                            <CardContent className="p-0 flex flex-col items-center justify-center gap-2">
+                              <h3 className="font-headline text-2xl text-foreground">{s.name}</h3>
+                              <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
+                            </CardContent>
+                          </Card>
+                        </Label>
+                      ))}
+                    </RadioGroup>
+                  </div>
                 )}
 
 
@@ -336,5 +332,3 @@ export default function OrderPage() {
     </>
   );
 }
-
-    
