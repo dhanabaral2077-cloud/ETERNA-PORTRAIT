@@ -24,22 +24,30 @@ export function HowItWorks() {
     {
       title: "Upload Your Pet's Photo",
       desc: "Simply share your favorite photo.",
-      icon: <Upload size={24} />,
+      icon: Upload,
     },
     {
       title: "Select Your Style & Size",
       desc: "Choose from Classic, Signature, or Masterpiece.",
-      icon: <Brush size={24} />,
+      icon: Brush,
     },
     {
       title: "We Create & Deliver",
       desc: "Receive your hand-finished artwork, ready to display.",
-      icon: <Frame size={24} />,
+      icon: Frame,
     },
   ];
 
   return (
-    <section ref={ref} id="how-it-works" className="relative py-24 px-6 md:px-16 bg-card">
+    <motion.section
+      ref={ref}
+      id="how-it-works"
+      initial={{ opacity: 0.8, scale: 0.98 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1, ease: "easeOut" }}
+      viewport={{ once: true }}
+      className="relative py-24 px-6 md:px-16 bg-card"
+    >
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
@@ -69,30 +77,40 @@ export function HowItWorks() {
           style={{ scaleY: lineScale, scaleX: lineScale, opacity: 0.8 }}
         />
 
-        {steps.map((step, idx) => (
-          <motion.div
-            key={idx}
-            className="flex flex-col items-center text-center relative z-10"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.3, duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            {/* Numbered Circle with pulse */}
+        {steps.map((step, idx) => {
+          const Icon = step.icon;
+          return (
             <motion.div
-              className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center mb-4 shadow-md relative"
-              whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
-              whileInView={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
-              viewport={{ once: false }}
+              key={idx}
+              className="flex flex-col items-center text-center relative z-10"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.3, duration: 0.6 }}
+              viewport={{ once: true }}
             >
-              <span className="absolute top-1 text-xs font-serif opacity-80">0{idx + 1}</span>
-              {step.icon}
+              {/* Numbered Circle with pulse + icon animation */}
+              <motion.div
+                className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center mb-4 shadow-md relative"
+                whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
+                whileInView={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+                viewport={{ once: false }}
+              >
+                <span className="absolute top-1 text-xs font-serif opacity-80">0{idx + 1}</span>
+                <motion.div
+                  initial={{ opacity: 0, rotate: -20 }}
+                  whileInView={{ opacity: 1, rotate: 0 }}
+                  transition={{ duration: 0.6, delay: idx * 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  <Icon size={24} />
+                </motion.div>
+              </motion.div>
+              <h3 className="font-serif text-xl text-gray-900 mb-2">{step.title}</h3>
+              <p className="font-sans text-gray-600 max-w-xs">{step.desc}</p>
             </motion.div>
-            <h3 className="font-serif text-xl text-gray-900 mb-2">{step.title}</h3>
-            <p className="font-sans text-gray-600 max-w-xs">{step.desc}</p>
-          </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       {/* CTA */}
@@ -107,6 +125,6 @@ export function HowItWorks() {
           <Link href="#contact">Start Your Portrait</Link>
         </Button>
       </motion.div>
-    </section>
+    </motion.section>
   );
 }
