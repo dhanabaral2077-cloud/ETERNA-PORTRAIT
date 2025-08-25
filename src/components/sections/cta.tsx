@@ -86,7 +86,7 @@ export function CTA() {
             <Button 
               asChild
               size="lg" 
-              className="text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transform hover:scale-105 hover:shadow-xl hover:shadow-amber-400/50 transition-all rounded-full animate-pulse-glow"
+              className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all animate-pulse-glow"
             >
               <Link href="#">Commission Your Portrait</Link>
             </Button>
