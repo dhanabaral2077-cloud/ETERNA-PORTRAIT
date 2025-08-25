@@ -52,7 +52,7 @@ export function HowItWorks() {
             aria-hidden="true"
             className="absolute inset-0 -z-10 rounded-lg"
             style={{
-                background: "linear-gradient(120deg, #FAF9F7, #F5E8C7, #FAF9F7)",
+                background: "linear-gradient(120deg, hsl(var(--background)), #F5E8C7, hsl(var(--background)))",
                 backgroundSize: "300% 300%",
             }}
             animate={{
@@ -71,7 +71,7 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-gray-800"
+          className="font-serif text-4xl md:text-5xl text-foreground"
         >
           How It Works
         </motion.h2>
@@ -80,7 +80,7 @@ export function HowItWorks() {
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="h-1 w-24 bg-[#C9A227] mx-auto mt-4 rounded-full origin-left"
+          className="h-1 w-24 bg-accent mx-auto mt-4 rounded-full origin-left"
         />
       </div>
 
@@ -89,7 +89,7 @@ export function HowItWorks() {
         {/* Connecting Line with shimmer */}
         <motion.div
           animate={shimmerControls}
-          className="absolute md:top-1/2 top-16 left-10 md:left-0 w-[2px] md:w-full md:h-[2px] h-full bg-[#C9A227] origin-top md:origin-left"
+          className="absolute md:top-1/2 top-16 left-10 md:left-0 w-[2px] md:w-full md:h-[2px] h-full bg-accent origin-top md:origin-left"
           style={{ scaleY: lineScale, scaleX: lineScale, opacity: 0.8 }}
         />
 
@@ -106,7 +106,7 @@ export function HowItWorks() {
             >
               {/* Numbered Circle with pulse + icon animation */}
               <motion.div
-                className="w-20 h-20 rounded-full bg-[#C9A227] text-white flex items-center justify-center mb-4 shadow-md relative"
+                className="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center mb-4 shadow-md relative"
                 whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
                 whileInView={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
@@ -122,8 +122,8 @@ export function HowItWorks() {
                   <Icon size={24} />
                 </motion.div>
               </motion.div>
-              <h3 className="font-serif text-xl text-gray-800 mb-2">{step.title}</h3>
-              <p className="font-sans text-gray-700 max-w-xs">{step.desc}</p>
+              <h3 className="font-serif text-xl text-foreground mb-2">{step.title}</h3>
+              <p className="font-sans text-secondary max-w-xs">{step.desc}</p>
             </motion.div>
           );
         })}
@@ -137,7 +137,7 @@ export function HowItWorks() {
         viewport={{ once: true }}
         className="text-center mt-16"
       >
-        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-[#b8921d] transition">
+        <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
           <Link href="#contact">Start Your Portrait</Link>
         </Button>
       </motion.div>

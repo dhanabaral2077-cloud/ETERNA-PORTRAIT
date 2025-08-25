@@ -34,13 +34,13 @@ export function Header() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className={`fixed top-0 w-full z-50 flex items-center justify-between px-8 transition-all duration-500 ${
           scrolled
-            ? "backdrop-blur-md bg-white/80 shadow-md h-16"
+            ? "backdrop-blur-md bg-background/80 shadow-md h-16"
             : "bg-transparent h-20"
         }`}
       >
         {/* Logo */}
         <motion.div
-          className="font-serif text-xl tracking-[0.15em] text-gray-900"
+          className="font-serif text-xl tracking-[0.15em] text-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -54,7 +54,7 @@ export function Header() {
             <motion.a
               key={idx}
               href={item.href}
-              className="relative text-gray-900 hover:text-primary transition-colors"
+              className="relative text-foreground hover:text-primary transition-colors"
               whileHover="hover"
             >
               {item.label}
@@ -70,7 +70,7 @@ export function Header() {
         </div>
 
         {/* CTA Button */}
-        <Button asChild className="hidden md:block rounded-full bg-[#C9A227] text-white px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-[#b8921d] transition">
+        <Button asChild className="hidden md:block rounded-full bg-primary text-primary-foreground px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
           <Link href="#contact">Order Now</Link>
         </Button>
 
@@ -89,14 +89,14 @@ export function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white flex flex-col items-center justify-center z-40"
+            className="fixed inset-0 bg-background flex flex-col items-center justify-center z-40"
           >
             <div className="flex flex-col gap-8 font-serif text-2xl uppercase tracking-widest">
               {navItems.map((item, idx) => (
                 <motion.a
                   key={idx}
                   href={item.href}
-                  className="text-gray-900 hover:text-primary"
+                  className="text-foreground hover:text-primary"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * idx }}
@@ -107,7 +107,7 @@ export function Header() {
               ))}
             </div>
 
-            <Button asChild className="mt-12 rounded-full bg-[#C9A227] text-white px-8 py-3 text-lg shadow-md hover:shadow-lg transition hover:bg-[#b8921d]">
+            <Button asChild className="mt-12 rounded-full bg-primary text-primary-foreground px-8 py-3 text-lg shadow-md hover:shadow-lg transition hover:bg-primary/90">
               <Link href="#contact" onClick={() => setMenuOpen(false)}>Order Now</Link>
             </Button>
           </motion.div>

@@ -8,17 +8,17 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
         </div>
         <div className="flex items-center space-x-4">
-          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-primary group">
+          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-accent group">
             <span>Privacy</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-accent transition-all duration-300 ease-out group-hover:w-full"></span>
           </Link>
-          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-primary group">
+          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-accent group">
             <span>Refunds</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-accent transition-all duration-300 ease-out group-hover:w-full"></span>
           </Link>
-          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-primary group">
+          <Link href="#" className="relative text-sm text-muted-foreground transition-colors hover:text-accent group">
             <span>Contact</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-accent transition-all duration-300 ease-out group-hover:w-full"></span>
           </Link>
         </div>
       </div>

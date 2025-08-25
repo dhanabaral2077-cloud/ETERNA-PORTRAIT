@@ -34,7 +34,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="bg-[#FAF9F7] py-24 px-6 md:px-16">
+    <section id="testimonials" className="bg-background py-24 px-6 md:px-16">
       {/* Section Heading */}
       <div className="text-center mb-16">
         <motion.h2
@@ -42,7 +42,7 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-gray-800"
+          className="font-serif text-4xl md:text-5xl text-foreground"
         >
           What Our Collectors Say
         </motion.h2>
@@ -51,7 +51,7 @@ export default function Testimonials() {
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="h-1 w-24 bg-[#C9A227] mx-auto mt-4 rounded-full origin-left"
+          className="h-1 w-24 bg-accent mx-auto mt-4 rounded-full origin-left"
         />
       </div>
 
@@ -64,18 +64,18 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.2, duration: 0.6 }}
             viewport={{ once: true }}
-            className="rounded-2xl bg-white shadow-lg p-8 flex flex-col items-center text-center border border-[#e5e1d8] hover:border-[#C9A227] transition"
+            className="rounded-2xl bg-card shadow-lg p-8 flex flex-col items-center text-center border border-muted/20 hover:border-accent transition"
           >
             <img
               src={t.src}
               alt={t.name}
-              className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-[#C9A227]"
+              className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-accent"
               data-ai-hint={t.aiHint}
             />
-            <p className="font-serif italic text-lg text-gray-700 leading-relaxed mb-6">
+            <p className="font-serif italic text-lg text-secondary leading-relaxed mb-6">
               “{t.quote}”
             </p>
-            <p className="font-sans text-sm uppercase tracking-wide text-gray-500">
+            <p className="font-sans text-sm uppercase tracking-wide text-muted-foreground">
               {t.name} — {t.location}
             </p>
           </motion.div>
@@ -84,7 +84,7 @@ export default function Testimonials() {
 
       {/* CTA */}
       <div className="text-center mt-16">
-        <Button asChild className="rounded-full bg-[#C9A227] text-white px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-[#b8921d] transition">
+        <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
           <Link href="#contact">Commission Your Portrait</Link>
         </Button>
       </div>
