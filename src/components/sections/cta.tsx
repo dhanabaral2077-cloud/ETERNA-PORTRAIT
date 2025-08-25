@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ export function CTA() {
   const [offsetY, setOffsetY] = useState(0);
   const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2 });
   const [displayedText, setDisplayedText] = useState('');
-  const fullText = "RReady to Immortalize Your Pet?";
+  const fullText = "Ready to Immortalize Your Pet?";
 
   const handleScroll = () => {
     if (ref.current) {
@@ -88,7 +89,7 @@ export function CTA() {
               size="lg" 
               className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all animate-pulse-glow"
             >
-              <Link href="#">Commission Your Portrait</Link>
+              <Link href="/order">Commission Your Portrait</Link>
             </Button>
           </div>
         </div>

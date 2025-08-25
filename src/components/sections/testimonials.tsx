@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -85,7 +86,7 @@ export default function Testimonials() {
       {/* CTA */}
       <div className="text-center mt-16">
         <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-          <Link href="#contact">Commission Your Portrait</Link>
+          <Link href="/order">Commission Your Portrait</Link>
         </Button>
       </div>
     </section>

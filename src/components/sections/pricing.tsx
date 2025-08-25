@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -106,7 +107,7 @@ export function Pricing() {
               variant={tier.highlight ? 'default' : 'outline'}
               className="rounded-full w-full py-4 text-lg shadow-md transition-all"
             >
-              <Link href="#contact">Commission Now</Link>
+              <Link href="/order">Commission Now</Link>
             </Button>
           </motion.div>
         ))}

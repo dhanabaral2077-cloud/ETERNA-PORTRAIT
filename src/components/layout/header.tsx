@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,10 +20,10 @@ export function Header() {
   }, []);
 
   const navItems = [
-    { href: '#gallery', label: 'Gallery' },
-    { href: '#how-it-works', label: 'How It Works' },
-    { href: '#testimonials', 'label': 'Testimonials' },
-    { href: '#pricing', label: 'Pricing' },
+    { href: '/#gallery', label: 'Gallery' },
+    { href: '/#how-it-works', label: 'How It Works' },
+    { href: '/#testimonials', 'label': 'Testimonials' },
+    { href: '/#pricing', label: 'Pricing' },
   ];
 
   return (
@@ -71,7 +72,7 @@ export function Header() {
 
         {/* CTA Button */}
         <Button asChild className="hidden md:block rounded-full bg-primary text-primary-foreground px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
-          <Link href="#contact">Order Now</Link>
+          <Link href="/order">Order Now</Link>
         </Button>
 
         {/* Mobile Menu Button */}
@@ -108,7 +109,7 @@ export function Header() {
             </div>
 
             <Button asChild className="mt-12 rounded-full bg-primary text-primary-foreground px-8 py-3 text-lg shadow-md hover:shadow-lg transition hover:bg-primary/90">
-              <Link href="#contact" onClick={() => setMenuOpen(false)}>Order Now</Link>
+              <Link href="/order" onClick={() => setMenuOpen(false)}>Order Now</Link>
             </Button>
           </motion.div>
         )}

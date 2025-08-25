@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion, useScroll, useTransform, useAnimation } from "framer-motion";
@@ -138,7 +139,7 @@ export function HowItWorks() {
         className="text-center mt-16"
       >
         <Button asChild className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-          <Link href="#contact">Start Your Portrait</Link>
+          <Link href="/order">Start Your Portrait</Link>
         </Button>
       </motion.div>
     </motion.section>
