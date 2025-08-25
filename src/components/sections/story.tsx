@@ -1,101 +1,87 @@
-
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import Image from "next/image";
 
 export function Story() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const element = sectionRef.current;
-      if (element) {
-        const { top, height } = element.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        
-        // Animation starts when the top of the section hits the top of the viewport.
-        // It uses the full height of the section for the scroll progress.
-        const start = top;
-        const end = top + height - windowHeight;
+  // Opacity transforms for each stage
+  const photoOpacity = useTransform(scrollYProgress, [0.0, 0.25, 0.3], [1, 1, 0]);
+  const paintingOpacity = useTransform(scrollYProgress, [0.25, 0.4, 0.55], [0, 1, 0]);
+  const portraitOpacity = useTransform(scrollYProgress, [0.5, 0.65, 0.8], [0, 1, 0]);
+  const roomOpacity = useTransform(scrollYProgress, [0.75, 0.9, 1], [0, 1, 1]);
 
-        const progress = Math.max(0, Math.min(1, 1 - (end / (end-start))));
-        setScrollProgress(progress);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); 
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const textOpacity = (start: number, end: number) => {
-    const midpoint = (start + end) / 2;
-    if (scrollProgress < start || scrollProgress > end) return 0;
-    if (scrollProgress < midpoint) return (scrollProgress - start) / (midpoint - start);
-    return 1 - (scrollProgress - midpoint) / (end - midpoint);
-  };
-  
-  const maskSize = Math.max(0, (scrollProgress - 0.2) * 200);
+  // Scale subtle zoom in/out for luxury feel
+  const scale = useTransform(scrollYProgress, [0, 1], [1.05, 1]);
 
   return (
-    <section ref={sectionRef} id="story" className="relative py-20 lg:py-32 bg-background h-[300vh]">
-      <div className="sticky top-20 h-[calc(100vh-5rem)] flex flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: scrollProgress > 0.5 ? 1 : 0, backgroundColor: 'hsl(var(--card))' }}>
-        </div>
+    <section ref={ref} id="story" className="relative h-[400vh] bg-background">
+      {/* Sticky container */}
+      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+        {/* Stage 1: Pet Photo */}
+        <motion.div
+            className="absolute w-full h-full"
+            style={{ opacity: photoOpacity, scale }}
+        >
+            <Image
+                src="https://placehold.co/800x1200.png"
+                alt="Pet Photo"
+                layout="fill"
+                objectFit="contain"
+                className="rounded-xl shadow-lg"
+                data-ai-hint="pet photo"
+            />
+        </motion.div>
 
-        <div className="relative w-[300px] h-[400px] md:w-[400px] md:h-[533px] animate-fade-in-up">
-          <Image
-            src="https://placehold.co/600x800.png"
-            alt="A beautiful pet"
-            width={600}
-            height={800}
-            className={cn(
-              'absolute inset-0 object-cover rounded-lg transition-opacity duration-slow',
-               scrollProgress > 0.55 ? 'opacity-0' : 'opacity-100'
-            )}
-            data-ai-hint="pet photo"
-          />
 
-          <Image
-            src="/portfolio/golden_retriever.jpg"
-            alt="A beautiful painted portrait of a pet"
-            width={600}
-            height={800}
-            className="absolute inset-0 object-cover rounded-lg"
-            style={{
-              maskImage: 'url(/brush-mask.svg)',
-              maskSize: `${maskSize}%`,
-              maskPosition: 'center',
-              WebkitMaskImage: 'url(/brush-mask.svg)',
-              WebkitMaskSize: `${maskSize}%`,
-              WebkitMaskPosition: 'center',
-            }}
-            data-ai-hint="pet portrait"
-          />
-           <div
-            className={cn(
-              "absolute -inset-4 md:-inset-8 border-8 rounded-2xl transition-all duration-slow",
-              scrollProgress > 0.7 ? 'opacity-100 border-primary' : 'opacity-0 border-transparent'
-            )}
-            style={{ transform: `scale(${0.9 + scrollProgress * 0.1})`}}
-          />
-        </div>
+        {/* Stage 2: Painting In Progress */}
+        <motion.div
+            className="absolute w-full h-full"
+            style={{ opacity: paintingOpacity, scale }}
+        >
+            <Image
+                src="https://placehold.co/800x1200.png"
+                alt="Painting in Progress"
+                layout="fill"
+                objectFit="contain"
+                className="rounded-xl shadow-lg"
+                data-ai-hint="painting process"
+            />
+        </motion.div>
 
-        <div className="absolute bottom-10 left-10 max-w-sm text-left">
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500" style={{ opacity: textOpacity(0.0, 0.3) }}>
-             It starts with a photo, a cherished memory.
-           </p>
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.35, 0.65)}}>
-             Our artists transform it into a masterpiece.
-           </p>
-           <p className="font-headline text-3xl md:text-4xl text-foreground transition-opacity duration-500 absolute top-0 left-0" style={{ opacity: textOpacity(0.7, 1.0) }}>
-             A timeless heirloom, framed for eternity.
-           </p>
-        </div>
+
+        {/* Stage 3: Final Portrait */}
+        <motion.div
+            className="absolute w-full h-full p-20"
+            style={{ opacity: portraitOpacity, scale }}
+        >
+            <Image
+                src="https://placehold.co/800x1200.png"
+                alt="Final Portrait"
+                layout="fill"
+                objectFit="contain"
+                className="rounded-xl shadow-lg border-8 border-primary"
+                data-ai-hint="pet portrait"
+            />
+        </motion.div>
+
+
+        {/* Stage 4: Interior Showcase */}
+        <motion.div
+            className="absolute w-full h-full"
+            style={{ opacity: roomOpacity, scale }}
+        >
+            <Image
+                src="https://placehold.co/1200x800.png"
+                alt="Portrait in Room"
+                layout="fill"
+                objectFit="cover"
+                data-ai-hint="art gallery"
+            />
+        </motion.div>
       </div>
     </section>
   );
