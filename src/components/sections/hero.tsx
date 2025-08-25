@@ -15,16 +15,16 @@ export function Hero() {
   });
 
   // Scroll-driven transforms
-  const photoOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
-  const paintingOpacity = useTransform(scrollYProgress, [0.2, 0.5], [0, 1]);
-  const roomOpacity = useTransform(scrollYProgress, [0.45, 0.75], [0, 1]);
+  const photoOpacity = useTransform(scrollYProgress, [0, 0.33, 0.43], [1, 1, 0]);
+  const paintingOpacity = useTransform(scrollYProgress, [0.4, 0.55, 0.65], [0, 1, 0]);
+  const roomOpacity = useTransform(scrollYProgress, [0.6, 0.75], [0, 1]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
     <section
       ref={ref}
       id="hero"
-      className="relative h-[200vh] w-full bg-background"
+      className="relative h-[300vh] w-full bg-background"
     >
       <div className="sticky top-0 h-screen w-full grid grid-cols-1 md:grid-cols-2">
         {/* Left Column - Text */}
