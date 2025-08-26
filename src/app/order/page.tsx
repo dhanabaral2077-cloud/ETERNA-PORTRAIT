@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useRef, useEffect, Suspense } from "react";
@@ -70,9 +71,11 @@ function OrderForm() {
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [orderId, setOrderId] = useState<string | null>(null);
     
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const xhrRef = useRef<XMLHttpRequest | null>(null);
 
     useEffect(() => {
         const pkg = searchParams.get('pkg') as PackageKey;
@@ -90,16 +93,17 @@ function OrderForm() {
         const files = e.target.files;
         if (files && selectedPackageKey) {
             const selectedPackage = packages[selectedPackageKey];
-            if (files.length > selectedPackage.maxPets) {
+            const newFiles = Array.from(files);
+
+            if ((photoFiles.length + newFiles.length) > selectedPackage.maxPets) {
                 toast({ variant: "destructive", title: "Too Many Photos", description: `You can upload a maximum of ${selectedPackage.maxPets} photos for this package.` });
                 return;
             }
 
-            const newFiles = Array.from(files);
-            setPhotoFiles(newFiles);
+            setPhotoFiles(prev => [...prev, ...newFiles]);
 
             const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-            setPhotoPreviews(newPreviews);
+            setPhotoPreviews(prev => [...prev, ...newPreviews]);
         }
     };
 
@@ -109,10 +113,10 @@ function OrderForm() {
         setPhotoFiles(newFiles);
 
         const newPreviews = [...photoPreviews];
-        newPreviews.splice(index, 1);
+        const removedPreview = newPreviews.splice(index, 1);
         setPhotoPreviews(newPreviews);
         // Clean up object URLs
-        URL.revokeObjectURL(photoPreviews[index]);
+        URL.revokeObjectURL(removedPreview[0]);
     };
 
     const validateForm = () => {
@@ -132,11 +136,13 @@ function OrderForm() {
     };
     
     const onPaymentSuccess = async () => {
-        if (isSubmitting || !validateForm()) return;
+        if (!validateForm() || !selectedPackageKey) return;
+        
         setIsSubmitting(true);
+        setUploadProgress(0);
 
         const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
-        if (!scriptUrl || !selectedPackageKey) {
+        if (!scriptUrl) {
             toast({ variant: "destructive", title: "Configuration Error", description: "Could not submit your order. Please contact support." });
             setIsSubmitting(false);
             return;
@@ -150,49 +156,61 @@ function OrderForm() {
         orderDetails.append('style', formData.style);
         orderDetails.append('package', selectedPackage.name);
         orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
-        orderDetails.append('notes', formData.notes);
+        orderDetailsappend('notes', formData.notes);
 
         photoFiles.forEach((file, index) => {
             orderDetails.append('file' + index, file, file.name);
         });
         
-        try {
-            const response = await fetch(scriptUrl, {
-                method: "POST",
-                body: orderDetails,
-            });
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
 
-            // Since the response from a script run with `withHeaders` might be opaque,
-            // we will proceed optimistically if the request doesn't throw an error.
-            // Proper error handling would involve parsing the response if it's not opaque.
-            if (response.ok || response.type === 'opaque') {
-                 toast({
-                    title: "Order Submitted!",
-                    description: `Your commission is now in the hands of our talented artists.`
-                });
-                setStep(1); // Move to success screen
-            } else {
-                 throw new Error(`Server responded with status ${response.status}`);
+        xhr.open("POST", scriptUrl, true);
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                setUploadProgress(percent);
             }
+        };
 
-        } catch (error) {
-            console.error("Submission Error:", error);
-            toast({
-                variant: "destructive",
-                title: "Order Submission Failed",
-                description: "There was a problem sending your order details. Please contact support."
-            });
-        } finally {
+        xhr.onload = () => {
             setIsSubmitting(false);
-        }
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const json = JSON.parse(xhr.responseText);
+                    if (json.success) {
+                        toast({
+                            title: "Order Submitted!",
+                            description: `Your commission (ID: ${json.orderId}) is now in our hands.`,
+                        });
+                        setUploadProgress(100);
+                        setStep(1); // Move to success screen
+                    } else {
+                        throw new Error(json.error || "Unknown server error.");
+                    }
+                } catch (error) {
+                    onPaymentError("Failed to parse server response.");
+                }
+            } else {
+                onPaymentError(`Upload failed with status ${xhr.status}.`);
+            }
+        };
+
+        xhr.onerror = () => {
+            setIsSubmitting(false);
+            onPaymentError("A network error occurred. Please check your connection.");
+        };
+
+        xhr.send(orderDetails);
     };
 
     const onPaymentError = (error: any) => {
-        console.error("PayPal Error:", error);
+        console.error("Submission or Payment Error:", error);
         toast({
             variant: "destructive",
-            title: "Payment Failed",
-            description: "Something went wrong with the payment. Please try again."
+            title: "Submission Failed",
+            description: typeof error === 'string' ? error : "There was a problem submitting your order. Please contact support.",
         });
         setIsSubmitting(false);
     };
@@ -243,8 +261,8 @@ function OrderForm() {
                                 ))}
                                 {photoFiles.length < selectedPackage.maxPets && (
                                     <div>
-                                        <input type="file" ref={el => fileInputRefs.current[0] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" multiple />
-                                        <div onClick={() => fileInputRefs.current[0]?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
+                                        <input type="file" ref={el => fileInputRefs.current[photoFiles.length] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" multiple={selectedPackage.maxPets > 1} />
+                                        <div onClick={() => fileInputRefs.current[photoFiles.length]?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
                                             <UploadCloud className="w-8 h-8 text-accent mb-2" />
                                             <span className="text-sm">Upload Photo(s)</span>
                                             <span className="text-xs mt-1">(Max 10MB)</span>
@@ -325,9 +343,11 @@ function OrderForm() {
 
                         <div className="pt-4 text-center">
                             {isSubmitting ? (
-                                <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground w-full">
-                                    <Loader2 className="h-8 w-8 animate-spin" />
-                                    <p>Finalizing your order...</p>
+                                <div className="w-full space-y-2">
+                                  <Progress value={uploadProgress} className="w-full" />
+                                  <p className="text-sm text-muted-foreground">
+                                    Uploading... {uploadProgress}%
+                                  </p>
                                 </div>
                              ) : (
                                 orderId && (
@@ -341,6 +361,7 @@ function OrderForm() {
                                             amount={priceInCents / 100}
                                             onSuccess={onPaymentSuccess}
                                             onError={onPaymentError}
+                                            disabled={isSubmitting}
                                         />
                                       </div>
                                     </div>
@@ -388,5 +409,3 @@ export default function OrderPage() {
     </div>
   );
 }
-
-    
