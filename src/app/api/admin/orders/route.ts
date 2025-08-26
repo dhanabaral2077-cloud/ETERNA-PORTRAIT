@@ -1,3 +1,4 @@
+
 // src/app/api/admin/orders/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -26,7 +27,13 @@ export async function POST(req: Request) {
         notes,
         customers (
           name,
-          email
+          email,
+          address_line1,
+          address_line2,
+          city,
+          state_province_region,
+          postal_code,
+          country
         )
       `, { count: 'exact' });
 
@@ -44,11 +51,25 @@ export async function POST(req: Request) {
       console.error('Supabase error fetching orders:', error.message);
       throw error;
     }
+    
+    const formatAddress = (customer: any) => {
+        if (!customer) return 'No address';
+        const parts = [
+            customer.address_line1,
+            customer.address_line2,
+            customer.city,
+            customer.state_province_region,
+            customer.postal_code,
+            customer.country
+        ];
+        return parts.filter(Boolean).join(', ');
+    }
 
     const transformedOrders = orders.map(order => ({
       ...order,
       customer_name: (order.customers as any)?.name || 'N/A',
       customer_email: (order.customers as any)?.email || 'N/A',
+      customer_address: formatAddress(order.customers)
     }));
 
     // Calculate stats

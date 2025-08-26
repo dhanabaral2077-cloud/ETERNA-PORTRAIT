@@ -1,3 +1,4 @@
+
 // src/app/admin/page.tsx
 'use client';
 
@@ -23,6 +24,7 @@ type Order = {
   created_at: string;
   customer_name: string;
   customer_email: string;
+  customer_address: string;
   package: string;
   price: number;
   status: string;
@@ -217,6 +219,7 @@ export default function AdminPage() {
                   <TableCell>
                     <div className="font-medium text-foreground">{order.customer_name}</div>
                     <div className="text-sm text-muted-foreground">{order.customer_email}</div>
+                    <div className="text-sm text-muted-foreground mt-1">{order.customer_address}</div>
                   </TableCell>
                   <TableCell>{order.package}</TableCell>
                   <TableCell>${(order.price / 100).toFixed(2)}</TableCell>

@@ -21,8 +21,14 @@ export async function POST(req: Request) {
       price,
       notes,
       photoUrls,
-      storageFolder, // Get the storage folder path
+      storageFolder,
       paypalOrderId,
+      addressLine1,
+      addressLine2,
+      city,
+      stateProvinceRegion,
+      postalCode,
+      country,
     } = body;
 
     // --- 1. Find or Create Customer ---
@@ -36,11 +42,22 @@ export async function POST(req: Request) {
       console.error('Error finding customer:', customerError.message);
       throw customerError;
     }
+    
+    const customerDetails = {
+      email,
+      name,
+      address_line1: addressLine1,
+      address_line2: addressLine2,
+      city,
+      state_province_region: stateProvinceRegion,
+      postal_code: postalCode,
+      country,
+    };
 
     if (!customer) {
       const { data: newCustomer, error: newCustomerError } = await supabase
         .from('customers')
-        .insert({ email, name })
+        .insert(customerDetails)
         .select('id')
         .single();
       
@@ -49,6 +66,17 @@ export async function POST(req: Request) {
         throw newCustomerError;
       }
       customer = newCustomer;
+    } else {
+        // Update existing customer's address
+         const { error: updateCustomerError } = await supabase
+            .from('customers')
+            .update(customerDetails)
+            .eq('id', customer.id);
+        
+        if (updateCustomerError) {
+            console.error('Error updating customer:', updateCustomerError.message);
+            // Non-fatal, we can still create the order
+        }
     }
 
     // --- 2. Create Order ---
@@ -64,7 +92,7 @@ export async function POST(req: Request) {
         storage_folder: storageFolder, // Save storage folder
         notes,
         status: 'Paid', // Assuming this is called after payment
-        paypal_order_id: paypalOrderId, // Save PayPal Order ID
+        paypal_order_id: paypalOrderId,
       })
       .select('id')
       .single();

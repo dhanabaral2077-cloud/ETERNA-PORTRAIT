@@ -17,7 +17,6 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from '@/lib/supabase-client';
-import { Progress } from "@/components/ui/progress";
 
 const packages = {
     classic: {
@@ -66,7 +65,13 @@ function OrderForm() {
         style: 'artist' as StyleOption,
         notes: '',
         name: '',
-        email: ''
+        email: '',
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        stateProvinceRegion: '',
+        postalCode: '',
+        country: '',
     });
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -114,10 +119,31 @@ function OrderForm() {
     };
 
     const validateForm = () => {
-        if (!formData.name) { toast({ variant: "destructive", title: "Name Required", description: "Please enter your full name." }); return false; }
-        if (!formData.email) { toast({ variant: "destructive", title: "Email Required", description: "Please enter your email address." }); return false; }
-        if (!/\S+@\S+\.\S+/.test(formData.email)) { toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." }); return false; }
-        if (photoFiles.length === 0) { toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." }); return false; }
+        // Required fields
+        const requiredFields = {
+            name: "Please enter your full name.",
+            email: "Please enter your email address.",
+            addressLine1: "Please enter your address.",
+            city: "Please enter your city.",
+            postalCode: "Please enter your postal code.",
+            country: "Please enter your country."
+        };
+
+        for (const [field, message] of Object.entries(requiredFields)) {
+            if (!formData[field as keyof typeof formData]) {
+                toast({ variant: "destructive", title: "Missing Information", description: message });
+                return false;
+            }
+        }
+        
+        if (!/\S+@\S+\.\S+/.test(formData.email)) { 
+            toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." }); 
+            return false; 
+        }
+        if (photoFiles.length === 0) { 
+            toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." }); 
+            return false; 
+        }
         return true;
     };
     
@@ -149,13 +175,9 @@ function OrderForm() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                    petName: formData.petName,
-                    style: formData.style,
-                    pkg: { name: selectedPackage.name, id: selectedPackage.id }, // Pass name and id
+                    ...formData,
+                    pkg: { name: selectedPackage.name, id: selectedPackage.id },
                     price: selectedPackage.price,
-                    notes: formData.notes,
                     photoUrls,
                     storageFolder: orderFolderName,
                     paypalOrderId,
@@ -217,10 +239,20 @@ function OrderForm() {
                         <h2 className="font-headline text-3xl text-foreground">Your Commission</h2>
                         
                         <div>
-                            <Label>1. Your Details</Label>
+                            <Label>1. Contact & Shipping</Label>
                             <div className="mt-2 space-y-4">
-                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" />
-                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" />
+                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required />
+                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required />
+                                <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required />
+                                <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required />
+                                    <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required />
+                                    <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required />
+                                </div>
                             </div>
                         </div>
 
@@ -316,9 +348,9 @@ function OrderForm() {
                              ) : (
                                 <div
                                   className={`${!photoFiles.length || !formData.email || !formData.name ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                  title={!formData.name ? "Please enter your name" : !formData.email ? "Please enter your email" : !photoFiles.length ? "Please upload at least one photo" : ""}
+                                  title={!validateForm() ? "Please fill out all required fields" : ""}
                                 >
-                                  <div className={`${!photoFiles.length || !formData.email || !formData.name ? 'pointer-events-none' : ''}`}>
+                                  <div className={`${!validateForm() ? 'pointer-events-none' : ''}`}>
                                     <PayPalButton 
                                         amount={priceInCents / 100}
                                         onSuccess={onPaymentSuccess}
@@ -370,5 +402,3 @@ export default function OrderPage() {
     </div>
   );
 }
-
-    
