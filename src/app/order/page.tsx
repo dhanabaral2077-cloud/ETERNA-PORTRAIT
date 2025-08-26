@@ -156,7 +156,7 @@ function OrderForm() {
         orderDetails.append('style', formData.style);
         orderDetails.append('package', selectedPackage.name);
         orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
-        orderDetailsappend('notes', formData.notes);
+        orderDetails.append('notes', formData.notes);
 
         photoFiles.forEach((file, index) => {
             orderDetails.append('file' + index, file, file.name);
