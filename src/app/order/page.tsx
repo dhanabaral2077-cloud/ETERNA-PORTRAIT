@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2, Package, Check } from "lucide-react";
+import { UploadCloud, Palette, Package, Pencil, CheckCircle, ShoppingCart, Loader2, Check } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -269,12 +269,15 @@ export default function OrderPage() {
                         <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {styleOptions.map((s) => (
                                 <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
-                                    <Card className="text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/5 transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
+                                    <Card className="relative text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10 transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
                                         <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
                                         <CardContent className="p-0 flex flex-col items-center justify-center gap-2">
                                             <h3 className="font-headline text-2xl text-foreground">{s.name}</h3>
                                             <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
                                         </CardContent>
+                                        <div className="absolute top-2 right-2 w-6 h-6 rounded-full border-2 border-muted flex items-center justify-center opacity-0 group-has-[:checked]:opacity-100 group-has-[:checked]:border-accent group-has-[:checked]:bg-accent transition-all">
+                                            <Check className="w-4 h-4 text-white" />
+                                        </div>
                                     </Card>
                                 </Label>
                             ))}
@@ -308,7 +311,7 @@ export default function OrderPage() {
                                       </ul>
                                   </CardContent>
                                   <div className="w-8 h-8 rounded-full border-2 border-muted flex items-center justify-center mt-6 mx-auto group-has-[:checked]:border-accent group-has-[:checked]:bg-accent transition-colors">
-                                      <Check className="w-5 h-5 text-white" />
+                                      <Check className="w-5 h-5 text-accent-foreground opacity-0 group-has-[:checked]:opacity-100 transition-opacity" />
                                   </div>
                               </Card>
                           </Label>
@@ -328,13 +331,13 @@ export default function OrderPage() {
                     <div className="space-y-2">
                        <Label>Background Style</Label>
                        <RadioGroup value={formData.background} onValueChange={(v) => handleChange('background', v)} className="flex gap-4">
-                          <Label htmlFor="bg-plain" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary transition-all">
+                          <Label htmlFor="bg-plain" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all">
                               <RadioGroupItem value="plain" id="bg-plain" className="sr-only" /> Plain
                           </Label>
-                          <Label htmlFor="bg-gradient" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary transition-all">
+                          <Label htmlFor="bg-gradient" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all">
                               <RadioGroupItem value="gradient" id="bg-gradient" className="sr-only" /> Soft Gradient
                           </Label>
-                          <Label htmlFor="bg-artist" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary transition-all">
+                          <Label htmlFor="bg-artist" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all">
                               <RadioGroupItem value="artist" id="bg-artist" className="sr-only" /> Artist's Choice
                           </Label>
                        </RadioGroup>
