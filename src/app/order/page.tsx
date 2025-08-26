@@ -16,6 +16,7 @@ import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
+import { Progress } from "@/components/ui/progress";
 
 const packages = {
     classic: {
@@ -70,8 +71,11 @@ function OrderForm() {
     const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
     
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const xhrRef = useRef<XMLHttpRequest | null>(null);
 
     useEffect(() => {
         const pkg = searchParams.get('pkg') as PackageKey;
@@ -80,7 +84,6 @@ function OrderForm() {
             const maxPets = packages[pkg].maxPets;
             setPhotoFiles(Array(maxPets).fill(null));
             setPhotoPreviews(Array(maxPets).fill(null));
-            // Create a temporary order ID for PayPal
             setOrderId(`TEMP-${Date.now()}`);
         }
     }, [searchParams]);
@@ -92,10 +95,15 @@ function OrderForm() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                toast({ variant: "destructive", title: "File Too Large", description: "Please upload an image smaller than 5MB." });
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                toast({ variant: "destructive", title: "File Too Large", description: "Please upload an image smaller than 10MB." });
                 return;
             }
+            if (photoFiles.filter(f => f).length >= packages[selectedPackageKey!].maxPets) {
+                toast({ variant: "destructive", title: "Upload Limit Reached", description: `You can upload a maximum of ${packages[selectedPackageKey!].maxPets} photos for this package.` });
+                return;
+            }
+
             const newFiles = [...photoFiles];
             newFiles[index] = file;
             setPhotoFiles(newFiles);
@@ -131,65 +139,104 @@ function OrderForm() {
             toast({ variant: "destructive", title: "Email Required", description: "Please enter your email address." });
             return false;
         }
-        // Basic email format check
         if (!/\S+@\S+\.\S+/.test(formData.email)) {
             toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." });
             return false;
         }
         return true;
     };
-
+    
     const onPaymentSuccess = async () => {
         if (isSubmitting || !validateForm()) return;
         setIsSubmitting(true);
-        
-        toast({ title: "Payment Complete!", description: "Finalizing your order..." });
+        setUploadStatus('uploading');
+        setUploadProgress(0);
 
-        try {
-            const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
-            if (!scriptUrl || !selectedPackageKey) {
-                throw new Error("Configuration error or missing package selection.");
-            }
-            
-            const selectedPackage = packages[selectedPackageKey];
-
-            const orderDetails = new FormData();
-            orderDetails.append('customerName', formData.name);
-            orderDetails.append('customerEmail', formData.email);
-            orderDetails.append('petName', formData.petName);
-            orderDetails.append('style', formData.style);
-            orderDetails.append('package', selectedPackage.name);
-            orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
-            orderDetails.append('notes', formData.notes);
-            
-            photoFiles.forEach((file) => {
-                if (file) {
-                    orderDetails.append('file', file);
-                }
-            });
-
-
-            await fetch(scriptUrl, {
-                method: "POST",
-                body: orderDetails,
-                mode: 'no-cors' 
-            });
-
-            toast({
-                title: "Order Submitted!",
-                description: "Your commission is now in the hands of our talented artists."
-            });
-            setStep(1); // Move to final confirmation step
-        } catch (error: any) {
-            console.error("Submission Error After Payment:", error);
-            toast({ 
-                variant: "destructive", 
-                title: "Order Submission Failed", 
-                description: "Your payment was successful, but we had trouble submitting your order details. Please contact support." 
-            });
-        } finally {
+        const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
+        if (!scriptUrl || !selectedPackageKey) {
+            toast({ variant: "destructive", title: "Configuration Error", description: "Could not submit your order. Please contact support." });
             setIsSubmitting(false);
+            setUploadStatus('error');
+            return;
         }
+
+        const selectedPackage = packages[selectedPackageKey];
+        const orderDetails = new FormData();
+        orderDetails.append('customerName', formData.name);
+        orderDetails.append('customerEmail', formData.email);
+        orderDetails.append('petName', formData.petName);
+        orderDetails.append('style', formData.style);
+        orderDetails.append('package', selectedPackage.name);
+        orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
+        orderDetails.append('notes', formData.notes);
+
+        photoFiles.forEach((file) => {
+            if (file) {
+                orderDetails.append('file', file, file.name);
+            }
+        });
+
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
+        xhr.open("POST", scriptUrl, true);
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percentComplete = Math.round((event.loaded / event.total) * 100);
+                setUploadProgress(percentComplete);
+            }
+        };
+
+        xhr.onload = () => {
+            setIsSubmitting(false);
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const json = JSON.parse(xhr.responseText);
+                    if (json.success) {
+                        setUploadStatus('success');
+                        setUploadProgress(100);
+                        toast({
+                            title: "Order Submitted!",
+                            description: `Your commission (#${json.orderId}) is now in the hands of our talented artists.`
+                        });
+                        setStep(1);
+                    } else {
+                        setUploadStatus('error');
+                        toast({
+                            variant: "destructive",
+                            title: "Order Submission Failed",
+                            description: json.error || "An unknown server error occurred."
+                        });
+                    }
+                } catch (e) {
+                    setUploadStatus('error');
+                    toast({
+                        variant: "destructive",
+                        title: "Unexpected Response",
+                        description: "The server sent a response we couldn't understand. Please contact support."
+                    });
+                }
+            } else {
+                setUploadStatus('error');
+                toast({
+                    variant: "destructive",
+                    title: "Upload Failed",
+                    description: `The server responded with status ${xhr.status}. Please try again.`
+                });
+            }
+        };
+
+        xhr.onerror = () => {
+            setIsSubmitting(false);
+            setUploadStatus('error');
+            toast({
+                variant: "destructive",
+                title: "Network Error",
+                description: "Could not connect to the server. Please check your network and try again."
+            });
+        };
+
+        xhr.send(orderDetails);
     };
 
     const onPaymentError = (error: any) => {
@@ -199,6 +246,7 @@ function OrderForm() {
             title: "Payment Failed",
             description: "Something went wrong with the payment. Please try again."
         });
+        setIsSubmitting(false);
     };
     
     if (!selectedPackageKey) {
@@ -235,7 +283,7 @@ function OrderForm() {
                         
                         {/* --- PHOTO UPLOAD --- */}
                         <div>
-                            <Label>1. Your Pet's Photo(s)</Label>
+                            <Label>1. Your Pet's Photo(s) (up to {selectedPackage.maxPets})</Label>
                              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {Array.from({ length: selectedPackage.maxPets }).map((_, index) => (
                                     <div key={index}>
@@ -243,7 +291,7 @@ function OrderForm() {
                                         <div onClick={() => triggerFileInput(index)} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
                                             {photoPreviews[index] ? (
                                                 <>
-                                                    <Image src={photoPreviews[index]!} alt={`Pet preview ${index + 1}`} layout="fill" className="rounded-lg object-cover" />
+                                                    <Image src={photoPreviews[index]!} alt={`Pet preview ${index + 1}`} fill className="rounded-lg object-cover" />
                                                     <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -252,7 +300,7 @@ function OrderForm() {
                                                 <>
                                                     <UploadCloud className="w-8 h-8 text-accent mb-2" />
                                                     <span className="text-sm">Upload Pet {index + 1}</span>
-                                                    <span className="text-xs mt-1">(Max 5MB)</span>
+                                                    <span className="text-xs mt-1">(Max 10MB)</span>
                                                 </>
                                             )}
                                         </div>
@@ -264,7 +312,7 @@ function OrderForm() {
                         {/* --- STYLE --- */}
                         <div className="space-y-2">
                             <Label>2. Choose a Style</Label>
-                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-2 gap-4 pt-2">
+                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-3 gap-4 pt-2">
                                 <div>
                                     <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
                                     <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
@@ -332,9 +380,9 @@ function OrderForm() {
 
                         <div className="pt-4 text-center">
                             {isSubmitting ? (
-                                <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
-                                    <Loader2 className="animate-spin" />
-                                    <p>Finalizing your order...</p>
+                                <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground w-full">
+                                    <p>Finalizing your order... {uploadProgress}%</p>
+                                    <Progress value={uploadProgress} className="w-full" />
                                 </div>
                              ) : (
                                 orderId && (
