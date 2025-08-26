@@ -4,8 +4,7 @@
 // Usage: <PayPalButton orderId={orderId} amount={199} currency="USD" onSuccess={() => ...}/>
 // =============================================
 "use client";
-import { useEffect, useRef, useState } from "react";
-import Script from "next/script";
+import { useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PayPalButtonProps {
@@ -19,23 +18,25 @@ interface PayPalButtonProps {
 
 export default function PayPalButton({ orderId, priceCents, currency = "USD", className, onSuccess, onError }: PayPalButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [sdkReady, setSdkReady] = useState(false);
   const { toast } = useToast();
   const amount = (priceCents / 100).toFixed(2);
 
   // Render buttons after SDK loads
   useEffect(() => {
-    if (!sdkReady || !containerRef.current) return;
-    
     // @ts-ignore
-    if (typeof window.paypal === 'undefined') {
-        console.error("PayPal SDK not loaded.");
-        toast({ variant: "destructive", title: "PayPal Error", description: "Could not connect to PayPal." });
+    if (typeof window.paypal === 'undefined' || !containerRef.current) {
+        // SDK might not be loaded yet, or container isn't rendered.
+        // The script tag in this component will trigger a re-render when it loads.
         return;
     };
 
     // Clear the container to avoid duplicate buttons
-    containerRef.current.innerHTML = "";
+    try {
+        if(containerRef.current) containerRef.current.innerHTML = "";
+    } catch (e) {
+        console.warn("Error clearing PayPal button container", e);
+    }
+
 
     // @ts-ignore
     const buttons = window.paypal.Buttons({
@@ -81,7 +82,13 @@ export default function PayPalButton({ orderId, priceCents, currency = "USD", cl
       },
     });
 
-    buttons.render(containerRef.current);
+    if (containerRef.current) {
+      buttons.render(containerRef.current).catch((err: any) => {
+        console.error("Failed to render PayPal buttons", err);
+        toast({ variant: "destructive", title: "PayPal Render Error", description: "Could not display PayPal buttons." });
+      });
+    }
+
 
     return () => {
       try { 
@@ -90,16 +97,11 @@ export default function PayPalButton({ orderId, priceCents, currency = "USD", cl
         console.error("Error clearing PayPal button container", e);
       }
     };
-  }, [sdkReady, orderId, amount, currency, onSuccess, onError, toast]);
+  }, [orderId, amount, currency, onSuccess, onError, toast]);
 
   return (
     <>
-      {/* PayPal SDK */}
-      <Script
-        src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=${currency}`}
-        onLoad={() => setSdkReady(true)}
-        strategy="afterInteractive"
-      />
+      {/* The SDK is loaded in the root layout, no need to load it here again */}
       <div ref={containerRef} className={className} />
     </>
   );
