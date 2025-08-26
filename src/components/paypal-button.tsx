@@ -55,6 +55,7 @@ export default function PayPalButton({ orderId, priceCents, currency = "USD", cl
              console.error("PayPal createOrder error:", error);
              toast({ variant: "destructive", title: "Payment Error", description: error.message });
              if (onError) onError(error);
+             return Promise.reject(error);
         }
       },
       onApprove: async (data: any) => {
@@ -69,13 +70,14 @@ export default function PayPalButton({ orderId, priceCents, currency = "USD", cl
                 const errorMessage = json.error || "Failed to finalize payment.";
                 toast({ variant: "destructive", title: "Payment Failed", description: errorMessage });
                 if (onError) onError(json);
-                return;
+                return Promise.reject(json);
             }
             if (onSuccess) onSuccess();
         } catch (error: any) {
             console.error("PayPal onApprove error:", error);
             toast({ variant: "destructive", title: "Payment Failed", description: error.message });
             if (onError) onError(error);
+            return Promise.reject(error);
         }
       },
       onError: (err: any) => {

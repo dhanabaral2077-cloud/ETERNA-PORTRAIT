@@ -1,40 +1,25 @@
 // /app/api/paypal/capture-order/route.ts
 import { NextResponse } from "next/server";
+import client from '@/lib/paypal-client';
+import paypal from '@paypal/checkout-server-sdk';
 // import { createClient } from "@supabase/supabase-js";
 // import { Resend } from "resend";
 import ProductionKickoff from "@/emails/ProductionKickoff";
 
-const PAYPAL_API_URL = process.env.PAYPAL_API_URL || "https://api-m.sandbox.paypal.com";
 
 export async function POST(req: Request) {
     try {
-        if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
-            throw new Error("PayPal API credentials are not configured.");
-        }
-
         const { orderId, paypalOrderId } = await req.json();
         if (!orderId || !paypalOrderId) {
             return NextResponse.json({ error: "orderId and paypalOrderId required" }, { status: 400 });
         }
 
-        const auth = Buffer.from(
-            `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-        ).toString("base64");
+        const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
+        // @ts-ignore
+        request.requestBody({});
 
-        const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${paypalOrderId}/capture`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Basic ${auth}`,
-            },
-            cache: 'no-store'
-        });
-
-        const captureData = await res.json();
-        if (!res.ok) {
-            console.error("PayPal capture error:", captureData);
-            return NextResponse.json({ error: captureData?.message || "PayPal capture error", details: captureData }, { status: res.status });
-        }
+        const capture = await client.execute(request);
+        const captureData = capture.result;
 
         if (captureData.status === 'COMPLETED') {
             // --- Database & Email Logic (Placeholder) ---
@@ -76,6 +61,6 @@ export async function POST(req: Request) {
 
     } catch (e: any) {
         console.error("Internal server error capturing PayPal order:", e);
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        return NextResponse.json({ error: e.message, details: e.message }, { status: 500 });
     }
 }
