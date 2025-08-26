@@ -1,99 +1,93 @@
 // =============================================
 // File: /components/paypal/PayPalButton.tsx
 // Desc: Drop‑in PayPal checkout button for your order flow
-// Usage: <PayPalButton orderId={orderId} priceCents={19900} onSuccess={() => ...}/>
+// Usage: <PayPalButton orderId={orderId} amount={199.00} onSuccess={() => ...}/>
 // =============================================
 "use client";
-import { useEffect, useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useRef, useState } from "react";
+import Script from 'next/script';
 
 interface PayPalButtonProps {
-  orderId: string;         // your internal order id (from Supabase)
-  priceCents: number;      // amount in cents
-  currency?: string;       // default "USD"
+  orderId: string;
+  amount: number; // The amount in major units (e.g. 199.00)
+  currency?: string;
   className?: string;
-  onSuccess?: () => void;  // called after capture succeeds
+  onSuccess?: () => void;
   onError?: (err: any) => void;
 }
 
-export default function PayPalButton({ orderId, priceCents, currency = "USD", className, onSuccess, onError }: PayPalButtonProps) {
+export default function PayPalButton({ orderId, amount, currency = "USD", className, onSuccess, onError }: PayPalButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const amount = (priceCents / 100).toFixed(2);
+  const [sdkReady, setSdkReady] = useState(false);
 
-  // Render buttons after SDK loads
   useEffect(() => {
     // @ts-ignore
-    if (typeof window.paypal === 'undefined' || !containerRef.current) {
-        // SDK might not be loaded yet, or container isn't rendered.
-        // The script tag in the root layout will trigger a re-render when it loads.
-        return;
-    };
-
-    // Clear the container to avoid duplicate buttons
-    try {
-        if(containerRef.current) containerRef.current.innerHTML = "";
-    } catch (e) {
-        console.warn("Error clearing PayPal button container", e);
+    if (!sdkReady || !window.paypal || !containerRef.current) {
+      return;
     }
 
+    // Clear the container to avoid re-rendering issues
+    containerRef.current.innerHTML = '';
 
     // @ts-ignore
-    window.paypal.Buttons({
+    const buttons = window.paypal.Buttons({
       style: { layout: "vertical", shape: "pill", color: "gold", label: "pay" },
       createOrder: async () => {
         try {
-            const res = await fetch("/api/paypal/create-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ orderId, amount: parseFloat(amount), currency }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to create PayPal order");
-            return data.id; // PayPal order id
-        } catch (error: any) {
-             console.error("PayPal createOrder error:", error);
-             toast({ variant: "destructive", title: "Payment Error", description: error.message });
-             if (onError) onError(error);
-             return Promise.reject(error);
+          const res = await fetch("/api/paypal/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, amount, currency }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || "Failed to create PayPal order.");
+          }
+          return data.id; // This is the PayPal order ID
+        } catch (error) {
+          console.error("PayPal createOrder error:", error);
+          if (onError) onError(error);
+          return Promise.reject(error);
         }
       },
-      onApprove: async (data: any) => {
+      onApprove: async (data: { orderID: string }) => {
         try {
-            const res = await fetch("/api/paypal/capture-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ orderId, paypalOrderId: data.orderID }),
-            });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                const errorMessage = json.error || "Failed to finalize payment.";
-                toast({ variant: "destructive", title: "Payment Failed", description: errorMessage });
-                if (onError) onError(json);
-                return Promise.reject(json);
-            }
-            if (onSuccess) onSuccess();
-        } catch (error: any) {
-            console.error("PayPal onApprove error:", error);
-            toast({ variant: "destructive", title: "Payment Failed", description: error.message });
-            if (onError) onError(error);
-            return Promise.reject(error);
+          const res = await fetch("/api/paypal/capture-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, paypalOrderId: data.orderID }),
+          });
+          const json = await res.json();
+          if (!res.ok || !json.success) {
+            throw new Error(json.error || "Failed to capture payment.");
+          }
+          if (onSuccess) onSuccess();
+        } catch (error) {
+          console.error("PayPal onApprove error:", error);
+          if (onError) onError(error);
         }
       },
       onError: (err: any) => {
-          console.error("PayPal SDK Error:", err);
-          toast({ variant: "destructive", title: "PayPal Error", description: "An unexpected error occurred during payment." });
-          if (onError) onError(err)
+        console.error("PayPal SDK Error:", err);
+        if (onError) onError(err);
       },
-    }).render(containerRef.current).catch((err: any) => {
-        console.error("Failed to render PayPal buttons", err);
-        toast({ variant: "destructive", title: "PayPal Render Error", description: "Could not display PayPal buttons." });
     });
 
+    buttons.render(containerRef.current).catch((err: any) => {
+      console.error("Failed to render PayPal Buttons:", err);
+      if (onError) onError(err);
+    });
 
-  }, [orderId, amount, currency, onSuccess, onError, toast]);
+  }, [sdkReady, orderId, amount, currency, onSuccess, onError]);
 
   return (
+    <>
+      <Script
+        src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=${currency}`}
+        onLoad={() => setSdkReady(true)}
+        strategy="afterInteractive"
+      />
       <div ref={containerRef} className={className} />
+    </>
   );
 }

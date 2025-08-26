@@ -2,7 +2,6 @@ import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import { Playfair_Display, Inter } from 'next/font/google';
 import './globals.css';
-import Script from 'next/script';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -32,7 +31,6 @@ export default function RootLayout({
         {children}
         <Toaster />
       </body>
-      <Script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`}></Script>
     </html>
   );
 }

@@ -316,6 +316,12 @@ export default function OrderPage() {
                     <Card>
                          <CardContent className="p-6">
                             <h3 className="font-headline text-lg mb-4">Final Invoice</h3>
+                            <div className="flex justify-between items-center text-secondary">
+                                <span>Style: <span className="font-medium text-foreground capitalize">{formData.style}</span></span>
+                            </div>
+                             <div className="flex justify-between items-center text-secondary">
+                                <span>Size: <span className="font-medium text-foreground capitalize">{formData.size}</span></span>
+                            </div>
                             <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
                                 <span>Total</span>
                                 <span>${(priceInCents / 100).toFixed(2)}</span>
@@ -327,15 +333,14 @@ export default function OrderPage() {
                          {orderId ? (
                             <PayPalButton 
                                 orderId={orderId} 
-                                priceCents={priceInCents}
+                                amount={priceInCents / 100}
                                 onSuccess={onPaymentSuccess}
                                 onError={onPaymentError}
                             />
                          ) : (
                            <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin" />
-                                <p>Securing your commission...</p>
-                           </div>
+                                <p>Securing your commission...</p>                           </div>
                          )}
                     </div>
                   </div>
