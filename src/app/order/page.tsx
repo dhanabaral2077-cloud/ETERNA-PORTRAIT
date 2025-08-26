@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2 } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -25,6 +25,7 @@ const packages = {
         priceFormatted: '$450',
         description: 'For those seeking timeless elegance in a smaller format.',
         features: ['High-resolution digital file', 'One pet included', 'Fine art canvas print (12x16)'],
+        maxPets: 1,
     },
     signature: {
         id: 'signature',
@@ -34,6 +35,7 @@ const packages = {
         description: 'Our most popular commission — premium and refined.',
         features: ['High-resolution digital file', 'Up to two pets', 'Premium canvas print (18x24)', 'Hand-finished brush details'],
         highlight: true,
+        maxPets: 2,
     },
     masterpiece: {
         id: 'masterpiece',
@@ -42,10 +44,12 @@ const packages = {
         priceFormatted: '$1800',
         description: 'For collectors who demand the grandest expression.',
         features: ['High-resolution digital file', 'Up to three pets', 'Large-format canvas (24x36)', 'Luxury gilded frame', 'Priority commission'],
+        maxPets: 3,
     },
 } as const;
 
 type PackageKey = keyof typeof packages;
+type StyleOption = "artist" | "renaissance" | "classic_oil";
 
 function OrderForm() {
     const router = useRouter();
@@ -57,27 +61,27 @@ function OrderForm() {
 
     const [formData, setFormData] = useState({
         petName: '',
-        background: 'artist',
+        style: 'artist' as StyleOption,
         notes: '',
         name: 'Jane Doe', // Placeholder
-        email: 'jane@example.com' // Placeholder
+        email: ''
     });
-    const [photoFile, setPhotoFile] = useState<File | null>(null);
-    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([]);
+    const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderId, setOrderId] = useState<string | null>(null);
     
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     useEffect(() => {
         const pkg = searchParams.get('pkg') as PackageKey;
         if (pkg && packages[pkg]) {
             setSelectedPackageKey(pkg);
+            const maxPets = packages[pkg].maxPets;
+            setPhotoFiles(Array(maxPets).fill(null));
+            setPhotoPreviews(Array(maxPets).fill(null));
             // Create a temporary order ID for PayPal
             setOrderId(`TEMP-${Date.now()}`);
-        } else {
-            // Handle case where no package or invalid package is selected
-            // No toast here, the component will render the "No Package Selected" state
         }
     }, [searchParams]);
 
@@ -85,25 +89,51 @@ function OrderForm() {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const file = e.target.files?.[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) { // 5MB limit
                 toast({ variant: "destructive", title: "File Too Large", description: "Please upload an image smaller than 5MB." });
                 return;
             }
-            setPhotoFile(file);
+            const newFiles = [...photoFiles];
+            newFiles[index] = file;
+            setPhotoFiles(newFiles);
+
             const reader = new FileReader();
-            reader.onloadend = () => setPhotoPreview(reader.result as string);
+            reader.onloadend = () => {
+                const newPreviews = [...photoPreviews];
+                newPreviews[index] = reader.result as string;
+                setPhotoPreviews(newPreviews);
+            };
             reader.readAsDataURL(file);
         }
     };
 
-    const triggerFileInput = () => fileInputRef.current?.click();
+    const triggerFileInput = (index: number) => fileInputRefs.current[index]?.click();
+
+    const removePhoto = (index: number) => {
+        const newFiles = [...photoFiles];
+        newFiles[index] = null;
+        setPhotoFiles(newFiles);
+
+        const newPreviews = [...photoPreviews];
+        newPreviews[index] = null;
+        setPhotoPreviews(newPreviews);
+    };
 
     const validateForm = () => {
-        if (!photoFile) {
-            toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet." });
+        if (!photoFiles.some(f => f !== null)) {
+            toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." });
+            return false;
+        }
+        if (!formData.email) {
+            toast({ variant: "destructive", title: "Email Required", description: "Please enter your email address." });
+            return false;
+        }
+        // Basic email format check
+        if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." });
             return false;
         }
         return true;
@@ -127,13 +157,19 @@ function OrderForm() {
             orderDetails.append('customerName', formData.name);
             orderDetails.append('customerEmail', formData.email);
             orderDetails.append('petName', formData.petName);
-            orderDetails.append('style', 'Artist Choice'); // Style is now simplified
+            orderDetails.append('style', formData.style);
             orderDetails.append('package', selectedPackage.name);
             orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
             orderDetails.append('notes', formData.notes);
-            orderDetails.append('file', photoFile!);
+            
+            photoFiles.forEach((file) => {
+                if (file) {
+                    orderDetails.append('file', file);
+                }
+            });
 
-            const response = await fetch(scriptUrl, {
+
+            await fetch(scriptUrl, {
                 method: "POST",
                 body: orderDetails,
                 mode: 'no-cors' 
@@ -199,30 +235,73 @@ function OrderForm() {
                         
                         {/* --- PHOTO UPLOAD --- */}
                         <div>
-                            <Label>1. Your Pet's Photo</Label>
-                            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
-                            <div onClick={triggerFileInput} className="mt-2 border-2 border-dashed border-accent rounded-xl p-6 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors">
-                                {photoPreview ? (
-                                    <Image src={photoPreview} alt="Pet preview" width={120} height={120} className="rounded-lg object-cover" />
-                                ) : (
-                                    <>
-                                        <UploadCloud className="w-10 h-10 text-accent mb-2" />
-                                        <span>Click to Upload Photo</span>
-                                        <span className="text-xs mt-1">(Max 5MB)</span>
-                                    </>
-                                )}
+                            <Label>1. Your Pet's Photo(s)</Label>
+                             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {Array.from({ length: selectedPackage.maxPets }).map((_, index) => (
+                                    <div key={index}>
+                                        <input type="file" ref={el => fileInputRefs.current[index] = el} onChange={(e) => handleFileChange(e, index)} accept="image/jpeg,image/png,image/webp" className="hidden" />
+                                        <div onClick={() => triggerFileInput(index)} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
+                                            {photoPreviews[index] ? (
+                                                <>
+                                                    <Image src={photoPreviews[index]!} alt={`Pet preview ${index + 1}`} layout="fill" className="rounded-lg object-cover" />
+                                                    <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UploadCloud className="w-8 h-8 text-accent mb-2" />
+                                                    <span className="text-sm">Upload Pet {index + 1}</span>
+                                                    <span className="text-xs mt-1">(Max 5MB)</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
+                        {/* --- STYLE --- */}
+                        <div className="space-y-2">
+                            <Label>2. Choose a Style</Label>
+                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value)} className="grid grid-cols-2 gap-4 pt-2">
+                                <div>
+                                    <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
+                                    <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                        Artist Choice
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="renaissance" id="renaissance" className="peer sr-only" />
+                                    <Label htmlFor="renaissance" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                        Renaissance
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="classic_oil" id="classic_oil" className="peer sr-only" />
+                                    <Label htmlFor="classic_oil" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                        Classic Oil
+                                    </Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+
+
                         {/* --- PET'S NAME --- */}
                         <div className="space-y-2">
-                          <Label htmlFor="pet-name">2. Pet's Name (Optional)</Label>
-                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max, Luna" />
+                          <Label htmlFor="pet-name">3. Pet's Name(s) (Optional)</Label>
+                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" />
+                        </div>
+
+                        {/* --- EMAIL --- */}
+                        <div className="space-y-2">
+                            <Label htmlFor="email">4. Your Email</Label>
+                            <Input id="email" type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" />
                         </div>
                         
                         {/* --- NOTES --- */}
                          <div className="space-y-2">
-                          <Label htmlFor="notes">3. Notes for the Artist (Optional)</Label>
+                          <Label htmlFor="notes">5. Notes for the Artist (Optional)</Label>
                           <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
                         </div>
 
@@ -260,10 +339,10 @@ function OrderForm() {
                              ) : (
                                 orderId && (
                                     <div
-                                      className={`${!photoFile ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                      title={!photoFile ? "Please upload a photo to proceed" : ""}
+                                      className={`${!photoFiles.some(f => f !== null) || !formData.email ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                      title={!photoFiles.some(f => f !== null) ? "Please upload at least one photo to proceed" : !formData.email ? "Please enter your email to proceed" : ""}
                                     >
-                                      <div className={`${!photoFile ? 'pointer-events-none' : ''}`}>
+                                      <div className={`${!photoFiles.some(f => f !== null) || !formData.email ? 'pointer-events-none' : ''}`}>
                                         <PayPalButton 
                                             orderId={orderId} 
                                             amount={priceInCents / 100}
@@ -290,7 +369,7 @@ function OrderForm() {
                   <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
                   <h2 className="font-headline text-4xl text-foreground">Thank You!</h2>
                   <p className="text-secondary max-w-md mx-auto">
-                    Your pet's portrait is now in progress. We’ll send an email with your order number and update you as the artwork moves from sketch → painting → delivery.
+                    Your pet's portrait is now in progress. We’ll send an email to <span className="font-semibold text-foreground">{formData.email}</span> with your order number and update you as the artwork moves from sketch → painting → delivery.
                   </p>
                   <Button onClick={() => router.push('/')} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all mt-6">
                     Back to Home
@@ -316,3 +395,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
