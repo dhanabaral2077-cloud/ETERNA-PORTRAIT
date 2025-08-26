@@ -87,13 +87,13 @@ export default function OrderPage() {
 
   const triggerFileInput = () => fileInputRef.current?.click();
 
-  const next = () => setStep((s) => {
-    if (s === 0 && !photoFile) {
+  const next = () => {
+    if (step === 0 && !photoFile) {
         setShowPhotoError(true);
-        return s;
+        return;
     }
-    return Math.min(s + 1, steps.length - 1);
-  });
+    setStep((s) => Math.min(s + 1, steps.length - 1));
+  };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmitToCheckout = async () => {
