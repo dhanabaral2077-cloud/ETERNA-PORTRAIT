@@ -15,11 +15,11 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-background border-t animate-fade-in">
-      <div className="container mx-auto py-6 px-4 md:px-6 flex flex-col md:flex-row items-center justify-between">
-        <div className="text-center md:text-left mb-4 md:mb-0">
+      <div className="container mx-auto py-8 px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="text-center md:text-left">
           <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
         </div>
-        <div className="flex items-center space-x-4 font-headline text-sm uppercase tracking-widest">
+        <div className="flex items-center space-x-6 font-headline text-sm uppercase tracking-widest">
           <Link href="/privacy" className="relative text-muted-foreground transition-colors hover:text-primary group">
             <span>Privacy</span>
             <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
@@ -33,7 +33,7 @@ export function Footer() {
             <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
           </Link>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="shrink-0">
             <a 
               href="https://www.paypal.com/webapps/mpp/paypal-popup" 
               title="How PayPal Works" 
