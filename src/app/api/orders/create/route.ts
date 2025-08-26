@@ -1,3 +1,4 @@
+
 // src/app/api/orders/create/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
       price,
       notes,
       photoUrls,
+      storageFolder, // Get the storage folder path
       paypalOrderId,
     } = body;
 
@@ -59,9 +61,10 @@ export async function POST(req: Request) {
         package: pkg.name,
         price,
         photo_urls: photoUrls,
+        storage_folder: storageFolder, // Save storage folder
         notes,
         status: 'Paid', // Assuming this is called after payment
-        paypal_order_id: paypalOrderId,
+        paypal_order_id: paypalOrderId, // Save PayPal Order ID
       })
       .select('id')
       .single();
@@ -86,3 +89,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message || 'An unknown error occurred' }, { status: 500 });
   }
 }
+
+    

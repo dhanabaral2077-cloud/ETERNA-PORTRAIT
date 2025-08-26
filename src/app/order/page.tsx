@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, Suspense } from "react";
@@ -10,13 +11,13 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, FileCheck2 } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2 } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
-import { Progress } from "@/components/ui/progress";
 import { supabase } from '@/lib/supabase-client';
+import { Progress } from "@/components/ui/progress";
 
 const packages = {
     classic: {
@@ -126,10 +127,11 @@ function OrderForm() {
         setIsSubmitting(true);
         
         try {
-            // 1. Upload files to Supabase Storage
+            const orderFolderName = `orders/${Date.now()}`;
+            // 1. Upload files to Supabase Storage in a dedicated folder
             const uploadPromises = photoFiles.map(file => {
-                const filePath = `portraits/${Date.now()}-${file.name}`;
-                return supabase.storage.from('portraits').upload(filePath, file);
+                const filePath = `${orderFolderName}/${file.name}`;
+                return supabase.storage.from('orders').upload(filePath, file);
             });
 
             const uploadResults = await Promise.all(uploadPromises);
@@ -137,7 +139,7 @@ function OrderForm() {
             const photoUrls: string[] = [];
             for (const result of uploadResults) {
                 if (result.error) throw new Error(`File upload failed: ${result.error.message}`);
-                const { data } = supabase.storage.from('portraits').getPublicUrl(result.data.path);
+                const { data } = supabase.storage.from('orders').getPublicUrl(result.data.path);
                 photoUrls.push(data.publicUrl);
             }
 
@@ -151,10 +153,11 @@ function OrderForm() {
                     email: formData.email,
                     petName: formData.petName,
                     style: formData.style,
-                    pkg: selectedPackage,
+                    pkg: { name: selectedPackage.name, id: selectedPackage.id }, // Pass name and id
                     price: selectedPackage.price,
                     notes: formData.notes,
                     photoUrls,
+                    storageFolder: orderFolderName,
                     paypalOrderId,
                 })
             });
@@ -367,3 +370,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
