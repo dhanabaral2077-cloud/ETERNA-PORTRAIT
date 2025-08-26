@@ -53,7 +53,7 @@ export function HowItWorks() {
             aria-hidden="true"
             className="absolute inset-0 -z-10 rounded-lg"
             style={{
-                background: "linear-gradient(120deg, hsl(var(--background)), #F5E8C7, hsl(var(--background)))",
+                background: "linear-gradient(120deg, hsl(var(--background)), hsl(var(--primary)/0.2), hsl(var(--background)))",
                 backgroundSize: "300% 300%",
             }}
             animate={{
@@ -72,7 +72,7 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-foreground"
+          className="font-headline text-4xl md:text-5xl text-foreground"
         >
           How It Works
         </motion.h2>
@@ -107,13 +107,13 @@ export function HowItWorks() {
             >
               {/* Numbered Circle with pulse + icon animation */}
               <motion.div
-                className="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center mb-4 shadow-md relative"
-                whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(201,162,39,0.4)" }}
+                className="w-20 h-20 rounded-full bg-accent text-accent-foreground flex items-center justify-center mb-4 shadow-md relative"
+                whileHover={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(34, 139, 34, 0.4)" }}
                 whileInView={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
                 viewport={{ once: false }}
               >
-                <span className="absolute top-1 text-xs font-serif opacity-80">0{idx + 1}</span>
+                <span className="absolute top-1 text-xs font-headline opacity-80">0{idx + 1}</span>
                 <motion.div
                   initial={{ opacity: 0, rotate: -20 }}
                   whileInView={{ opacity: 1, rotate: 0 }}
@@ -123,8 +123,8 @@ export function HowItWorks() {
                   <Icon size={24} />
                 </motion.div>
               </motion.div>
-              <h3 className="font-serif text-xl text-foreground mb-2">{step.title}</h3>
-              <p className="font-sans text-secondary max-w-xs">{step.desc}</p>
+              <h3 className="font-headline text-xl text-foreground mb-2">{step.title}</h3>
+              <p className="font-body text-secondary max-w-xs">{step.desc}</p>
             </motion.div>
           );
         })}

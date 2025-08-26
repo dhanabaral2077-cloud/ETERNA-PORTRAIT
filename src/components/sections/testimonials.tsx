@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function Testimonials() {
   const testimonials = [
     {
-      src: "https://placehold.co/80x80.png",
+      src: "https://picsum.photos/80/80?random=1",
       quote:
         "The portrait of Bella is the centerpiece of our home. It feels like museum art.",
       name: "Sophia L.",
@@ -17,7 +17,7 @@ export default function Testimonials() {
       aiHint: "woman portrait",
     },
     {
-      src: "https://placehold.co/80x80.png",
+      src: "https://picsum.photos/80/80?random=2",
       quote:
         "Max’s portrait captures his soul. It’s more than art—it’s a family heirloom.",
       name: "Jonathan M.",
@@ -25,7 +25,7 @@ export default function Testimonials() {
       aiHint: "man portrait",
     },
     {
-      src: "https://placehold.co/80x80.png",
+      src: "https://picsum.photos/80/80?random=3",
       quote:
         "When guests visit, they always ask about Luna’s painting. It has elevated our home.",
       name: "Elena R.",
@@ -43,7 +43,7 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-foreground"
+          className="font-headline text-4xl md:text-5xl text-foreground"
         >
           What Our Collectors Say
         </motion.h2>
@@ -67,16 +67,18 @@ export default function Testimonials() {
             viewport={{ once: true }}
             className="rounded-2xl bg-card shadow-lg p-8 flex flex-col items-center text-center border border-muted/20 hover:border-accent transition"
           >
-            <img
+            <Image
               src={t.src}
+              width={80}
+              height={80}
               alt={t.name}
               className="w-20 h-20 object-cover rounded-full mb-6 border-2 border-accent"
               data-ai-hint={t.aiHint}
             />
-            <p className="font-serif italic text-lg text-secondary leading-relaxed mb-6">
+            <p className="font-headline italic text-lg text-secondary leading-relaxed mb-6">
               “{t.quote}”
             </p>
-            <p className="font-sans text-sm uppercase tracking-wide text-muted-foreground">
+            <p className="font-body text-sm uppercase tracking-wide text-muted-foreground">
               {t.name} — {t.location}
             </p>
           </motion.div>

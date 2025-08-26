@@ -7,7 +7,7 @@ export function Footer() {
         <div className="text-center md:text-left mb-4 md:mb-0">
           <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
         </div>
-        <div className="flex items-center space-x-4 font-serif text-sm uppercase tracking-widest">
+        <div className="flex items-center space-x-4 font-headline text-sm uppercase tracking-widest">
           <Link href="/privacy" className="relative text-muted-foreground transition-colors hover:text-primary group">
             <span>Privacy</span>
             <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>

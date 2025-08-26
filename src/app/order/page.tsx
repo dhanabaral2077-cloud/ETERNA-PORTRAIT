@@ -264,22 +264,22 @@ function OrderForm() {
                         {/* --- STYLE --- */}
                         <div className="space-y-2">
                             <Label>2. Choose a Style</Label>
-                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value)} className="grid grid-cols-2 gap-4 pt-2">
+                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-2 gap-4 pt-2">
                                 <div>
                                     <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
-                                    <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                    <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
                                         Artist Choice
                                     </Label>
                                 </div>
                                 <div>
                                     <RadioGroupItem value="renaissance" id="renaissance" className="peer sr-only" />
-                                    <Label htmlFor="renaissance" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                    <Label htmlFor="renaissance" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
                                         Renaissance
                                     </Label>
                                 </div>
                                 <div>
                                     <RadioGroupItem value="classic_oil" id="classic_oil" className="peer sr-only" />
-                                    <Label htmlFor="classic_oil" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                    <Label htmlFor="classic_oil" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
                                         Classic Oil
                                     </Label>
                                 </div>
@@ -395,7 +395,3 @@ export default function OrderPage() {
     </div>
   );
 }
-
-    
-
-    

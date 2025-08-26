@@ -62,7 +62,7 @@ export function CTA() {
     <section id="contact" ref={ref} className="relative py-20 lg:py-32 bg-card overflow-hidden">
        <div className="absolute inset-0 z-0">
         <Image
-          src="https://placehold.co/1920x1080.png"
+          src="https://picsum.photos/1920/1080"
           alt="Framed pet portrait on a wall"
           layout="fill"
           objectFit="cover"

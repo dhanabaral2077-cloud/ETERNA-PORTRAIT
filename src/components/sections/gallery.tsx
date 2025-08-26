@@ -8,12 +8,12 @@ import Link from "next/link";
 
 export function Gallery() {
   const portraits = [
-    { src: "https://placehold.co/600x960.png", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
-    { src: "https://placehold.co/600x960.png", title: "Max in Classic Oil", aiHint: "cat oil" },
-    { src: "https://placehold.co/600x960.png", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
-    { src: "https://placehold.co/600x960.png", title: "Charlie in Regal Style", aiHint: "dog regal" },
-    { src: "https://placehold.co/600x960.png", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
-    { src: "https://placehold.co/600x960.png", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
+    { src: "https://picsum.photos/600/960?random=1", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
+    { src: "https://picsum.photos/600/960?random=2", title: "Max in Classic Oil", aiHint: "cat oil" },
+    { src: "https://picsum.photos/600/960?random=3", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
+    { src: "https://picsum.photos/600/960?random=4", title: "Charlie in Regal Style", aiHint: "dog regal" },
+    { src: "https://picsum.photos/600/960?random=5", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
+    { src: "https://picsum.photos/600/960?random=6", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
   ];
 
   return (
@@ -25,7 +25,7 @@ export function Gallery() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-foreground"
+          className="font-headline text-4xl md:text-5xl text-foreground"
         >
           Our Portrait Gallery
         </motion.h2>
@@ -58,7 +58,7 @@ export function Gallery() {
               data-ai-hint={portrait.aiHint}
             />
             <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/60 to-transparent text-white p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <p className="font-serif italic text-lg">{portrait.title}</p>
+              <p className="font-headline italic text-lg">{portrait.title}</p>
             </div>
           </motion.div>
         ))}

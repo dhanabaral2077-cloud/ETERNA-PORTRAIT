@@ -1,12 +1,12 @@
 import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
-import { Playfair_Display, Inter } from 'next/font/google';
+import { Alegreya, Inter } from 'next/font/google';
 import './globals.css';
 
-const playfairDisplay = Playfair_Display({
+const alegreya = Alegreya({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-playfair-display',
+  variable: '--font-alegreya',
 });
 
 const inter = Inter({
@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="!scroll-smooth">
-      <body className={`${playfairDisplay.variable} ${inter.variable} font-body bg-background text-foreground antialiased`}>
+      <body className={`${alegreya.variable} ${inter.variable} font-body bg-background text-foreground antialiased`}>
         {children}
         <Toaster />
       </body>

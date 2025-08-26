@@ -30,7 +30,7 @@ export function Hero() {
         {/* Left Column - Text */}
         <div className="flex flex-col justify-center items-start px-8 md:px-16 z-10">
           <motion.h1
-            className="font-serif text-5xl md:text-6xl text-foreground leading-tight"
+            className="font-headline text-5xl md:text-6xl text-foreground leading-tight"
             style={{ y: textY }}
           >
             Transform Your Pet’s Photo Into Timeless Art.
@@ -65,7 +65,7 @@ export function Hero() {
             style={{ opacity: photoOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="https://picsum.photos/800/1200?random=1"
               alt="Dog Photo"
               width={800}
               height={1200}
@@ -80,7 +80,7 @@ export function Hero() {
             style={{ opacity: paintingOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="https://picsum.photos/800/1200?random=2"
               alt="Dog Painting"
               width={800}
               height={1200}
@@ -95,7 +95,7 @@ export function Hero() {
             style={{ opacity: roomOpacity }}
           >
             <Image
-              src="https://placehold.co/800x1200.png"
+              src="https://picsum.photos/800/1200?random=3"
               alt="Dog Painting in Room"
               width={800}
               height={1200}

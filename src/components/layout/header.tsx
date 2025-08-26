@@ -41,16 +41,16 @@ export function Header() {
       >
         {/* Logo */}
         <motion.div
-          className="font-serif text-xl tracking-[0.15em] text-foreground"
+          className="font-headline text-xl tracking-[0.15em] text-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Link href="/">ETERNA PORTRAITS</Link>
+          <Link href="/">PET MASTERPIECE</Link>
         </motion.div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex gap-10 font-serif text-sm uppercase tracking-widest">
+        <div className="hidden md:flex gap-10 font-headline text-sm uppercase tracking-widest">
           {navItems.map((item, idx) => (
             <motion.a
               key={idx}
@@ -92,7 +92,7 @@ export function Header() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-background flex flex-col items-center justify-center z-40"
           >
-            <div className="flex flex-col gap-8 font-serif text-2xl uppercase tracking-widest">
+            <div className="flex flex-col gap-8 font-headline text-2xl uppercase tracking-widest">
               {navItems.map((item, idx) => (
                 <motion.a
                   key={idx}

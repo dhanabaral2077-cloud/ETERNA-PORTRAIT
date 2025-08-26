@@ -32,7 +32,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: photoOpacity }}>
            <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/1200x800.png"
+                src="https://picsum.photos/1200/800?random=4"
                 alt="Pet Photo"
                 layout="fill"
                 objectFit="cover"
@@ -44,7 +44,7 @@ export function Story() {
             style={textAnimation(photoOpacity)}
           >
             <p
-              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
             >
               It starts with your favorite memory.
             </p>
@@ -55,7 +55,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/1200x800.png"
+                src="https://picsum.photos/1200/800?random=5"
                 alt="Painting in Progress"
                 layout="fill"
                 objectFit="cover"
@@ -67,7 +67,7 @@ export function Story() {
             style={textAnimation(paintingOpacity)}
           >
             <p
-              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
             >
               Hand-painted with care by our artists.
             </p>
@@ -78,7 +78,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: portraitOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://placehold.co/1200x800.png"
+                src="https://picsum.photos/1200/800?random=6"
                 alt="Final Portrait"
                 layout="fill"
                 objectFit="cover"
@@ -91,7 +91,7 @@ export function Story() {
             style={textAnimation(portraitOpacity)}
           >
             <p
-              className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
             >
               A timeless masterpiece.
             </p>
@@ -102,7 +102,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: roomOpacity }}>
             <motion.div style={{ scale }} className="relative w-full h-full">
               <Image
-                  src="https://placehold.co/1200x800.png"
+                  src="https://picsum.photos/1200/800?random=7"
                   alt="Portrait in Room"
                   layout="fill"
                   objectFit="cover"
@@ -114,7 +114,7 @@ export function Story() {
                 style={textAnimation(roomOpacity)}
             >
               <p
-                className="text-foreground font-serif text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
+                className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
               >
                 Ready to elevate your space.
               </p>
