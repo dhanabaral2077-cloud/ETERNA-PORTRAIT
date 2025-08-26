@@ -34,9 +34,9 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
             <div className="mt-4">
               <Image
-                src="https://www.paypalobjects.com/webstatic/mktg/logo-center/AM_mc_vs_dc_ae.png"
-                alt="Accepted payment methods: American Express, Mastercard, Visa, Discover, PayPal"
-                width={200}
+                src="/portfolio/Transparent_Trust_Badges.png"
+                alt="Accepted payment methods"
+                width={300}
                 height={50}
                 className="mx-auto"
               />
