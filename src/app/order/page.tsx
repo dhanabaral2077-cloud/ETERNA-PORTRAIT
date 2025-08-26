@@ -87,7 +87,6 @@ export default function OrderPage() {
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   
@@ -103,17 +102,11 @@ export default function OrderPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit for Apps Script
-        toast({ variant: "destructive", title: "File too large", description: "Please upload an image under 5MB." });
-        return;
-      }
       setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
         setPhotoPreview(result);
-        // Strip the data URL prefix to get pure Base64
-        setImageBase64(result.split(',')[1]);
       };
       reader.readAsDataURL(file);
     }
@@ -138,7 +131,7 @@ export default function OrderPage() {
     setIsSubmitting(true);
     
     try {
-        if (!photoFile || !imageBase64) {
+        if (!photoFile) {
           throw new Error("Please upload a photo of your pet.");
         }
 
@@ -147,41 +140,37 @@ export default function OrderPage() {
             throw new Error("Configuration error: Apps Script URL is not defined.");
         }
         
-        const orderDetails = {
-            customerName: formData.name,
-            customerEmail: formData.email,
-            petName: formData.petName,
-            style: formData.style,
-            package: selectedPackage.name,
-            price: (priceInCents / 100).toFixed(2),
-            notes: formData.notes,
-            imageBase64: imageBase64,
-        };
+        const orderDetails = new FormData();
+        orderDetails.append('customerName', formData.name);
+        orderDetails.append('customerEmail', formData.email);
+        orderDetails.append('petName', formData.petName);
+        orderDetails.append('style', formData.style);
+        orderDetails.append('package', selectedPackage.name);
+        orderDetails.append('price', (priceInCents / 100).toFixed(2));
+        orderDetails.append('notes', formData.notes);
+        orderDetails.append('file', photoFile);
 
         const response = await fetch(scriptUrl, {
             method: "POST",
-            mode: 'no-cors', // Apps Script requires no-cors for cross-origin POST from client
-            cache: 'no-cache',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            redirect: 'follow',
-            body: JSON.stringify(orderDetails)
+            body: orderDetails
         });
 
-        // With no-cors, we can't read the response body, so we assume success if the request doesn't throw.
-        // We'll proceed to payment. A more robust solution might involve a redirect URL from the script.
-        
-        // Let's invent an order ID for PayPal as we can't get one back
-        const mockOrderId = `MOCK-${Date.now()}`;
-        setOrderId(mockOrderId);
+        const result = await response.json();
+
+        if (!result.success) {
+            console.error("Apps Script Error:", result.error);
+            throw new Error(result.error || "An unknown error occurred during submission.");
+        }
+
+        const newOrderId = result.orderId;
+        setOrderId(newOrderId);
         
         toast({ title: "Order submitted!", description: "Please complete your payment below." });
         setStep(4); // Move to checkout step
         
     } catch (error: any) {
         console.error("Submission Error:", error);
-        toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred. Please check the console." });
+        toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred. Please try again." });
     } finally {
         setIsSubmitting(false);
     }
@@ -273,11 +262,13 @@ export default function OrderPage() {
                                 <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
                                     <motion.div 
                                         whileTap={{ scale: 0.97 }}
-                                        className={`relative p-6 rounded-2xl border transition-all duration-300 ${
-                                            formData.style === s.id
-                                            ? "bg-gradient-to-r from-yellow-300/50 to-amber-400/50 text-foreground border-accent shadow-lg"
-                                            : "bg-background/50 border-muted/20 text-foreground hover:border-accent"
-                                        }`}
+                                        className={`
+                                          relative p-6 rounded-2xl border transition-all duration-300
+                                          ${formData.style === s.id 
+                                            ? "bg-gradient-to-r from-[#C9A227] to-[#FFD84D] text-gray-900 border-[#C9A227] shadow-lg" 
+                                            : "bg-[#FAF9F7] border-gray-300 text-gray-700 hover:border-[#C9A227]"
+                                          }
+                                        `}
                                     >
                                         <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
                                         <CardContent className="p-0 flex flex-col items-center justify-center gap-2 text-center">
@@ -285,14 +276,14 @@ export default function OrderPage() {
                                             <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
                                         </CardContent>
                                         {formData.style === s.id && (
-                                            <motion.div
-                                            initial={{ scale: 0, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="absolute top-2 right-2 text-accent"
+                                            <motion.span
+                                              initial={{ scale: 0, opacity: 0 }}
+                                              animate={{ scale: 1, opacity: 1 }}
+                                              transition={{ duration: 0.3 }}
+                                              className="absolute top-2 right-2 text-gray-900"
                                             >
-                                            <Check size={18} />
-                                            </motion.div>
+                                              <Check size={18} />
+                                            </motion.span>
                                         )}
                                     </motion.div>
                                 </Label>
@@ -307,11 +298,15 @@ export default function OrderPage() {
                     <RadioGroup value={formData.pkg} onValueChange={(v) => handleChange('pkg', v)} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                       {Object.values(packages).map((pkg) => (
                           <Label key={pkg.id} htmlFor={pkg.id} className="cursor-pointer group h-full">
-                              <motion.div whileTap={{ scale: 0.98 }} className={`relative text-center p-6 rounded-2xl border transition-all duration-300 ease-in-out-quad h-full flex flex-col ${
-                                formData.pkg === pkg.id
-                                ? 'bg-gradient-to-tr from-yellow-300/30 to-amber-400/30 border-accent shadow-xl'
-                                : `bg-card hover:shadow-lg hover:-translate-y-1 ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`
-                              }`}>
+                              <motion.div 
+                                whileTap={{ scale: 0.98 }} 
+                                className={`
+                                  relative text-center p-6 rounded-2xl border transition-all duration-300 ease-in-out-quad h-full flex flex-col 
+                                  ${formData.pkg === pkg.id
+                                    ? 'bg-gradient-to-tr from-[#C9A227]/40 to-[#FFD84D]/40 border-accent shadow-xl'
+                                    : `bg-[#FAF9F7] border-gray-300 hover:shadow-lg hover:-translate-y-1 ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`
+                                  }`
+                                }>
                                   <RadioGroupItem value={pkg.id} id={pkg.id} className="sr-only" />
                                   {pkg.highlight && (
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-md">
@@ -331,14 +326,14 @@ export default function OrderPage() {
                                       </ul>
                                   </CardContent>
                                   {formData.pkg === pkg.id && (
-                                    <motion.div
+                                    <motion.span
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ duration: 0.3 }}
                                     className="absolute top-2 right-2 text-accent"
                                     >
-                                    <Check size={20} />
-                                    </motion.div>
+                                      <Check size={20} />
+                                    </motion.span>
                                   )}
                               </motion.div>
                           </Label>
@@ -366,23 +361,25 @@ export default function OrderPage() {
                             <Label key={bg.id} htmlFor={`bg-${bg.id}`} className="cursor-pointer flex-1">
                                 <motion.div 
                                     whileTap={{ scale: 0.97 }}
-                                    className={`relative text-center border rounded-lg p-4 transition-all duration-300 ${
-                                        formData.background === bg.id
-                                        ? "bg-gradient-to-r from-yellow-300/50 to-amber-400/50 text-foreground border-accent shadow-lg"
-                                        : "bg-background/50 border-muted/20 text-foreground hover:border-accent"
-                                    }`}
+                                    className={`
+                                      relative text-center border rounded-lg p-4 transition-all duration-300
+                                      ${formData.background === bg.id
+                                        ? "bg-gradient-to-r from-[#C9A227] to-[#FFD84D] text-gray-900 border-[#C9A227] shadow-lg"
+                                        : "bg-[#FAF9F7] border-gray-300 text-gray-700 hover:border-[#C9A227]"
+                                      }
+                                    `}
                                 >
                                     <RadioGroupItem value={bg.id} id={`bg-${bg.id}`} className="sr-only" />
                                     {bg.label}
                                     {formData.background === bg.id && (
-                                        <motion.div
+                                        <motion.span
                                             initial={{ scale: 0, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             transition={{ duration: 0.3 }}
-                                            className="absolute top-2 right-2 text-accent"
+                                            className="absolute top-2 right-2 text-gray-900"
                                         >
                                             <Check size={16} />
-                                        </motion.div>
+                                        </motion.span>
                                     )}
                                 </motion.div>
                             </Label>
@@ -490,3 +487,5 @@ export default function OrderPage() {
       </div>
   );
 }
+
+    
