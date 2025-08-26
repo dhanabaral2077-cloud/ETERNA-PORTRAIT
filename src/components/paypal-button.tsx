@@ -21,18 +21,26 @@ export default function PayPalButton({ orderId, amount, currency = "USD", classN
   const [sdkReady, setSdkReady] = useState(false);
 
   useEffect(() => {
+    console.log("PayPalButton useEffect triggered", { sdkReady, orderId, amount, currency });
+    console.log("Container ref:", containerRef.current);
+    // @ts-ignore
+    console.log("window.paypal:", window.paypal);
+    console.log("Client ID:", process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID);
+
     // @ts-ignore
     if (!sdkReady || !window.paypal || !containerRef.current) {
+      console.log("Skipping button render: SDK not ready or container missing");
       return;
     }
 
-    // Clear the container to avoid re-rendering issues
     containerRef.current.innerHTML = '';
+    console.log("Rendering PayPal button...");
 
     // @ts-ignore
     const buttons = window.paypal.Buttons({
       style: { layout: "vertical", shape: "pill", color: "gold", label: "pay" },
       createOrder: async () => {
+        console.log("Creating PayPal order...");
         try {
           const res = await fetch("/api/paypal/create-order", {
             method: "POST",
@@ -40,10 +48,11 @@ export default function PayPalButton({ orderId, amount, currency = "USD", classN
             body: JSON.stringify({ orderId, amount, currency }),
           });
           const data = await res.json();
+          console.log("Create order response:", data);
           if (!res.ok) {
             throw new Error(data.error || "Failed to create PayPal order.");
           }
-          return data.id; // This is the PayPal order ID
+          return data.id;
         } catch (error) {
           console.error("PayPal createOrder error:", error);
           if (onError) onError(error);
@@ -51,6 +60,7 @@ export default function PayPalButton({ orderId, amount, currency = "USD", classN
         }
       },
       onApprove: async (data: { orderID: string }) => {
+        console.log("Capturing PayPal order:", data.orderID);
         try {
           const res = await fetch("/api/paypal/capture-order", {
             method: "POST",
@@ -58,6 +68,7 @@ export default function PayPalButton({ orderId, amount, currency = "USD", classN
             body: JSON.stringify({ orderId, paypalOrderId: data.orderID }),
           });
           const json = await res.json();
+          console.log("Capture order response:", json);
           if (!res.ok || !json.success) {
             throw new Error(json.error || "Failed to capture payment.");
           }
@@ -84,7 +95,10 @@ export default function PayPalButton({ orderId, amount, currency = "USD", classN
     <>
       <Script
         src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=${currency}`}
-        onLoad={() => setSdkReady(true)}
+        onLoad={() => {
+          console.log("PayPal SDK loaded successfully");
+          setSdkReady(true);
+        }}
         strategy="afterInteractive"
       />
       <div ref={containerRef} className={className} />
