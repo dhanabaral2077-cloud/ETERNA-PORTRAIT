@@ -127,12 +127,22 @@ export default function OrderPage() {
   const priceInCents = selectedPackage.price;
 
   const handleSubmitToCheckout = async () => {
+    // This function just moves to the payment step.
+    // The actual submission happens after successful payment.
+    const newOrderId = `TEMP-${Date.now()}`;
+    setOrderId(newOrderId);
+    setStep(4);
+  };
+
+  const onPaymentSuccess = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     
+    toast({ title: "Payment Complete!", description: "Finalizing your order..." });
+
     try {
         if (!photoFile) {
-          throw new Error("Please upload a photo of your pet.");
+          throw new Error("A photo is required to complete the submission.");
         }
 
         const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
@@ -150,6 +160,7 @@ export default function OrderPage() {
         orderDetails.append('notes', formData.notes);
         orderDetails.append('file', photoFile);
 
+        // We send the data to Google Apps Script after payment.
         const response = await fetch(scriptUrl, {
             method: "POST",
             body: orderDetails,
@@ -157,35 +168,25 @@ export default function OrderPage() {
         });
 
         // Since the mode is 'no-cors', we can't read the response.
-        // We'll proceed optimistically.
-        // const result = await response.json(); // This line will fail with no-cors
+        // We'll proceed optimistically, assuming the script handled it.
+        
+        toast({
+            title: "Order Submitted!",
+            description: "Your commission is now in the hands of our talented artists."
+        });
 
-        // if (!result.success) {
-        //     console.error("Apps Script Error:", result.error);
-        //     throw new Error(result.error || "An unknown error occurred during submission.");
-        // }
-        
-        // Let's create a temporary order ID on the client for PayPal
-        const newOrderId = `TEMP-${Date.now()}`;
-        setOrderId(newOrderId);
-        
-        toast({ title: "Order submitted!", description: "Please complete your payment below." });
-        setStep(4); // Move to checkout step
-        
+        setStep(5); // Move to final confirmation step
+
     } catch (error: any) {
-        console.error("Submission Error:", error);
-        toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred. Please try again." });
+        console.error("Submission Error After Payment:", error);
+        toast({ 
+            variant: "destructive", 
+            title: "Order Submission Failed", 
+            description: "Your payment was successful, but we had trouble submitting your order details. Please contact support." 
+        });
     } finally {
         setIsSubmitting(false);
     }
-  };
-
-  const onPaymentSuccess = () => {
-    toast({
-        title: "Payment Successful!",
-        description: "Your commission is now in the hands of our talented artists."
-    });
-    setStep(5); // Move to confirmation step
   };
 
   const onPaymentError = (error: any) => {
@@ -429,17 +430,20 @@ export default function OrderPage() {
                     </Card>
 
                     <div className="pt-4 text-center">
-                         {orderId ? (
-                            <PayPalButton 
-                                orderId={orderId} 
-                                amount={priceInCents / 100}
-                                onSuccess={onPaymentSuccess}
-                                onError={onPaymentError}
-                            />
-                         ) : (
-                           <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
+                         {isSubmitting ? (
+                            <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin" />
-                                <p>Securing your commission...</p>                           </div>
+                                <p>Finalizing your order...</p>
+                            </div>
+                         ) : (
+                           orderId && (
+                                <PayPalButton 
+                                    orderId={orderId} 
+                                    amount={priceInCents / 100}
+                                    onSuccess={onPaymentSuccess}
+                                    onError={onPaymentError}
+                                />
+                           )
                          )}
                     </div>
                   </div>
