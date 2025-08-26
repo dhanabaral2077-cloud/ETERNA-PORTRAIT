@@ -85,6 +85,7 @@ export default function OrderConfirmation({ name, orderId, style, format, size, 
             color: #999;
             margin-top: 24px;
             font-size: 14px;
+            text-align: center;
           }
         `}</style>
       </head>
@@ -100,7 +101,7 @@ export default function OrderConfirmation({ name, orderId, style, format, size, 
               Hi {name || "there"},
             </p>
             <p className="paragraph">
-              We are honored to begin the journey of immortalizing {petName ? `the wonderful ${petName}` : "your cherished pet"}. Our artists are already filled with inspiration.
+              We are honored to begin the journey of immortalizing {petName ? `the wonderful ${petName}` : "your cherished pet"}. Our artists are already filled with inspiration. Please complete your payment to move your commission into the studio queue.
             </p>
             <div className="details">
               <strong>Order Details:</strong><br />
@@ -108,10 +109,10 @@ export default function OrderConfirmation({ name, orderId, style, format, size, 
               <strong>Order ID:</strong> {orderId}
             </div>
             <a
-              href={`${baseUrl}/track?order=${orderId}`}
+              href={`${baseUrl}/order`}
               className="button"
             >
-              View Order Status
+              Complete Your Payment
             </a>
             <p className="footer">
               Eterna Portraits • Hand-Finished Artworks

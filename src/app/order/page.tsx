@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
@@ -11,7 +12,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2 } from "lucide-react";
-import Script from "next/script";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -55,6 +55,7 @@ export default function OrderPage() {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -83,33 +84,27 @@ export default function OrderPage() {
         toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
         return s;
     }
-    // If on the review step, create the order before showing payment options
-    if (s === 3) {
-      handleSubmit();
-    }
     return Math.min(s + 1, steps.length - 1);
   });
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const handleSubmit = async () => {
-    if (isSubmitting) return; // Prevent double submission
+  const handleSubmitToCheckout = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     
     try {
         if (!photoFile) {
           throw new Error("Please upload a photo of your pet.");
         }
-        // 1. Get signed URL
-        const uploadUrlRes = await fetch("/api/upload-url");
-        if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
-        const { url: signedUrl, path } = await uploadUrlRes.json();
-        if (!signedUrl || !path) throw new Error("Invalid upload URL response.");
-
-        // 2. Upload file to signed URL
-        const uploadRes = await fetch(signedUrl, { method: "PUT", body: photoFile });
-        if (!uploadRes.ok) throw new Error("Failed to upload photo.");
-
-        // 3. Create order in our DB
+        // 1. Get signed URL (mocked)
+        // const uploadUrlRes = await fetch("/api/upload-url");
+        // if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
+        // const { url: signedUrl, path } = await uploadUrlRes.json();
+        const path = `uploads/mock-path-${crypto.randomUUID()}.jpg`;
+        console.log("Mock photo path:", path);
+        // await fetch(signedUrl, { method: "PUT", body: photoFile });
+        
+        // 2. Create order in our DB
         const orderRes = await fetch("/api/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -138,19 +133,33 @@ export default function OrderPage() {
         
     } catch (error: any) {
         toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred." });
-        setStep(3); // Stay on the current step if fails
     } finally {
         setIsSubmitting(false);
     }
   };
+
+  const onPaymentSuccess = () => {
+    toast({
+        title: "Payment Successful!",
+        description: "Your commission is now in the hands of our talented artists."
+    });
+    setStep(5); // Move to confirmation step
+  };
+
+  const onPaymentError = (error: any) => {
+    console.error("PayPal Error:", error);
+    toast({
+        variant: "destructive",
+        title: "Payment Failed",
+        description: "Something went wrong with the payment. Please try again."
+    });
+  }
 
 
   const currentStep = steps[step];
   const priceInCents = prices[formData.size] || 0;
 
   return (
-    <>
-      <Script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`}></Script>
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center py-24 md:py-32 px-4 md:px-6">
@@ -294,8 +303,7 @@ export default function OrderPage() {
                 {step === 4 && (
                   <div className="space-y-6">
                     <h2 className="font-headline text-3xl text-foreground">5. Complete Your Payment</h2>
-                    <div className="grid grid-cols-1 gap-4">
-                       <Card>
+                    <Card>
                          <CardContent className="p-6">
                             <h3 className="font-headline text-lg mb-4">Final Invoice</h3>
                             <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
@@ -303,18 +311,22 @@ export default function OrderPage() {
                                 <span>${(priceInCents / 100).toFixed(2)}</span>
                             </div>
                          </CardContent>
-                       </Card>
+                    </Card>
 
-                      <div className="pt-4 text-center">
+                    <div className="pt-4 text-center">
                          {orderId ? (
-                            <PayPalButton orderId={orderId} priceCents={priceInCents} />
+                            <PayPalButton 
+                                orderId={orderId} 
+                                priceCents={priceInCents}
+                                onSuccess={onPaymentSuccess}
+                                onError={onPaymentError}
+                            />
                          ) : (
                            <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin" />
-                                <p>Creating your order...</p>
+                                <p>Securing your commission...</p>
                            </div>
                          )}
-                      </div>
                     </div>
                   </div>
                 )}
@@ -322,49 +334,46 @@ export default function OrderPage() {
                 {step === 5 && (
                   <div className="text-center space-y-4 py-8">
                     <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
+                       <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
                        <h2 className="font-headline text-4xl text-foreground">Thank You!</h2>
                     </motion.div>
                     <p className="text-secondary max-w-md mx-auto">
                       Your pet's portrait is now in progress. We’ll send an email with your order number and update you as the artwork moves from sketch → painting → delivery.
                     </p>
                     <p className="text-sm text-muted-foreground pt-4">Share the excitement! #PetMasterpiece</p>
+                     <Button onClick={() => router.push('/')} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all mt-6">
+                        Back to Home
+                    </Button>
                   </div>
                 )}
 
                 {/* Navigation Buttons */}
-                {step < 3 && (
-                  <div className="flex justify-between items-center pt-8">
-                    <Button variant="outline" onClick={back} disabled={step === 0} className="rounded-full">
-                      Back
-                    </Button>
-                    <Button onClick={next} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-                      Next
-                    </Button>
-                  </div>
-                )}
-                 {step === 3 && (
-                   <div className="flex justify-between items-center pt-8">
-                      <Button variant="outline" onClick={back} className="rounded-full">
-                        Back
-                      </Button>
-                       <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full max-w-xs rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
+                <div className="flex justify-between items-center pt-8">
+                    {step > 0 && step < 4 && (
+                        <Button variant="outline" onClick={back} className="rounded-full">Back</Button>
+                    )}
+                    {step === 0 && <div/>}
+                    
+                    {step < 3 && (
+                        <Button onClick={next} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">Next</Button>
+                    )}
+                    
+                    {step === 3 && (
+                       <Button onClick={handleSubmitToCheckout} disabled={isSubmitting} className="w-full max-w-xs ml-auto rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
                             {isSubmitting ? <Loader2 className="animate-spin" /> : "Proceed to Payment"}
                        </Button>
-                   </div>
-                 )}
-                 {step === 4 && (
-                   <div className="flex justify-between items-center pt-8">
-                      <Button variant="outline" onClick={back} disabled={isSubmitting} className="rounded-full">
-                        Back
-                      </Button>
-                   </div>
-                 )}
+                    )}
+
+                    {step === 4 && (
+                         <Button variant="outline" onClick={back} disabled={isSubmitting} className="rounded-full">Back to Review</Button>
+                    )}
+                </div>
+
               </motion.div>
             </AnimatePresence>
           </div>
         </main>
         <Footer />
       </div>
-    </>
   );
 }
