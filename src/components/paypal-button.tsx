@@ -7,7 +7,7 @@
 import {
     PayPalScriptProvider,
     PayPalButtons,
-    ReactPayPalScriptOptions
+    type ReactPayPalScriptOptions
 } from "@paypal/react-paypal-js";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,16 +22,18 @@ interface PayPalButtonProps {
 export default function PayPalButton({ orderId, amount, currency = "USD", onSuccess, onError }: PayPalButtonProps) {
     const { toast } = useToast();
     
+    const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+
+    if (!paypalClientId) {
+        console.error("PayPal Client ID is not set. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment variables.");
+        return <p className="text-destructive text-center font-medium">PayPal is not configured. Missing Client ID.</p>;
+    }
+    
     const initialOptions: ReactPayPalScriptOptions = {
-        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+        clientId: paypalClientId,
         currency: currency,
         intent: "capture",
     };
-
-    if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
-        console.error("PayPal Client ID is not set in environment variables.");
-        return <p className="text-destructive text-center">PayPal is not configured correctly.</p>;
-    }
     
     return (
         <PayPalScriptProvider options={initialOptions}>
