@@ -22,13 +22,7 @@ interface PayPalButtonProps {
 export default function PayPalButton({ orderId, amount, currency = "USD", onSuccess, onError }: PayPalButtonProps) {
     const { toast } = useToast();
     
-    const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-
-    if (!paypalClientId || paypalClientId === 'YOUR_PAYPAL_CLIENT_ID') {
-        const errorMsg = "PayPal Client ID is not configured. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your .env.local file and restart your server.";
-        console.error(errorMsg);
-        return <p className="text-destructive text-center font-medium">{errorMsg}</p>;
-    }
+    const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!;
     
     const initialOptions: ReactPayPalScriptOptions = {
         clientId: paypalClientId,
