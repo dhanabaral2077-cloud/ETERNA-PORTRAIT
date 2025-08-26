@@ -24,9 +24,10 @@ export default function PayPalButton({ orderId, amount, currency = "USD", onSucc
     
     const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-    if (!paypalClientId) {
-        console.error("PayPal Client ID is not set. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment variables.");
-        return <p className="text-destructive text-center font-medium">PayPal is not configured. Missing Client ID.</p>;
+    if (!paypalClientId || paypalClientId === 'YOUR_PAYPAL_CLIENT_ID') {
+        const errorMsg = "PayPal Client ID is not configured. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your .env.local file and restart your server.";
+        console.error(errorMsg);
+        return <p className="text-destructive text-center font-medium">{errorMsg}</p>;
     }
     
     const initialOptions: ReactPayPalScriptOptions = {
