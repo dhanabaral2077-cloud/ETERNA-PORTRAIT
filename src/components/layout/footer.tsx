@@ -29,9 +29,18 @@ export function Footer() {
 
           <div className="w-full max-w-lg border-b border-border/50 my-4"></div>
 
-          {/* Copyright */}
+          {/* Copyright & Payment Icons */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
+            <div className="mt-4">
+              <Image
+                src="https://www.paypalobjects.com/webstatic/mktg/logo-center/AM_mc_vs_dc_ae.png"
+                alt="Accepted payment methods: American Express, Mastercard, Visa, Discover, PayPal"
+                width={200}
+                height={50}
+                className="mx-auto"
+              />
+            </div>
           </div>
 
         </div>
