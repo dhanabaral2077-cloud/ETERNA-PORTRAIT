@@ -9,6 +9,7 @@ import Link from 'next/link';
 export function Pricing() {
   const tiers = [
     {
+      id: 'classic',
       name: 'Classic',
       price: '$450',
       description: 'For those seeking timeless elegance in a smaller format.',
@@ -20,6 +21,7 @@ export function Pricing() {
       highlight: false,
     },
     {
+      id: 'signature',
       name: 'Signature',
       price: '$950',
       description: 'Our most popular commission — premium and refined.',
@@ -32,6 +34,7 @@ export function Pricing() {
       highlight: true,
     },
     {
+      id: 'masterpiece',
       name: 'Masterpiece',
       price: '$1800',
       description: 'For collectors who demand the grandest expression.',
@@ -107,7 +110,7 @@ export function Pricing() {
               variant={tier.highlight ? 'default' : 'outline'}
               className="rounded-full w-full py-4 text-lg shadow-md transition-all"
             >
-              <Link href="/order">Commission Now</Link>
+              <Link href={`/order?pkg=${tier.id}`}>Commission Now</Link>
             </Button>
           </motion.div>
         ))}

@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
@@ -11,19 +11,11 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, Palette, Package, Pencil, CheckCircle, ShoppingCart, Loader2, Check } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-
-const steps = [
-  { label: "Upload", icon: UploadCloud },
-  { label: "Style", icon: Palette },
-  { label: "Package", icon: Package },
-  { label: "Personalize", icon: Pencil },
-  { label: "Checkout", icon: ShoppingCart },
-  { label: "Confirm", icon: CheckCircle },
-];
+import Link from "next/link";
 
 const packages = {
     classic: {
@@ -32,11 +24,7 @@ const packages = {
         price: 45000,
         priceFormatted: '$450',
         description: 'For those seeking timeless elegance in a smaller format.',
-        features: [
-            'High-resolution digital file',
-            'One pet included',
-            'Fine art canvas print (12x16)',
-        ],
+        features: ['High-resolution digital file', 'One pet included', 'Fine art canvas print (12x16)'],
     },
     signature: {
         id: 'signature',
@@ -44,12 +32,7 @@ const packages = {
         price: 95000,
         priceFormatted: '$950',
         description: 'Our most popular commission — premium and refined.',
-        features: [
-            'High-resolution digital file',
-            'Up to two pets',
-            'Premium canvas print (18x24)',
-            'Hand-finished brush details',
-        ],
+        features: ['High-resolution digital file', 'Up to two pets', 'Premium canvas print (18x24)', 'Hand-finished brush details'],
         highlight: true,
     },
     masterpiece: {
@@ -58,442 +41,284 @@ const packages = {
         price: 180000,
         priceFormatted: '$1800',
         description: 'For collectors who demand the grandest expression.',
-        features: [
-            'High-resolution digital file',
-            'Up to three pets',
-            'Large-format canvas (24x36)',
-            'Luxury gilded frame',
-            'Priority commission',
-        ],
+        features: ['High-resolution digital file', 'Up to three pets', 'Large-format canvas (24x36)', 'Luxury gilded frame', 'Priority commission'],
     },
-}
+} as const;
 
-const styleOptions = [
-    { id: 'classic', name: 'Classic', description: 'Timeless & Elegant' },
-    { id: 'signature', name: 'Signature', description: 'Rich & Expressive' },
-    { id: 'masterpiece', name: 'Masterpiece', description: 'Grand & Ornate' },
-]
+type PackageKey = keyof typeof packages;
+
+function OrderForm() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { toast } = useToast();
+
+    const [step, setStep] = useState(0); // 0: Form, 1: Success
+    const [selectedPackageKey, setSelectedPackageKey] = useState<PackageKey | null>(null);
+
+    const [formData, setFormData] = useState({
+        petName: '',
+        background: 'artist',
+        notes: '',
+        name: 'Jane Doe', // Placeholder
+        email: 'jane@example.com' // Placeholder
+    });
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [orderId, setOrderId] = useState<string | null>(null);
+    
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const pkg = searchParams.get('pkg') as PackageKey;
+        if (pkg && packages[pkg]) {
+            setSelectedPackageKey(pkg);
+            // Create a temporary order ID for PayPal
+            setOrderId(`TEMP-${Date.now()}`);
+        } else {
+            // Handle case where no package or invalid package is selected
+            toast({
+                variant: "destructive",
+                title: "No Package Selected",
+                description: "Please select a package from our pricing page to begin.",
+            });
+            // Optionally redirect
+            // router.push('/#pricing');
+        }
+    }, [searchParams, toast]);
+
+    const handleChange = (field: string, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                toast({ variant: "destructive", title: "File Too Large", description: "Please upload an image smaller than 5MB." });
+                return;
+            }
+            setPhotoFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => setPhotoPreview(reader.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const triggerFileInput = () => fileInputRef.current?.click();
+
+    const validateForm = () => {
+        if (!photoFile) {
+            toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet." });
+            return false;
+        }
+        return true;
+    };
+
+    const onPaymentSuccess = async () => {
+        if (isSubmitting || !validateForm()) return;
+        setIsSubmitting(true);
+        
+        toast({ title: "Payment Complete!", description: "Finalizing your order..." });
+
+        try {
+            const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
+            if (!scriptUrl || !selectedPackageKey) {
+                throw new Error("Configuration error or missing package selection.");
+            }
+            
+            const selectedPackage = packages[selectedPackageKey];
+
+            const orderDetails = new FormData();
+            orderDetails.append('customerName', formData.name);
+            orderDetails.append('customerEmail', formData.email);
+            orderDetails.append('petName', formData.petName);
+            orderDetails.append('style', 'Artist Choice'); // Style is now simplified
+            orderDetails.append('package', selectedPackage.name);
+            orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
+            orderDetails.append('notes', formData.notes);
+            orderDetails.append('file', photoFile!);
+
+            const response = await fetch(scriptUrl, {
+                method: "POST",
+                body: orderDetails,
+                mode: 'no-cors' 
+            });
+
+            toast({
+                title: "Order Submitted!",
+                description: "Your commission is now in the hands of our talented artists."
+            });
+            setStep(1); // Move to final confirmation step
+        } catch (error: any) {
+            console.error("Submission Error After Payment:", error);
+            toast({ 
+                variant: "destructive", 
+                title: "Order Submission Failed", 
+                description: "Your payment was successful, but we had trouble submitting your order details. Please contact support." 
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const onPaymentError = (error: any) => {
+        console.error("PayPal Error:", error);
+        toast({
+            variant: "destructive",
+            title: "Payment Failed",
+            description: "Something went wrong with the payment. Please try again."
+        });
+    };
+    
+    if (!selectedPackageKey) {
+        return (
+            <div className="text-center p-8">
+                <AlertCircle className="mx-auto h-12 w-12 text-destructive" />
+                <h2 className="mt-4 text-2xl font-semibold text-foreground">No Package Selected</h2>
+                <p className="mt-2 text-muted-foreground">
+                    Please start by choosing a portrait package.
+                </p>
+                <Button asChild className="mt-6">
+                    <Link href="/#pricing">View Pricing</Link>
+                </Button>
+            </div>
+        );
+    }
+    
+    const selectedPackage = packages[selectedPackageKey];
+    const priceInCents = selectedPackage.price;
+
+    return (
+        <AnimatePresence mode="wait">
+            {step === 0 && (
+                <motion.div
+                    key="form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full grid md:grid-cols-2 gap-12"
+                >
+                    {/* Left Side: Form */}
+                    <div className="space-y-6">
+                        <h2 className="font-headline text-3xl text-foreground">Your Commission</h2>
+                        
+                        {/* --- PHOTO UPLOAD --- */}
+                        <div>
+                            <Label>1. Your Pet's Photo</Label>
+                            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
+                            <div onClick={triggerFileInput} className="mt-2 border-2 border-dashed border-accent rounded-xl p-6 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors">
+                                {photoPreview ? (
+                                    <Image src={photoPreview} alt="Pet preview" width={120} height={120} className="rounded-lg object-cover" />
+                                ) : (
+                                    <>
+                                        <UploadCloud className="w-10 h-10 text-accent mb-2" />
+                                        <span>Click to Upload Photo</span>
+                                        <span className="text-xs mt-1">(Max 5MB)</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* --- PET'S NAME --- */}
+                        <div className="space-y-2">
+                          <Label htmlFor="pet-name">2. Pet's Name (Optional)</Label>
+                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max, Luna" />
+                        </div>
+                        
+                        {/* --- NOTES --- */}
+                         <div className="space-y-2">
+                          <Label htmlFor="notes">3. Notes for the Artist (Optional)</Label>
+                          <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
+                        </div>
+
+                    </div>
+
+                    {/* Right Side: Summary & Payment */}
+                    <div className="space-y-6">
+                         <h3 className="font-headline text-2xl text-foreground">Order Summary</h3>
+                         <Card>
+                             <CardContent className="p-6">
+                                <div className="flex justify-between items-center text-lg font-bold text-foreground">
+                                    <span>{selectedPackage.name} Package</span>
+                                    <span>{selectedPackage.priceFormatted}</span>
+                                </div>
+                                <ul className="text-secondary space-y-1.5 text-sm mt-4">
+                                  {selectedPackage.features.map((feature, i) => (
+                                    <li key={i} className="flex items-start">
+                                      <Check className="text-accent mr-2 h-4 w-4 mt-0.5 shrink-0" /> {feature}
+                                    </li>
+                                  ))}
+                                </ul>
+                                <div className="flex justify-between items-center text-xl font-bold text-foreground mt-4 pt-4 border-t">
+                                    <span>Total</span>
+                                    <span>{selectedPackage.priceFormatted}</span>
+                                </div>
+                             </CardContent>
+                        </Card>
+
+                        <div className="pt-4 text-center">
+                            {isSubmitting ? (
+                                <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
+                                    <Loader2 className="animate-spin" />
+                                    <p>Finalizing your order...</p>
+                                </div>
+                             ) : (
+                                orderId && (
+                                    <div
+                                      className={`${!photoFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                      title={!photoFile ? "Please upload a photo to proceed" : ""}
+                                    >
+                                      <div className={`${!photoFile ? 'pointer-events-none' : ''}`}>
+                                        <PayPalButton 
+                                            orderId={orderId} 
+                                            amount={priceInCents / 100}
+                                            onSuccess={onPaymentSuccess}
+                                            onError={onPaymentError}
+                                        />
+                                      </div>
+                                    </div>
+                               )
+                             )}
+                        </div>
+                    </div>
+
+                </motion.div>
+            )}
+
+            {step === 1 && (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center space-y-4 py-8 max-w-md mx-auto"
+                >
+                  <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
+                  <h2 className="font-headline text-4xl text-foreground">Thank You!</h2>
+                  <p className="text-secondary max-w-md mx-auto">
+                    Your pet's portrait is now in progress. We’ll send an email with your order number and update you as the artwork moves from sketch → painting → delivery.
+                  </p>
+                  <Button onClick={() => router.push('/')} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all mt-6">
+                    Back to Home
+                  </Button>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+}
 
 export default function OrderPage() {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({
-    style: 'signature',
-    pkg: 'signature', // 'pkg' for package
-    petName: '',
-    background: 'artist',
-    notes: '',
-    name: 'Jane Doe', // Placeholder
-    email: 'jane@example.com' // Placeholder
-  });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderId, setOrderId] = useState<string | null>(null);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  const router = useRouter();
-
-
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhotoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPhotoPreview(result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const triggerFileInput = () => fileInputRef.current?.click();
-
-  const next = () => {
-    if (step === 0 && !photoFile) {
-        toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
-        return;
-    }
-    setStep((s) => Math.min(s + 1, steps.length - 1));
-  };
-  const back = () => setStep((s) => Math.max(s - 1, 0));
-  
-  const selectedPackage = packages[formData.pkg as keyof typeof packages];
-  const priceInCents = selectedPackage.price;
-
-  const handleSubmitToCheckout = async () => {
-    // This function just moves to the payment step.
-    // The actual submission happens after successful payment.
-    const newOrderId = `TEMP-${Date.now()}`;
-    setOrderId(newOrderId);
-    setStep(4);
-  };
-
-  const onPaymentSuccess = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    
-    toast({ title: "Payment Complete!", description: "Finalizing your order..." });
-
-    try {
-        if (!photoFile) {
-          throw new Error("A photo is required to complete the submission.");
-        }
-
-        const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
-        if (!scriptUrl) {
-            throw new Error("Configuration error: Apps Script URL is not defined.");
-        }
-        
-        const orderDetails = new FormData();
-        orderDetails.append('customerName', formData.name);
-        orderDetails.append('customerEmail', formData.email);
-        orderDetails.append('petName', formData.petName);
-        orderDetails.append('style', formData.style);
-        orderDetails.append('package', selectedPackage.name);
-        orderDetails.append('price', (priceInCents / 100).toFixed(2));
-        orderDetails.append('notes', formData.notes);
-        orderDetails.append('file', photoFile);
-
-        // We send the data to Google Apps Script after payment.
-        const response = await fetch(scriptUrl, {
-            method: "POST",
-            body: orderDetails,
-            mode: 'no-cors'
-        });
-
-        // Since the mode is 'no-cors', we can't read the response.
-        // We'll proceed optimistically, assuming the script handled it.
-        
-        toast({
-            title: "Order Submitted!",
-            description: "Your commission is now in the hands of our talented artists."
-        });
-
-        setStep(5); // Move to final confirmation step
-
-    } catch (error: any) {
-        console.error("Submission Error After Payment:", error);
-        toast({ 
-            variant: "destructive", 
-            title: "Order Submission Failed", 
-            description: "Your payment was successful, but we had trouble submitting your order details. Please contact support." 
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-
-  const onPaymentError = (error: any) => {
-    console.error("PayPal Error:", error);
-    toast({
-        variant: "destructive",
-        title: "Payment Failed",
-        description: "Something went wrong with the payment. Please try again."
-    });
-  }
-
-
-  const currentStep = steps[step];
-
   return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center py-24 md:py-32 px-4 md:px-6">
-          <div className="w-full max-w-4xl mb-12">
-            <div className="flex items-center justify-between">
-              {steps.map((s, idx) => (
-                <div key={idx} className="flex items-center text-xs text-center flex-col w-20">
-                  <div
-                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-                      idx < step ? "bg-green-500 border-green-500 text-white" :
-                      idx === step ? "bg-primary border-primary text-primary-foreground" : "border-muted text-muted-foreground"
-                    }`}
-                  >
-                    {idx < step ? <CheckCircle className="w-6 h-6" /> : <s.icon className="w-6 h-6" />}
-                  </div>
-                  <span className={`mt-2 font-medium ${idx <= step ? 'text-foreground' : 'text-muted-foreground'}`}>{s.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="relative w-full h-1 bg-muted rounded-full mt-4">
-               <motion.div
-                  className="absolute top-0 left-0 h-1 bg-primary rounded-full"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${(step / (steps.length - 1)) * 100}%` }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
-               />
-            </div>
-          </div>
-
-          <div className="relative w-full max-w-4xl">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -50, opacity: 0 }}
-                transition={{ duration: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
-                className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full"
-              >
-                {step === 0 && (
-                  <div className="space-y-6 max-w-2xl mx-auto">
-                    <h2 className="font-headline text-3xl text-foreground">1. Upload Your Pet's Photo</h2>
-                    <p className="text-secondary">Upload your pet’s best photo for the perfect portrait. High-resolution images work best!</p>
-                     <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
-                    <div onClick={triggerFileInput} className="border-2 border-dashed border-accent rounded-xl p-10 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors">
-                      {photoPreview ? (
-                        <Image src={photoPreview} alt="Pet preview" width={150} height={150} className="rounded-lg object-cover" />
-                      ) : (
-                        <>
-                         <UploadCloud className="w-12 h-12 text-accent mb-4" />
-                         <span>Drag & Drop or Click to Upload</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {step === 1 && (
-                    <div className="space-y-8 max-w-2xl mx-auto">
-                        <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
-                        <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {styleOptions.map((s) => (
-                                <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
-                                    <motion.div 
-                                        whileTap={{ scale: 0.97 }}
-                                        className={`
-                                          relative p-6 rounded-2xl border transition-all duration-300
-                                          ${formData.style === s.id 
-                                            ? "bg-gradient-to-r from-[#C9A227] to-[#FFD84D] text-gray-900 border-[#C9A227] shadow-lg" 
-                                            : "bg-[#FAF9F7] border-gray-300 text-gray-700 hover:border-[#C9A227]"
-                                          }
-                                        `}
-                                    >
-                                        <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
-                                        <CardContent className="p-0 flex flex-col items-center justify-center gap-2 text-center">
-                                            <h3 className="font-headline text-2xl">{s.name}</h3>
-                                            <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
-                                        </CardContent>
-                                        {formData.style === s.id && (
-                                            <motion.span
-                                              initial={{ scale: 0, opacity: 0 }}
-                                              animate={{ scale: 1, opacity: 1 }}
-                                              transition={{ duration: 0.3 }}
-                                              className="absolute top-2 right-2 text-gray-900"
-                                            >
-                                              <Check size={18} />
-                                            </motion.span>
-                                        )}
-                                    </motion.div>
-                                </Label>
-                            ))}
-                        </RadioGroup>
-                    </div>
-                )}
-
-                {step === 2 && (
-                  <div className="space-y-8">
-                    <h2 className="font-headline text-3xl text-foreground text-center">3. Choose Your Package</h2>
-                    <RadioGroup value={formData.pkg} onValueChange={(v) => handleChange('pkg', v)} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                      {Object.values(packages).map((pkg) => (
-                          <Label key={pkg.id} htmlFor={pkg.id} className="cursor-pointer group h-full">
-                              <motion.div 
-                                whileTap={{ scale: 0.98 }} 
-                                className={`
-                                  relative text-center p-6 rounded-2xl border transition-all duration-300 ease-in-out-quad h-full flex flex-col 
-                                  ${formData.pkg === pkg.id
-                                    ? 'bg-gradient-to-tr from-[#C9A227]/40 to-[#FFD84D]/40 border-accent shadow-xl'
-                                    : `bg-[#FAF9F7] border-gray-300 hover:shadow-lg hover:-translate-y-1 ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`
-                                  }`
-                                }>
-                                  <RadioGroupItem value={pkg.id} id={pkg.id} className="sr-only" />
-                                  {pkg.highlight && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                                        Most Popular
-                                    </div>
-                                  )}
-                                  <CardContent className="p-0 flex flex-col items-center justify-start gap-2 flex-grow">
-                                      <h3 className="font-headline text-2xl text-foreground">{pkg.name}</h3>
-                                      <p className="text-3xl font-headline text-foreground mb-1">{pkg.priceFormatted}</p>
-                                      <p className="text-sm text-muted-foreground h-12 flex items-center mb-4">{pkg.description}</p>
-                                      <ul className="text-secondary space-y-2 text-left text-sm flex-grow">
-                                        {pkg.features.map((feature, i) => (
-                                          <li key={i} className="flex items-start">
-                                            <Check className="text-accent mr-2 h-4 w-4 mt-0.5 shrink-0" /> {feature}
-                                          </li>
-                                        ))}
-                                      </ul>
-                                  </CardContent>
-                                  {formData.pkg === pkg.id && (
-                                    <motion.span
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="absolute top-2 right-2 text-accent"
-                                    >
-                                      <Check size={20} />
-                                    </motion.span>
-                                  )}
-                              </motion.div>
-                          </Label>
-                      ))}
-                    </RadioGroup>
-                  </div>
-                )}
-
-                {step === 3 && (
-                  <div className="space-y-6 max-w-2xl mx-auto">
-                    <h2 className="font-headline text-3xl text-foreground">4. Personalize & Review</h2>
-                    <div className="space-y-2">
-                      <Label htmlFor="pet-name">Pet's Name (Optional)</Label>
-                      <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max, Luna" />
-                      <p className="text-xs text-muted-foreground">The name will be rendered in an elegant calligraphy style.</p>
-                    </div>
-                    <div className="space-y-2">
-                       <Label>Background Style</Label>
-                       <RadioGroup value={formData.background} onValueChange={(v) => handleChange('background', v)} className="flex gap-4">
-                          {[
-                            {id: 'plain', label: 'Plain'},
-                            {id: 'gradient', label: 'Soft Gradient'},
-                            {id: 'artist', label: 'Artist\'s Choice'},
-                          ].map(bg => (
-                            <Label key={bg.id} htmlFor={`bg-${bg.id}`} className="cursor-pointer flex-1">
-                                <motion.div 
-                                    whileTap={{ scale: 0.97 }}
-                                    className={`
-                                      relative text-center border rounded-lg p-4 transition-all duration-300
-                                      ${formData.background === bg.id
-                                        ? "bg-gradient-to-r from-[#C9A227] to-[#FFD84D] text-gray-900 border-[#C9A227] shadow-lg"
-                                        : "bg-[#FAF9F7] border-gray-300 text-gray-700 hover:border-[#C9A227]"
-                                      }
-                                    `}
-                                >
-                                    <RadioGroupItem value={bg.id} id={`bg-${bg.id}`} className="sr-only" />
-                                    {bg.label}
-                                    {formData.background === bg.id && (
-                                        <motion.span
-                                            initial={{ scale: 0, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="absolute top-2 right-2 text-gray-900"
-                                        >
-                                            <Check size={16} />
-                                        </motion.span>
-                                    )}
-                                </motion.div>
-                            </Label>
-                          ))}
-                       </RadioGroup>
-                    </div>
-                    <Card>
-                         <CardContent className="p-6">
-                            <h3 className="font-headline text-lg mb-4">Order Summary</h3>
-                            <div className="flex justify-between items-center text-secondary">
-                                <span>Style: <span className="font-medium text-foreground capitalize">{formData.style}</span></span>
-                            </div>
-                            <div className="flex justify-between items-center text-secondary">
-                                <span>Package: <span className="font-medium text-foreground capitalize">{selectedPackage.name}</span></span>
-                                <span>${(priceInCents / 100).toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
-                                <span>Total</span>
-                                <span>${(priceInCents / 100).toFixed(2)}</span>
-                            </div>
-                         </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {step === 4 && (
-                  <div className="space-y-6 max-w-md mx-auto">
-                    <h2 className="font-headline text-3xl text-foreground">5. Complete Your Payment</h2>
-                    <Card>
-                         <CardContent className="p-6">
-                            <h3 className="font-headline text-lg mb-4">Final Invoice</h3>
-                            <div className="flex justify-between items-center text-secondary">
-                                <span>Style: <span className="font-medium text-foreground capitalize">{formData.style}</span></span>
-                            </div>
-                             <div className="flex justify-between items-center text-secondary">
-                                <span>Package: <span className="font-medium text-foreground capitalize">{selectedPackage.name}</span></span>
-                            </div>
-                            <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
-                                <span>Total</span>
-                                <span>${(priceInCents / 100).toFixed(2)}</span>
-                            </div>
-                         </CardContent>
-                    </Card>
-
-                    <div className="pt-4 text-center">
-                         {isSubmitting ? (
-                            <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin" />
-                                <p>Finalizing your order...</p>
-                            </div>
-                         ) : (
-                           orderId && (
-                                <PayPalButton 
-                                    orderId={orderId} 
-                                    amount={priceInCents / 100}
-                                    onSuccess={onPaymentSuccess}
-                                    onError={onPaymentError}
-                                />
-                           )
-                         )}
-                    </div>
-                  </div>
-                )}
-
-                {step === 5 && (
-                  <div className="text-center space-y-4 py-8 max-w-md mx-auto">
-                    <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
-                       <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
-                       <h2 className="font-headline text-4xl text-foreground">Thank You!</h2>
-                    </motion.div>
-                    <p className="text-secondary max-w-md mx-auto">
-                      Your pet's portrait is now in progress. We’ll send an email with your order number and update you as the artwork moves from sketch → painting → delivery.
-                    </p>
-                    <p className="text-sm text-muted-foreground pt-4">Share the excitement! #PetMasterpiece</p>
-                     <Button onClick={() => router.push('/')} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all mt-6">
-                        Back to Home
-                    </Button>
-                  </div>
-                )}
-
-                {/* Navigation Buttons */}
-                <div className="flex justify-between items-center pt-8 max-w-2xl mx-auto">
-                    {step > 0 && step < 4 && (
-                        <Button variant="outline" onClick={back} className="rounded-full">Back</Button>
-                    )}
-                    {step === 0 && <div/>}
-                    
-                    {step < 3 && (
-                        <Button onClick={next} className="rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">Next</Button>
-                    )}
-                    
-                    {step === 3 && (
-                       <Button onClick={handleSubmitToCheckout} disabled={isSubmitting} className="w-full max-w-xs ml-auto rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-                            {isSubmitting ? <Loader2 className="animate-spin" /> : "Proceed to Payment"}
-                       </Button>
-                    )}
-
-                    {step === 4 && (
-                         <Button variant="outline" onClick={back} disabled={isSubmitting} className="rounded-full">Back to Review</Button>
-                    )}
-                </div>
-
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </main>
-        <Footer />
-      </div>
+    <div className="flex flex-col min-h-screen bg-background">
+      <Header />
+      <main className="flex-1 flex flex-col items-center justify-center py-24 md:py-32 px-4 md:px-6">
+        <div className="w-full max-w-4xl">
+            <Suspense fallback={<Loader2 className="h-12 w-12 animate-spin mx-auto" />}>
+                <OrderForm />
+            </Suspense>
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }
-
-    
