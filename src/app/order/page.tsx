@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -52,10 +52,18 @@ export default function OrderPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [showPhotoError, setShowPhotoError] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    if (showPhotoError) {
+      toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
+      setShowPhotoError(false); // Reset the trigger
+    }
+  }, [showPhotoError, toast]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -81,7 +89,7 @@ export default function OrderPage() {
 
   const next = () => setStep((s) => {
     if (s === 0 && !photoFile) {
-        toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
+        setShowPhotoError(true);
         return s;
     }
     return Math.min(s + 1, steps.length - 1);
@@ -97,12 +105,14 @@ export default function OrderPage() {
           throw new Error("Please upload a photo of your pet.");
         }
         // 1. Get signed URL (mocked)
-        // const uploadUrlRes = await fetch("/api/upload-url");
-        // if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
-        // const { url: signedUrl, path } = await uploadUrlRes.json();
-        const path = `uploads/mock-path-${crypto.randomUUID()}.jpg`;
-        console.log("Mock photo path:", path);
+        const uploadUrlRes = await fetch("/api/upload-url");
+        if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
+        const { url: signedUrl, path } = await uploadUrlRes.json();
+
+        // In a real scenario, you'd upload the file here
         // await fetch(signedUrl, { method: "PUT", body: photoFile });
+        console.log("Mock photo path:", path);
+        console.log("Mock signed URL:", signedUrl);
         
         // 2. Create order in our DB
         const orderRes = await fetch("/api/orders", {
