@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2 } from "lucide-react";
+import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2, Package, Check } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -19,17 +19,54 @@ import Image from "next/image";
 const steps = [
   { label: "Upload", icon: UploadCloud },
   { label: "Style", icon: Palette },
-  { label: "Size", icon: Ruler },
+  { label: "Package", icon: Package },
   { label: "Personalize", icon: Pencil },
   { label: "Checkout", icon: ShoppingCart },
   { label: "Confirm", icon: CheckCircle },
 ];
 
-const prices: Record<string, number> = {
-    digital: 25000,
-    canvas: 45000,
-    framed: 75000
-};
+const packages = {
+    classic: {
+        id: 'classic',
+        name: 'Classic',
+        price: 45000,
+        priceFormatted: '$450',
+        description: 'For those seeking timeless elegance in a smaller format.',
+        features: [
+            'High-resolution digital file',
+            'One pet included',
+            'Fine art canvas print (12x16)',
+        ],
+    },
+    signature: {
+        id: 'signature',
+        name: 'Signature',
+        price: 95000,
+        priceFormatted: '$950',
+        description: 'Our most popular commission — premium and refined.',
+        features: [
+            'High-resolution digital file',
+            'Up to two pets',
+            'Premium canvas print (18x24)',
+            'Hand-finished brush details',
+        ],
+        highlight: true,
+    },
+    masterpiece: {
+        id: 'masterpiece',
+        name: 'Masterpiece',
+        price: 180000,
+        priceFormatted: '$1800',
+        description: 'For collectors who demand the grandest expression.',
+        features: [
+            'High-resolution digital file',
+            'Up to three pets',
+            'Large-format canvas (24x36)',
+            'Luxury gilded frame',
+            'Priority commission',
+        ],
+    },
+}
 
 const styleOptions = [
     { id: 'classic', name: 'Classic', description: 'Timeless & Elegant' },
@@ -41,7 +78,7 @@ export default function OrderPage() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     style: 'signature',
-    size: 'canvas',
+    pkg: 'signature', // 'pkg' for package
     petName: '',
     background: 'artist',
     notes: '',
@@ -88,6 +125,9 @@ export default function OrderPage() {
     setStep((s) => Math.min(s + 1, steps.length - 1));
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));
+  
+  const selectedPackage = packages[formData.pkg as keyof typeof packages];
+  const priceInCents = selectedPackage.price;
 
   const handleSubmitToCheckout = async () => {
     if (isSubmitting) return;
@@ -112,9 +152,13 @@ export default function OrderPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                ...formData,
+                style: formData.style,
+                format: selectedPackage.name, // Using package name as format
+                size: selectedPackage.features.find(f => f.includes('canvas') || f.includes('format')) || '',
+                petName: formData.petName,
+                notes: formData.notes,
                 photoUrl: path,
-                priceCents: prices[formData.size],
+                priceCents: priceInCents,
                 name: 'John Doe', // Placeholder
                 email: 'john.doe@example.com', // Placeholder
             }),
@@ -160,13 +204,12 @@ export default function OrderPage() {
 
 
   const currentStep = steps[step];
-  const priceInCents = prices[formData.size] || 0;
 
   return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center py-24 md:py-32 px-4 md:px-6">
-          <div className="w-full max-w-2xl mb-12">
+          <div className="w-full max-w-4xl mb-12">
             <div className="flex items-center justify-between">
               {steps.map((s, idx) => (
                 <div key={idx} className="flex items-center text-xs text-center flex-col w-20">
@@ -192,7 +235,7 @@ export default function OrderPage() {
             </div>
           </div>
 
-          <div className="relative w-full max-w-2xl">
+          <div className="relative w-full max-w-4xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -203,7 +246,7 @@ export default function OrderPage() {
                 className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full"
               >
                 {step === 0 && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 max-w-2xl mx-auto">
                     <h2 className="font-headline text-3xl text-foreground">1. Upload Your Pet's Photo</h2>
                     <p className="text-secondary">Upload your pet’s best photo for the perfect portrait. High-resolution images work best!</p>
                      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
@@ -221,7 +264,7 @@ export default function OrderPage() {
                 )}
 
                 {step === 1 && (
-                    <div className="space-y-8">
+                    <div className="space-y-8 max-w-2xl mx-auto">
                         <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
                         <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {styleOptions.map((s) => (
@@ -240,22 +283,34 @@ export default function OrderPage() {
                 )}
 
                 {step === 2 && (
-                  <div className="space-y-6">
-                    <h2 className="font-headline text-3xl text-foreground">3. Choose Size & Format</h2>
-                    <RadioGroup value={formData.size} onValueChange={(v) => handleChange('size', v)} className="space-y-4">
-                      {[
-                          { id: 'digital', name: 'Digital Only', price: '$250' },
-                          { id: 'canvas', name: 'Canvas Print (18x24)', price: '$450' },
-                          { id: 'framed', name: 'Framed Print (24x36)', price: '$750' }
-                      ].map(item => (
-                          <Label key={item.id} htmlFor={item.id} className="flex items-center justify-between p-4 border rounded-lg cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all">
-                              <div>
-                                  <h4 className="font-headline text-lg text-foreground">{item.name}</h4>
-                              </div>
-                             <div className="flex items-center gap-4">
-                               <span className="text-lg font-medium text-foreground">{item.price}</span>
-                               <RadioGroupItem value={item.id} id={item.id} />
-                             </div>
+                  <div className="space-y-8">
+                    <h2 className="font-headline text-3xl text-foreground text-center">3. Choose Your Package</h2>
+                    <RadioGroup value={formData.pkg} onValueChange={(v) => handleChange('pkg', v)} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                      {Object.values(packages).map((pkg) => (
+                          <Label key={pkg.id} htmlFor={pkg.id} className="cursor-pointer group h-full">
+                              <Card className={`relative text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1 h-full flex flex-col ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`}>
+                                  <RadioGroupItem value={pkg.id} id={pkg.id} className="sr-only" />
+                                  {pkg.highlight && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                                        Most Popular
+                                    </div>
+                                  )}
+                                  <CardContent className="p-0 flex flex-col items-center justify-start gap-2 flex-grow">
+                                      <h3 className="font-headline text-2xl text-foreground">{pkg.name}</h3>
+                                      <p className="text-3xl font-headline text-foreground mb-1">{pkg.priceFormatted}</p>
+                                      <p className="text-sm text-muted-foreground h-12 flex items-center mb-4">{pkg.description}</p>
+                                      <ul className="text-secondary space-y-2 text-left text-sm flex-grow">
+                                        {pkg.features.map((feature, i) => (
+                                          <li key={i} className="flex items-start">
+                                            <Check className="text-accent mr-2 h-4 w-4 mt-0.5 shrink-0" /> {feature}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                  </CardContent>
+                                  <div className="w-8 h-8 rounded-full border-2 border-muted flex items-center justify-center mt-6 mx-auto group-has-[:checked]:border-accent group-has-[:checked]:bg-accent transition-colors">
+                                      <Check className="w-5 h-5 text-white" />
+                                  </div>
+                              </Card>
                           </Label>
                       ))}
                     </RadioGroup>
@@ -263,7 +318,7 @@ export default function OrderPage() {
                 )}
 
                 {step === 3 && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 max-w-2xl mx-auto">
                     <h2 className="font-headline text-3xl text-foreground">4. Personalize & Review</h2>
                     <div className="space-y-2">
                       <Label htmlFor="pet-name">Pet's Name (Optional)</Label>
@@ -291,7 +346,7 @@ export default function OrderPage() {
                                 <span>Style: <span className="font-medium text-foreground capitalize">{formData.style}</span></span>
                             </div>
                             <div className="flex justify-between items-center text-secondary">
-                                <span>Size: <span className="font-medium text-foreground capitalize">{formData.size}</span></span>
+                                <span>Package: <span className="font-medium text-foreground capitalize">{selectedPackage.name}</span></span>
                                 <span>${(priceInCents / 100).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
@@ -304,7 +359,7 @@ export default function OrderPage() {
                 )}
 
                 {step === 4 && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 max-w-md mx-auto">
                     <h2 className="font-headline text-3xl text-foreground">5. Complete Your Payment</h2>
                     <Card>
                          <CardContent className="p-6">
@@ -313,7 +368,7 @@ export default function OrderPage() {
                                 <span>Style: <span className="font-medium text-foreground capitalize">{formData.style}</span></span>
                             </div>
                              <div className="flex justify-between items-center text-secondary">
-                                <span>Size: <span className="font-medium text-foreground capitalize">{formData.size}</span></span>
+                                <span>Package: <span className="font-medium text-foreground capitalize">{selectedPackage.name}</span></span>
                             </div>
                             <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
                                 <span>Total</span>
@@ -340,7 +395,7 @@ export default function OrderPage() {
                 )}
 
                 {step === 5 && (
-                  <div className="text-center space-y-4 py-8">
+                  <div className="text-center space-y-4 py-8 max-w-md mx-auto">
                     <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
                        <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
                        <h2 className="font-headline text-4xl text-foreground">Thank You!</h2>
@@ -356,7 +411,7 @@ export default function OrderPage() {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between items-center pt-8">
+                <div className="flex justify-between items-center pt-8 max-w-2xl mx-auto">
                     {step > 0 && step < 4 && (
                         <Button variant="outline" onClick={back} className="rounded-full">Back</Button>
                     )}
