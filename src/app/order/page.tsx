@@ -118,7 +118,7 @@ function OrderForm() {
         });
     };
 
-    const validateForm = (): { isValid: boolean, message?: string, title?: string } => {
+    const validateForm = (): { isValid: boolean; title?: string, message?: string } => {
         if (!formData.name) return { isValid: false, title: "Missing Information", message: "Please enter your full name." };
         if (!formData.email) return { isValid: false, title: "Missing Information", message: "Please enter your email address." };
         if (!/\S+@\S+\.\S+/.test(formData.email)) return { isValid: false, title: "Invalid Email", message: "Please enter a valid email address." };
@@ -327,12 +327,68 @@ function OrderForm() {
                                 </div>
                              </CardContent>
                         </Card>
-
+                        
                         <div className="p-4 text-center bg-background/50 rounded-lg border border-border/50">
                             <p className="text-sm font-semibold mb-3 text-muted-foreground">Secure Payments By:</p>
-                            <div className="flex justify-center items-center space-x-4">
+                             <div className="flex justify-center items-center space-x-4">
                                 <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110" />
                                 <svg width="49" height="30" viewBox="0 0 49 30" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110"><path fill="#0055A4" d="M32.8.2c-2-.3-4.6.6-5.8 2.5-1.1 1.7-1.1 3.8-.4 5.7.7 1.8 2.4 2.8 4.1 2.8h4.4V11c-1.6 0-3.1-.3-4.5-.8-.7-.3-1.4-.6-2.1-.9-3.2-1.6-6-4.5-5.8-8.2.3-3 2.9-4.8 5.7-5C31.1-.3 34.6-.2 37 1.1c1.3.7 2.3 1.7 3 3l-4 2.1c-.3-.6-.8-1.1-1.4-1.5-1.2-.7-2.6-.9-3.8-.5zm13.2 2.1c-1-1.3-2.5-2.2-4.1-2.4-2.2-.2-4.5.7-5.9 2.5-1.2 1.5-1.6 3.4-1.3 5.3.3 2.2 1.7 3.8 3.8 4.7l-3.3 9.4c-.4 1 .2 2.2 1.3 2.6.4.1.8.2 1.2.2.9 0 1.7-.5 2.1-1.3l6.3-17.9c.5-1.6.2-3.3-.8-4.6zM22.9 5.2c-.5-1.5-1.8-2.6-3.4-2.8-2.2-.2-4.4.9-5.6 2.8-.8 1.4-1 3.1-.6 4.7.4 1.7 1.6 3 3.3 3.5.7.2 1.4.3 2.1.3 1.2 0 2.4-.4 3.4-1.2l-3.9-2.2c-.3.4-.6.8-.8 1.2-.5 1-1.5 1.7-2.7 1.5-1-.2-1.7-.9-1.9-1.8-.3-1.2.2-2.5 1.3-3.1.5-.3 1.1-.5 1.7-.5.6 0 1.2.1 1.7.4l4.3-2.3zM15.4 17l-1.3 3.8c-.5 1.5.3 3 1.8 3.4 1.5.5 3-.3 3.4-1.8l6.1-17.3C26 2.9 24.7 1 22.8.5c-2-.5-4.1.4-5.1 2.2L15.4 17zm-15 4.8C.1 21.3-.1 20.5.1 19.6l3.5-11c.4-1.2 1.6-2 2.8-2h6.2c.4 0 .7.3.7.6s-.3.6-.7.6H6.4c-.6 0-1.1.3-1.3.9L1.7 21c-.2.6.1 1.2.7 1.4.6.2 1.2-.1 1.4-.7l.8-2.4h5.5l-1.4 4.3c-.5 1.5.3 3 1.8 3.4 1.5.5 3-.3 3.4-1.8l1.3-3.8h-9c-.3 0-.6.3-.7.6z"></path></svg>
                                 <svg width="50" height="30" viewBox="0 0 38 24" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110"><path d="M35.25 6.4H2.75A2.75 2.75 0 000 9.15v10.7C0 22.69 1.23 24 2.75 24h32.5A2.75 2.75 0 0038 21.25V9.15A2.75 2.75 0 0035.25 6.4zM31.22 19.46l-4.5-4.5 4.5-4.5 1.56 1.56-2.94 2.94 2.94 2.94-1.56 1.56zM15.65 18h-2.34l2.34-12h2.34l-2.34 12zm-6.26 0H7.05l2.34-12h2.34L9.39 18zm-4.68 0H2.37l2.34-12h2.34L4.71 18zM25.4 18h-2.34l.8-3.4h-3.9l-.8 3.4h-2.34l3.54-12h3.54l-2.04 12z" fill="#000"></path><circle cx="15.5" cy="12" r="7" fill="#F79E1B"></circle><path d="M15.5 5c-3.87 0-7 3.13-7 7s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 11.5c-2.49 0-4.5-2.01-4.5-4.5S13.01 7.5 15.5 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z" fill="#EB001B"></path><path d="M20 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" fill="#F79E1B"></path></svg>
                                 <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110"><path d="M14.52.48a1.2 1.2 0 00-1.04-.48h-11a1.2 1.2 0 00-1.04.48A1.2 1.2 0 001 1.52v13a1.2 1.2 0 00.48 1.04A1.2 1.2 0 002.52 16h11a1.2 1.2 0 001.04-.48A1.2 1.2 0 0015 14.48v-13a1.2 1.2 0 00-.48-1.04zM8.36 12.4H5.68V7.52h2.68a1.69 1.69 0 110 4.88zM8.8 3.68H5.24V5.6h3.56z" fill="#2566AF"></path></svg>
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110"><path d="M24 6.81a4.2 4.2 0 00-3.3-3.6C16.9.11 12.31 0 12 0s-4.9.11-8.7 3.2A4.2 4.2 0 000 6.81c-.1 2.3.6 6.5 4.1 8.1 3.5 1.6 7.9 1.6 7.9 1.6s4.4 0 7.9-1.6c3.5-1.6 4.2-5.8 4.1-8.1zm-17.4 6.2a.9.9 0 01-1-1.2l2-3.5a.9.9 0 111.5.9l-2 3.5a.9.9 0 01-.5.3zm3.1-1.3a.9.9 0 01-1.2-.5l1.3-2.2a.9.9 0 111.5.9l-1.3 2.2a.9.
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-7 transition-transform duration-200 ease-in-out hover:scale-110"><path d="M24 6.81a4.2 4.2 0 00-3.3-3.6C16.9.11 12.31 0 12 0s-4.9.11-8.7 3.2A4.2 4.2 0 000 6.81c-.1 2.3.6 6.5 4.1 8.1 3.5 1.6 7.9 1.6 7.9 1.6s4.4 0 7.9-1.6c3.5-1.6 4.2-5.8 4.1-8.1zm-17.4 6.2a.9.9 0 01-1-1.2l2-3.5a.9.9 0 111.5.9l-2 3.5a.9.9 0 01-.5.3zm3.1-1.3a.9.9 0 01-1.2-.5l1.3-2.2a.9.9 0 111.5.9l-1.3 2.2a.9.9 0 01-.5.3zm3.1-1.2a.9.9 0 01-1.2-.5l1.3-2.2a.9.9 0 111.5.9l-1.3 2.2a.9.9 0 01-.5.3zm3.1-1.3a.9.9 0 01-1.2-.5l1.3-2.2a.9.9 0 111.5.9l-1.3 2.2a.9.9 0 01-.5.3z" fill="#1434CB"></path></svg>
+                             </div>
+                        </div>
+
+                        <PayPalButton 
+                            amount={priceInCents / 100}
+                            disabled={isFormIncomplete || isSubmitting}
+                            onSuccess={onPaymentSuccess}
+                            onError={onPaymentError}
+                        />
+
+                        {isSubmitting && (
+                            <div className="flex items-center justify-center text-secondary">
+                                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                <span>Finalizing your commission...</span>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+
+            {step === 1 && (
+                <motion.div
+                    key="success"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center p-12 bg-card rounded-2xl shadow-xl flex flex-col items-center"
+                >
+                    <CheckCircle className="w-16 h-16 text-accent mb-6" />
+                    <h2 className="font-headline text-3xl text-foreground">Commission Submitted!</h2>
+                    <p className="mt-4 text-secondary max-w-md">
+                        Thank you for your trust. Our artists are honored to begin creating your masterpiece. You will receive an email confirmation shortly with your order details.
+                    </p>
+                    <Button asChild className="mt-8 rounded-full">
+                        <Link href="/">Back to Home</Link>
+                    </Button>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+}
+
+export default function OrderPage() {
+    return (
+        <div className="flex flex-col min-h-screen bg-background">
+            <Header />
+            <main className="flex-1 py-24 md:py-32">
+                <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+                    <Suspense fallback={<p>Loading...</p>}>
+                        <OrderForm />
+                    </Suspense>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
+}
