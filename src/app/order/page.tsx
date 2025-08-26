@@ -269,13 +269,30 @@ export default function OrderPage() {
                         <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {styleOptions.map((s) => (
                                 <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
-                                    <Card className="relative text-center p-6 rounded-xl border border-border has-[:checked]:bg-accent has-[:checked]:border-accent transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
+                                    <motion.div 
+                                        whileTap={{ scale: 0.97 }}
+                                        className={`relative p-6 rounded-2xl border transition-all duration-300 ${
+                                            formData.style === s.id
+                                            ? "bg-gradient-to-r from-yellow-300/50 to-amber-400/50 text-foreground border-accent shadow-lg"
+                                            : "bg-background/50 border-muted/20 text-foreground hover:border-accent"
+                                        }`}
+                                    >
                                         <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
-                                        <CardContent className="p-0 flex flex-col items-center justify-center gap-2">
-                                            <h3 className="font-headline text-2xl text-foreground group-has-[:checked]:text-accent-foreground">{s.name}</h3>
-                                            <p className="text-sm text-muted-foreground h-10 flex items-center group-has-[:checked]:text-accent-foreground/80">{s.description}</p>
+                                        <CardContent className="p-0 flex flex-col items-center justify-center gap-2 text-center">
+                                            <h3 className="font-headline text-2xl">{s.name}</h3>
+                                            <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
                                         </CardContent>
-                                    </Card>
+                                        {formData.style === s.id && (
+                                            <motion.div
+                                            initial={{ scale: 0, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="absolute top-2 right-2 text-accent"
+                                            >
+                                            <Check size={18} />
+                                            </motion.div>
+                                        )}
+                                    </motion.div>
                                 </Label>
                             ))}
                         </RadioGroup>
@@ -288,7 +305,11 @@ export default function OrderPage() {
                     <RadioGroup value={formData.pkg} onValueChange={(v) => handleChange('pkg', v)} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                       {Object.values(packages).map((pkg) => (
                           <Label key={pkg.id} htmlFor={pkg.id} className="cursor-pointer group h-full">
-                              <Card className={`relative text-center p-6 rounded-xl border has-[:checked]:bg-accent/20 has-[:checked]:border-accent transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1 h-full flex flex-col ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`}>
+                              <motion.div whileTap={{ scale: 0.98 }} className={`relative text-center p-6 rounded-2xl border transition-all duration-300 ease-in-out-quad h-full flex flex-col ${
+                                formData.pkg === pkg.id
+                                ? 'bg-gradient-to-tr from-yellow-300/30 to-amber-400/30 border-accent shadow-xl'
+                                : `bg-card hover:shadow-lg hover:-translate-y-1 ${pkg.highlight ? 'border-accent' : 'border-muted/20'}`
+                              }`}>
                                   <RadioGroupItem value={pkg.id} id={pkg.id} className="sr-only" />
                                   {pkg.highlight && (
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-md">
@@ -307,10 +328,17 @@ export default function OrderPage() {
                                         ))}
                                       </ul>
                                   </CardContent>
-                                  <div className="w-8 h-8 rounded-full border-2 border-muted flex items-center justify-center mt-6 mx-auto group-has-[:checked]:border-accent group-has-[:checked]:bg-accent transition-colors">
-                                      <Check className="w-5 h-5 text-accent-foreground opacity-0 group-has-[:checked]:opacity-100 transition-opacity" />
-                                  </div>
-                              </Card>
+                                  {formData.pkg === pkg.id && (
+                                    <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="absolute top-2 right-2 text-accent"
+                                    >
+                                    <Check size={20} />
+                                    </motion.div>
+                                  )}
+                              </motion.div>
                           </Label>
                       ))}
                     </RadioGroup>
@@ -328,15 +356,35 @@ export default function OrderPage() {
                     <div className="space-y-2">
                        <Label>Background Style</Label>
                        <RadioGroup value={formData.background} onValueChange={(v) => handleChange('background', v)} className="flex gap-4">
-                          <Label htmlFor="bg-plain" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-accent-foreground transition-all">
-                              <RadioGroupItem value="plain" id="bg-plain" className="sr-only" /> Plain
-                          </Label>
-                          <Label htmlFor="bg-gradient" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-accent-foreground transition-all">
-                              <RadioGroupItem value="gradient" id="bg-gradient" className="sr-only" /> Soft Gradient
-                          </Label>
-                          <Label htmlFor="bg-artist" className="border rounded-lg p-4 flex-1 text-center cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-accent-foreground transition-all">
-                              <RadioGroupItem value="artist" id="bg-artist" className="sr-only" /> Artist's Choice
-                          </Label>
+                          {[
+                            {id: 'plain', label: 'Plain'},
+                            {id: 'gradient', label: 'Soft Gradient'},
+                            {id: 'artist', label: 'Artist\'s Choice'},
+                          ].map(bg => (
+                            <Label key={bg.id} htmlFor={`bg-${bg.id}`} className="cursor-pointer flex-1">
+                                <motion.div 
+                                    whileTap={{ scale: 0.97 }}
+                                    className={`relative text-center border rounded-lg p-4 transition-all duration-300 ${
+                                        formData.background === bg.id
+                                        ? "bg-gradient-to-r from-yellow-300/50 to-amber-400/50 text-foreground border-accent shadow-lg"
+                                        : "bg-background/50 border-muted/20 text-foreground hover:border-accent"
+                                    }`}
+                                >
+                                    <RadioGroupItem value={bg.id} id={`bg-${bg.id}`} className="sr-only" />
+                                    {bg.label}
+                                    {formData.background === bg.id && (
+                                        <motion.div
+                                            initial={{ scale: 0, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="absolute top-2 right-2 text-accent"
+                                        >
+                                            <Check size={16} />
+                                        </motion.div>
+                                    )}
+                                </motion.div>
+                            </Label>
+                          ))}
                        </RadioGroup>
                     </div>
                     <Card>
@@ -440,3 +488,5 @@ export default function OrderPage() {
       </div>
   );
 }
+
+    
