@@ -46,7 +46,9 @@ export async function POST(req: Request) {
     
     if (!res.ok) {
         console.error('PayPal API Error:', data);
-        return NextResponse.json({ error: data.message || "Failed to create PayPal order." }, { status: res.status });
+        // Provide a more specific error message if available from PayPal
+        const errorMessage = data?.details?.[0]?.description || data.message || "Failed to create PayPal order.";
+        return NextResponse.json({ error: errorMessage }, { status: res.status });
     }
 
     return NextResponse.json(data);

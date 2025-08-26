@@ -83,17 +83,27 @@ export default function OrderPage() {
         toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
         return s;
     }
+    // If on the review step, create the order before showing payment options
+    if (s === 3) {
+      handleSubmit();
+    }
     return Math.min(s + 1, steps.length - 1);
   });
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
+    if (isSubmitting) return; // Prevent double submission
     setIsSubmitting(true);
+    
     try {
+        if (!photoFile) {
+          throw new Error("Please upload a photo of your pet.");
+        }
         // 1. Get signed URL
         const uploadUrlRes = await fetch("/api/upload-url");
         if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
         const { url: signedUrl, path } = await uploadUrlRes.json();
+        if (!signedUrl || !path) throw new Error("Invalid upload URL response.");
 
         // 2. Upload file to signed URL
         const uploadRes = await fetch(signedUrl, { method: "PUT", body: photoFile });
@@ -107,21 +117,28 @@ export default function OrderPage() {
                 ...formData,
                 photoUrl: path,
                 priceCents: prices[formData.size],
-                // These are mock values for now, would come from form in a real scenario
-                name: 'John Doe',
-                email: 'john.doe@example.com',
+                name: 'John Doe', // Placeholder
+                email: 'john.doe@example.com', // Placeholder
             }),
         });
-        if (!orderRes.ok) throw new Error("Failed to create order.");
+
+        if (!orderRes.ok) {
+           const errorBody = await orderRes.json();
+           throw new Error(errorBody.error || "Failed to create order.");
+        }
         const orderData = await orderRes.json();
+        
+        if (!orderData.orderId) {
+            throw new Error("Failed to retrieve order ID.");
+        }
 
         setOrderId(orderData.orderId);
-        // The PayPal button will now be rendered with the correct orderId
-        // The user will click the PayPal button to complete the payment
         toast({ title: "Order created!", description: "Please complete your payment below." });
+        setStep(4); // Move to checkout step
         
     } catch (error: any) {
         toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred." });
+        setStep(3); // Stay on the current step if fails
     } finally {
         setIsSubmitting(false);
     }
@@ -192,24 +209,23 @@ export default function OrderPage() {
                 )}
 
                 {step === 1 && (
-                  <div className="space-y-8">
-                    <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
-                    <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {styleOptions.map((s) => (
-                        <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
-                          <Card className="text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/5 transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
-                            <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
-                            <CardContent className="p-0 flex flex-col items-center justify-center gap-2">
-                              <h3 className="font-headline text-2xl text-foreground">{s.name}</h3>
-                              <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
-                            </CardContent>
-                          </Card>
-                        </Label>
-                      ))}
-                    </RadioGroup>
-                  </div>
+                    <div className="space-y-8">
+                        <h2 className="font-headline text-3xl text-foreground text-center">2. Select Your Style</h2>
+                        <RadioGroup value={formData.style} onValueChange={(v) => handleChange('style', v)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {styleOptions.map((s) => (
+                                <Label key={s.id} htmlFor={s.id} className="cursor-pointer group">
+                                    <Card className="text-center p-6 rounded-xl has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/5 transition-all duration-300 ease-in-out-quad hover:shadow-lg hover:-translate-y-1">
+                                        <RadioGroupItem value={s.id} id={s.id} className="sr-only" />
+                                        <CardContent className="p-0 flex flex-col items-center justify-center gap-2">
+                                            <h3 className="font-headline text-2xl text-foreground">{s.name}</h3>
+                                            <p className="text-sm text-muted-foreground h-10 flex items-center">{s.description}</p>
+                                        </CardContent>
+                                    </Card>
+                                </Label>
+                            ))}
+                        </RadioGroup>
+                    </div>
                 )}
-
 
                 {step === 2 && (
                   <div className="space-y-6">
@@ -236,7 +252,7 @@ export default function OrderPage() {
 
                 {step === 3 && (
                   <div className="space-y-6">
-                    <h2 className="font-headline text-3xl text-foreground">4. Personalization</h2>
+                    <h2 className="font-headline text-3xl text-foreground">4. Personalize & Review</h2>
                     <div className="space-y-2">
                       <Label htmlFor="pet-name">Pet's Name (Optional)</Label>
                       <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max, Luna" />
@@ -256,14 +272,7 @@ export default function OrderPage() {
                           </Label>
                        </RadioGroup>
                     </div>
-                  </div>
-                )}
-
-                {step === 4 && (
-                  <div className="space-y-6">
-                    <h2 className="font-headline text-3xl text-foreground">5. Review & Checkout</h2>
-                    <div className="grid grid-cols-1 gap-4">
-                       <Card>
+                    <Card>
                          <CardContent className="p-6">
                             <h3 className="font-headline text-lg mb-4">Order Summary</h3>
                             <div className="flex justify-between items-center text-secondary">
@@ -278,15 +287,32 @@ export default function OrderPage() {
                                 <span>${(priceInCents / 100).toFixed(2)}</span>
                             </div>
                          </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {step === 4 && (
+                  <div className="space-y-6">
+                    <h2 className="font-headline text-3xl text-foreground">5. Complete Your Payment</h2>
+                    <div className="grid grid-cols-1 gap-4">
+                       <Card>
+                         <CardContent className="p-6">
+                            <h3 className="font-headline text-lg mb-4">Final Invoice</h3>
+                            <div className="flex justify-between items-center text-lg font-bold text-foreground mt-4 pt-4 border-t">
+                                <span>Total</span>
+                                <span>${(priceInCents / 100).toFixed(2)}</span>
+                            </div>
+                         </CardContent>
                        </Card>
 
-                      <div className="pt-4">
+                      <div className="pt-4 text-center">
                          {orderId ? (
                             <PayPalButton orderId={orderId} priceCents={priceInCents} />
                          ) : (
-                           <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-                                {isSubmitting ? <Loader2 className="animate-spin" /> : "Complete My Commission"}
-                           </Button>
+                           <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground">
+                                <Loader2 className="animate-spin" />
+                                <p>Creating your order...</p>
+                           </div>
                          )}
                       </div>
                     </div>
@@ -306,7 +332,7 @@ export default function OrderPage() {
                 )}
 
                 {/* Navigation Buttons */}
-                {step < 4 && (
+                {step < 3 && (
                   <div className="flex justify-between items-center pt-8">
                     <Button variant="outline" onClick={back} disabled={step === 0} className="rounded-full">
                       Back
@@ -316,9 +342,19 @@ export default function OrderPage() {
                     </Button>
                   </div>
                 )}
+                 {step === 3 && (
+                   <div className="flex justify-between items-center pt-8">
+                      <Button variant="outline" onClick={back} className="rounded-full">
+                        Back
+                      </Button>
+                       <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full max-w-xs rounded-full bg-primary text-primary-foreground px-10 py-3 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : "Proceed to Payment"}
+                       </Button>
+                   </div>
+                 )}
                  {step === 4 && (
                    <div className="flex justify-between items-center pt-8">
-                      <Button variant="outline" onClick={back} disabled={step === 0} className="rounded-full">
+                      <Button variant="outline" onClick={back} disabled={isSubmitting} className="rounded-full">
                         Back
                       </Button>
                    </div>
