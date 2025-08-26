@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useRef, useEffect, Suspense } from "react";
@@ -12,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2 } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, FileCheck2 } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
-import { submitOrderToServer } from "@/app/actions";
+import { supabase } from '@/lib/supabase-client';
 
 const packages = {
     classic: {
@@ -66,13 +64,12 @@ function OrderForm() {
         petName: '',
         style: 'artist' as StyleOption,
         notes: '',
-        name: 'Jane Doe', // Placeholder
+        name: '',
         email: ''
     });
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [orderId, setOrderId] = useState<string | null>(null);
     
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -80,7 +77,6 @@ function OrderForm() {
         const pkg = searchParams.get('pkg') as PackageKey;
         if (pkg && packages[pkg]) {
             setSelectedPackageKey(pkg);
-            setOrderId(`TEMP-${Date.now()}`);
         }
     }, [searchParams]);
 
@@ -107,65 +103,68 @@ function OrderForm() {
     };
 
     const removePhoto = (index: number) => {
-        const newFiles = [...photoFiles];
-        newFiles.splice(index, 1);
-        setPhotoFiles(newFiles);
-
-        const newPreviews = [...photoPreviews];
-        const removedPreview = newPreviews.splice(index, 1);
-        setPhotoPreviews(newPreviews);
-        // Clean up object URLs
-        URL.revokeObjectURL(removedPreview[0]);
+        setPhotoFiles(prev => prev.filter((_, i) => i !== index));
+        setPhotoPreviews(prev => {
+            const newPreviews = [...prev];
+            const removed = newPreviews.splice(index, 1);
+            URL.revokeObjectURL(removed[0]);
+            return newPreviews;
+        });
     };
 
     const validateForm = () => {
-        if (photoFiles.length === 0) {
-            toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." });
-            return false;
-        }
-        if (!formData.email) {
-            toast({ variant: "destructive", title: "Email Required", description: "Please enter your email address." });
-            return false;
-        }
-        if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." });
-            return false;
-        }
+        if (!formData.name) { toast({ variant: "destructive", title: "Name Required", description: "Please enter your full name." }); return false; }
+        if (!formData.email) { toast({ variant: "destructive", title: "Email Required", description: "Please enter your email address." }); return false; }
+        if (!/\S+@\S+\.\S+/.test(formData.email)) { toast({ variant: "destructive", title: "Invalid Email", description: "Please enter a valid email address." }); return false; }
+        if (photoFiles.length === 0) { toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." }); return false; }
         return true;
     };
     
-    const onPaymentSuccess = async () => {
+    const onPaymentSuccess = async (paypalOrderId: string) => {
         if (!validateForm() || !selectedPackageKey) return;
         
         setIsSubmitting(true);
         
-        const selectedPackage = packages[selectedPackageKey];
-        const orderDetails = new FormData();
-        orderDetails.append('customerName', formData.name);
-        orderDetails.append('customerEmail', formData.email);
-        orderDetails.append('petName', formData.petName);
-        orderDetails.append('style', formData.style);
-        orderDetails.append('package', selectedPackage.name);
-        orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
-        orderDetails.append('notes', formData.notes);
-
-        photoFiles.forEach((file, index) => {
-             // Use a consistent key that the Apps Script expects, e.g., 'file0', 'file1'
-            orderDetails.append('file' + index, file, file.name);
-        });
-
         try {
-            const result = await submitOrderToServer(orderDetails);
+            // 1. Upload files to Supabase Storage
+            const uploadPromises = photoFiles.map(file => {
+                const filePath = `portraits/${Date.now()}-${file.name}`;
+                return supabase.storage.from('portraits').upload(filePath, file);
+            });
 
-            if (result.success) {
-                toast({
-                    title: "Order Submitted!",
-                    description: `Your commission is now in our hands.`,
-                });
-                setStep(1); // Move to success screen
-            } else {
-                throw new Error("Server action reported failure.");
+            const uploadResults = await Promise.all(uploadPromises);
+
+            const photoUrls: string[] = [];
+            for (const result of uploadResults) {
+                if (result.error) throw new Error(`File upload failed: ${result.error.message}`);
+                const { data } = supabase.storage.from('portraits').getPublicUrl(result.data.path);
+                photoUrls.push(data.publicUrl);
             }
+
+            // 2. Submit order details to our backend
+            const selectedPackage = packages[selectedPackageKey];
+            const response = await fetch('/api/orders/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    petName: formData.petName,
+                    style: formData.style,
+                    pkg: selectedPackage,
+                    price: selectedPackage.price,
+                    notes: formData.notes,
+                    photoUrls,
+                    paypalOrderId,
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save order.');
+            }
+            
+            setStep(1); // Move to success screen
         } catch (error) {
             onPaymentError(error);
         } finally {
@@ -211,13 +210,19 @@ function OrderForm() {
                     exit={{ opacity: 0 }}
                     className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full grid md:grid-cols-2 gap-12"
                 >
-                    {/* Left Side: Form */}
                     <div className="space-y-6">
                         <h2 className="font-headline text-3xl text-foreground">Your Commission</h2>
                         
-                        {/* --- PHOTO UPLOAD --- */}
                         <div>
-                            <Label>1. Your Pet's Photo(s) (up to {selectedPackage.maxPets})</Label>
+                            <Label>1. Your Details</Label>
+                            <div className="mt-2 space-y-4">
+                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" />
+                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <Label>2. Your Pet's Photo(s) (up to {selectedPackage.maxPets})</Label>
                              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {photoPreviews.map((preview, index) => (
                                     <div key={index} className="relative group">
@@ -229,7 +234,7 @@ function OrderForm() {
                                 ))}
                                 {photoFiles.length < selectedPackage.maxPets && (
                                     <div>
-                                        <input type="file" ref={el => fileInputRefs.current[photoFiles.length] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" multiple={selectedPackage.maxPets > 1} />
+                                        <input type="file" ref={el => fileInputRefs.current[photoFiles.length] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
                                         <div onClick={() => fileInputRefs.current[photoFiles.length]?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
                                             <UploadCloud className="w-8 h-8 text-accent mb-2" />
                                             <span className="text-sm">Upload Photo(s)</span>
@@ -240,9 +245,8 @@ function OrderForm() {
                             </div>
                         </div>
 
-                        {/* --- STYLE --- */}
                         <div className="space-y-2">
-                            <Label>2. Choose a Style</Label>
+                            <Label>3. Choose a Style</Label>
                             <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-3 gap-4 pt-2">
                                 <div>
                                     <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
@@ -265,28 +269,17 @@ function OrderForm() {
                             </RadioGroup>
                         </div>
 
-
-                        {/* --- PET'S NAME --- */}
                         <div className="space-y-2">
-                          <Label htmlFor="pet-name">3. Pet's Name(s) (Optional)</Label>
+                          <Label htmlFor="pet-name">4. Pet's Name(s) (Optional)</Label>
                           <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" />
                         </div>
-
-                        {/* --- EMAIL --- */}
-                        <div className="space-y-2">
-                            <Label htmlFor="email">4. Your Email</Label>
-                            <Input id="email" type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" />
-                        </div>
                         
-                        {/* --- NOTES --- */}
                          <div className="space-y-2">
                           <Label htmlFor="notes">5. Notes for the Artist (Optional)</Label>
                           <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
                         </div>
-
                     </div>
 
-                    {/* Right Side: Summary & Payment */}
                     <div className="space-y-6">
                          <h3 className="font-headline text-2xl text-foreground">Order Summary</h3>
                          <Card>
@@ -314,26 +307,23 @@ function OrderForm() {
                                 <div className="w-full flex items-center justify-center space-x-2">
                                   <Loader2 className="h-6 w-6 animate-spin" />
                                   <p className="text-sm text-muted-foreground">
-                                    Submitting your order...
+                                    Finalizing your order...
                                   </p>
                                 </div>
                              ) : (
-                                orderId && (
-                                    <div
-                                      className={`${!photoFiles.length || !formData.email ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                      title={!photoFiles.length ? "Please upload at least one photo to proceed" : !formData.email ? "Please enter your email to proceed" : ""}
-                                    >
-                                      <div className={`${!photoFiles.length || !formData.email ? 'pointer-events-none' : ''}`}>
-                                        <PayPalButton 
-                                            orderId={orderId} 
-                                            amount={priceInCents / 100}
-                                            onSuccess={onPaymentSuccess}
-                                            onError={onPaymentError}
-                                            disabled={isSubmitting}
-                                        />
-                                      </div>
-                                    </div>
-                               )
+                                <div
+                                  className={`${!photoFiles.length || !formData.email || !formData.name ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  title={!formData.name ? "Please enter your name" : !formData.email ? "Please enter your email" : !photoFiles.length ? "Please upload at least one photo" : ""}
+                                >
+                                  <div className={`${!photoFiles.length || !formData.email || !formData.name ? 'pointer-events-none' : ''}`}>
+                                    <PayPalButton 
+                                        amount={priceInCents / 100}
+                                        onSuccess={onPaymentSuccess}
+                                        onError={onPaymentError}
+                                        disabled={isSubmitting}
+                                    />
+                                  </div>
+                                </div>
                              )}
                         </div>
                     </div>

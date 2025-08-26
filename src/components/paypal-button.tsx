@@ -9,91 +9,54 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 interface PayPalButtonProps {
-  orderId: string;
-  amount: number; // The amount in major units (e.g. 199.00)
+  amount: number;
   currency?: string;
-  onSuccess?: () => void;
+  onSuccess?: (paypalOrderId: string) => void;
   onError?: (err: any) => void;
+  disabled?: boolean;
 }
 
 export default function PayPalButton({
-  orderId,
   amount,
   currency = "USD",
   onSuccess,
   onError,
+  disabled = false,
 }: PayPalButtonProps) {
   const { toast } = useToast();
-
-  // Use the public client id environment variable (may be undefined in dev if not set)
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-  // Basic client-side validations
   if (!paypalClientId || paypalClientId === "YOUR_PAYPAL_CLIENT_ID") {
-    const errorMsg =
-      "PayPal Client ID is not configured. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID and restart the server.";
+    const errorMsg = "PayPal Client ID is not configured.";
     console.error(errorMsg);
-    return (
-      <p className="text-destructive text-center font-medium">{errorMsg}</p>
-    );
+    return <p className="text-destructive text-center font-medium">{errorMsg}</p>;
   }
-
-  if (!orderId) {
-    const errorMsg = "Missing orderId for PayPal payment.";
-    console.error(errorMsg);
-    return (
-      <p className="text-destructive text-center font-medium">{errorMsg}</p>
-    );
-  }
-
-  if (typeof amount !== "number" || Number.isNaN(amount) || amount <= 0) {
-    const errorMsg = "Invalid payment amount for PayPal.";
-    console.error(errorMsg, amount);
-    return (
-      <p className="text-destructive text-center font-medium">{errorMsg}</p>
-    );
-  }
-
-  const normalizedCurrency =
-    typeof currency === "string" && currency.length === 3
-      ? currency.toUpperCase()
-      : "USD";
 
   const initialOptions: ReactPayPalScriptOptions = {
     clientId: paypalClientId,
-    currency: normalizedCurrency,
+    currency: currency.toUpperCase(),
     intent: "capture",
-    // components: "buttons", // react-paypal-js will load buttons by default; leave commented for clarity
   };
 
   return (
     <PayPalScriptProvider options={initialOptions}>
       <PayPalButtons
         style={{ layout: "vertical", shape: "pill", color: "gold", label: "pay" }}
-        createOrder={async () => {
+        disabled={disabled}
+        forceReRender={[amount, currency, disabled]}
+        createOrder={async (data, actions) => {
           try {
-            const res = await fetch("/api/paypal/create-order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId,
-                amount,
-                currency: normalizedCurrency,
-              }),
+            const orderId = await actions.order.create({
+              purchase_units: [
+                {
+                  amount: {
+                    value: amount.toFixed(2),
+                    currency_code: currency.toUpperCase(),
+                  },
+                },
+              ],
             });
-
-            const data = await res.json().catch(() => ({}));
-
-            if (!res.ok) {
-              const errMsg = data?.error || "Failed to create PayPal order.";
-              throw new Error(errMsg);
-            }
-
-            if (!data?.id) {
-              throw new Error("PayPal create-order returned unexpected response.");
-            }
-
-            return data.id; // PayPal order ID
+            return orderId;
           } catch (error) {
             console.error("PayPal createOrder error:", error);
             toast({
@@ -102,32 +65,18 @@ export default function PayPalButton({
               description: "Could not initiate payment. Please try again.",
             });
             if (onError) onError(error);
-            // Return a rejected promise so PayPal buttons know createOrder failed
             return Promise.reject(error);
           }
         }}
-        onApprove={async (data) => {
+        onApprove={async (data, actions) => {
           try {
-            // data.orderID is expected from the PayPal SDK
-            const paypalOrderId = (data as any)?.orderID;
-            if (!paypalOrderId) {
-              throw new Error("Missing PayPal order ID on approval.");
+            if (!actions.order) {
+              throw new Error("PayPal actions.order is not available.");
             }
-
-            const res = await fetch("/api/paypal/capture-order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId, paypalOrderId }),
-            });
-
-            const json = await res.json().catch(() => ({}));
-
-            if (!res.ok || !json?.success) {
-              const errMsg = json?.error || "Payment capture failed.";
-              throw new Error(errMsg);
+            const details = await actions.order.capture();
+            if (onSuccess) {
+              onSuccess(details.id); // Pass PayPal order ID on success
             }
-
-            if (onSuccess) onSuccess();
           } catch (error) {
             console.error("PayPal onApprove error:", error);
             toast({
