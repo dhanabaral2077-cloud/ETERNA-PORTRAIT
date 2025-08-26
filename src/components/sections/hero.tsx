@@ -49,7 +49,7 @@ export function Hero() {
             style={{ y: textY }}
           >
             <Button asChild size="lg" className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
-              <Link href="/order">Order Your Portrait</Link>
+              <Link href="/#pricing">Order Your Portrait</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full border-foreground text-foreground px-10 py-4 text-lg hover:bg-foreground hover:text-background transition-colors">
               <Link href="#gallery">View Gallery</Link>

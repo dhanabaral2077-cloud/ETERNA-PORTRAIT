@@ -77,15 +77,9 @@ function OrderForm() {
             setOrderId(`TEMP-${Date.now()}`);
         } else {
             // Handle case where no package or invalid package is selected
-            toast({
-                variant: "destructive",
-                title: "No Package Selected",
-                description: "Please select a package from our pricing page to begin.",
-            });
-            // Optionally redirect
-            // router.push('/#pricing');
+            // No toast here, the component will render the "No Package Selected" state
         }
-    }, [searchParams, toast]);
+    }, [searchParams]);
 
     const handleChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));

@@ -89,7 +89,7 @@ export function CTA() {
               size="lg" 
               className="rounded-full bg-primary text-primary-foreground px-10 py-4 text-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all animate-pulse-glow"
             >
-              <Link href="/order">Commission Your Portrait</Link>
+              <Link href="/#pricing">Commission Your Portrait</Link>
             </Button>
           </div>
         </div>
