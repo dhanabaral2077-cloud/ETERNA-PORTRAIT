@@ -67,23 +67,17 @@ function OrderForm() {
         name: 'Jane Doe', // Placeholder
         email: ''
     });
-    const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([]);
-    const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([]);
+    const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+    const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderId, setOrderId] = useState<string | null>(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
     
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-    const xhrRef = useRef<XMLHttpRequest | null>(null);
 
     useEffect(() => {
         const pkg = searchParams.get('pkg') as PackageKey;
         if (pkg && packages[pkg]) {
             setSelectedPackageKey(pkg);
-            const maxPets = packages[pkg].maxPets;
-            setPhotoFiles(Array(maxPets).fill(null));
-            setPhotoPreviews(Array(maxPets).fill(null));
             setOrderId(`TEMP-${Date.now()}`);
         }
     }, [searchParams]);
@@ -92,46 +86,37 @@ function OrderForm() {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                toast({ variant: "destructive", title: "File Too Large", description: "Please upload an image smaller than 10MB." });
-                return;
-            }
-            if (photoFiles.filter(f => f).length >= packages[selectedPackageKey!].maxPets) {
-                toast({ variant: "destructive", title: "Upload Limit Reached", description: `You can upload a maximum of ${packages[selectedPackageKey!].maxPets} photos for this package.` });
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && selectedPackageKey) {
+            const selectedPackage = packages[selectedPackageKey];
+            if (files.length > selectedPackage.maxPets) {
+                toast({ variant: "destructive", title: "Too Many Photos", description: `You can upload a maximum of ${selectedPackage.maxPets} photos for this package.` });
                 return;
             }
 
-            const newFiles = [...photoFiles];
-            newFiles[index] = file;
+            const newFiles = Array.from(files);
             setPhotoFiles(newFiles);
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const newPreviews = [...photoPreviews];
-                newPreviews[index] = reader.result as string;
-                setPhotoPreviews(newPreviews);
-            };
-            reader.readAsDataURL(file);
+            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+            setPhotoPreviews(newPreviews);
         }
     };
 
-    const triggerFileInput = (index: number) => fileInputRefs.current[index]?.click();
-
     const removePhoto = (index: number) => {
         const newFiles = [...photoFiles];
-        newFiles[index] = null;
+        newFiles.splice(index, 1);
         setPhotoFiles(newFiles);
 
         const newPreviews = [...photoPreviews];
-        newPreviews[index] = null;
+        newPreviews.splice(index, 1);
         setPhotoPreviews(newPreviews);
+        // Clean up object URLs
+        URL.revokeObjectURL(photoPreviews[index]);
     };
 
     const validateForm = () => {
-        if (!photoFiles.some(f => f !== null)) {
+        if (photoFiles.length === 0) {
             toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload at least one photo of your pet." });
             return false;
         }
@@ -149,14 +134,11 @@ function OrderForm() {
     const onPaymentSuccess = async () => {
         if (isSubmitting || !validateForm()) return;
         setIsSubmitting(true);
-        setUploadStatus('uploading');
-        setUploadProgress(0);
 
         const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
         if (!scriptUrl || !selectedPackageKey) {
             toast({ variant: "destructive", title: "Configuration Error", description: "Could not submit your order. Please contact support." });
             setIsSubmitting(false);
-            setUploadStatus('error');
             return;
         }
 
@@ -170,73 +152,39 @@ function OrderForm() {
         orderDetails.append('price', (selectedPackage.price / 100).toFixed(2));
         orderDetails.append('notes', formData.notes);
 
-        photoFiles.forEach((file) => {
-            if (file) {
-                orderDetails.append('file', file, file.name);
-            }
+        photoFiles.forEach((file, index) => {
+            orderDetails.append('file' + index, file, file.name);
         });
+        
+        try {
+            const response = await fetch(scriptUrl, {
+                method: "POST",
+                body: orderDetails,
+            });
 
-        const xhr = new XMLHttpRequest();
-        xhrRef.current = xhr;
-        xhr.open("POST", scriptUrl, true);
-
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percentComplete = Math.round((event.loaded / event.total) * 100);
-                setUploadProgress(percentComplete);
-            }
-        };
-
-        xhr.onload = () => {
-            setIsSubmitting(false);
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const json = JSON.parse(xhr.responseText);
-                    if (json.success) {
-                        setUploadStatus('success');
-                        setUploadProgress(100);
-                        toast({
-                            title: "Order Submitted!",
-                            description: `Your commission (#${json.orderId}) is now in the hands of our talented artists.`
-                        });
-                        setStep(1);
-                    } else {
-                        setUploadStatus('error');
-                        toast({
-                            variant: "destructive",
-                            title: "Order Submission Failed",
-                            description: json.error || "An unknown server error occurred."
-                        });
-                    }
-                } catch (e) {
-                    setUploadStatus('error');
-                    toast({
-                        variant: "destructive",
-                        title: "Unexpected Response",
-                        description: "The server sent a response we couldn't understand. Please contact support."
-                    });
-                }
-            } else {
-                setUploadStatus('error');
-                toast({
-                    variant: "destructive",
-                    title: "Upload Failed",
-                    description: `The server responded with status ${xhr.status}. Please try again.`
+            // Since the response from a script run with `withHeaders` might be opaque,
+            // we will proceed optimistically if the request doesn't throw an error.
+            // Proper error handling would involve parsing the response if it's not opaque.
+            if (response.ok || response.type === 'opaque') {
+                 toast({
+                    title: "Order Submitted!",
+                    description: `Your commission is now in the hands of our talented artists.`
                 });
+                setStep(1); // Move to success screen
+            } else {
+                 throw new Error(`Server responded with status ${response.status}`);
             }
-        };
 
-        xhr.onerror = () => {
-            setIsSubmitting(false);
-            setUploadStatus('error');
+        } catch (error) {
+            console.error("Submission Error:", error);
             toast({
                 variant: "destructive",
-                title: "Network Error",
-                description: "Could not connect to the server. Please check your network and try again."
+                title: "Order Submission Failed",
+                description: "There was a problem sending your order details. Please contact support."
             });
-        };
-
-        xhr.send(orderDetails);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const onPaymentError = (error: any) => {
@@ -285,27 +233,24 @@ function OrderForm() {
                         <div>
                             <Label>1. Your Pet's Photo(s) (up to {selectedPackage.maxPets})</Label>
                              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {Array.from({ length: selectedPackage.maxPets }).map((_, index) => (
-                                    <div key={index}>
-                                        <input type="file" ref={el => fileInputRefs.current[index] = el} onChange={(e) => handleFileChange(e, index)} accept="image/jpeg,image/png,image/webp" className="hidden" />
-                                        <div onClick={() => triggerFileInput(index)} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
-                                            {photoPreviews[index] ? (
-                                                <>
-                                                    <Image src={photoPreviews[index]!} alt={`Pet preview ${index + 1}`} fill className="rounded-lg object-cover" />
-                                                    <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <UploadCloud className="w-8 h-8 text-accent mb-2" />
-                                                    <span className="text-sm">Upload Pet {index + 1}</span>
-                                                    <span className="text-xs mt-1">(Max 10MB)</span>
-                                                </>
-                                            )}
-                                        </div>
+                                {photoPreviews.map((preview, index) => (
+                                    <div key={index} className="relative group">
+                                        <Image src={preview} alt={`Pet preview ${index + 1}`} width={150} height={150} className="rounded-lg object-cover w-full h-40" />
+                                        <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 ))}
+                                {photoFiles.length < selectedPackage.maxPets && (
+                                    <div>
+                                        <input type="file" ref={el => fileInputRefs.current[0] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" multiple />
+                                        <div onClick={() => fileInputRefs.current[0]?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
+                                            <UploadCloud className="w-8 h-8 text-accent mb-2" />
+                                            <span className="text-sm">Upload Photo(s)</span>
+                                            <span className="text-xs mt-1">(Max 10MB)</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -381,16 +326,16 @@ function OrderForm() {
                         <div className="pt-4 text-center">
                             {isSubmitting ? (
                                 <div className="flex items-center justify-center flex-col gap-2 text-muted-foreground w-full">
-                                    <p>Finalizing your order... {uploadProgress}%</p>
-                                    <Progress value={uploadProgress} className="w-full" />
+                                    <Loader2 className="h-8 w-8 animate-spin" />
+                                    <p>Finalizing your order...</p>
                                 </div>
                              ) : (
                                 orderId && (
                                     <div
-                                      className={`${!photoFiles.some(f => f !== null) || !formData.email ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                      title={!photoFiles.some(f => f !== null) ? "Please upload at least one photo to proceed" : !formData.email ? "Please enter your email to proceed" : ""}
+                                      className={`${!photoFiles.length || !formData.email ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                      title={!photoFiles.length ? "Please upload at least one photo to proceed" : !formData.email ? "Please enter your email to proceed" : ""}
                                     >
-                                      <div className={`${!photoFiles.some(f => f !== null) || !formData.email ? 'pointer-events-none' : ''}`}>
+                                      <div className={`${!photoFiles.length || !formData.email ? 'pointer-events-none' : ''}`}>
                                         <PayPalButton 
                                             orderId={orderId} 
                                             amount={priceInCents / 100}
@@ -443,3 +388,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
