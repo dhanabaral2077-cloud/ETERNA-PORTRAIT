@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         price, 
         status, 
         photo_urls,
+        paypal_order_id,
         customers (
           name,
           email
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ orders: transformedOrders });
   } catch (err: any) {
+    console.error('API Error:', err);
     return NextResponse.json({ error: err.message || 'An unknown error occurred' }, { status: 500 });
   }
 }

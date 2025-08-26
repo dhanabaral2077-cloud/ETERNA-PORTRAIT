@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
     PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID,
     PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET,
     NEXT_PUBLIC_APPS_SCRIPT_URL: process.env.NEXT_PUBLIC_APPS_SCRIPT_URL,
+    // Add Supabase service role key for server-side access
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   }
 };
 
