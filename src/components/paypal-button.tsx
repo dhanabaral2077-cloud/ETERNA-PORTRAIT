@@ -1,6 +1,6 @@
 // =============================================
 // File: /components/paypal-button.tsx
-// Desc: Drop‑in PayPal checkout button for your order flow
+// Desc: Drop-in PayPal checkout button for your order flow
 // Usage: <PayPalButton orderId={orderId} amount={199.00} onSuccess={() => ...}/>
 // =============================================
 "use client";
@@ -23,6 +23,12 @@ export default function PayPalButton({ orderId, amount, currency = "USD", onSucc
     const { toast } = useToast();
     
     const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!;
+
+    if (!paypalClientId || paypalClientId === 'YOUR_PAYPAL_CLIENT_ID') {
+        const errorMsg = "PayPal Client ID is not configured. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment variables and restart your server.";
+        console.error(errorMsg);
+        return <p className="text-destructive text-center font-medium">{errorMsg}</p>;
+    }
     
     const initialOptions: ReactPayPalScriptOptions = {
         clientId: paypalClientId,
