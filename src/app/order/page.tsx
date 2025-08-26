@@ -82,11 +82,12 @@ export default function OrderPage() {
     petName: '',
     background: 'artist',
     notes: '',
-    name: '',
-    email: ''
+    name: 'Jane Doe', // Placeholder
+    email: 'jane@example.com' // Placeholder
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   
@@ -102,14 +103,17 @@ export default function OrderPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        toast({ variant: "destructive", title: "File too large", description: "Please upload an image under 10MB." });
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit for Apps Script
+        toast({ variant: "destructive", title: "File too large", description: "Please upload an image under 5MB." });
         return;
       }
       setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
+        const result = reader.result as string;
+        setPhotoPreview(result);
+        // Strip the data URL prefix to get pure Base64
+        setImageBase64(result.split(',')[1]);
       };
       reader.readAsDataURL(file);
     }
@@ -134,52 +138,50 @@ export default function OrderPage() {
     setIsSubmitting(true);
     
     try {
-        if (!photoFile) {
+        if (!photoFile || !imageBase64) {
           throw new Error("Please upload a photo of your pet.");
         }
-        // 1. Get signed URL (mocked)
-        const uploadUrlRes = await fetch("/api/upload-url");
-        if (!uploadUrlRes.ok) throw new Error("Could not get upload URL.");
-        const { url: signedUrl, path } = await uploadUrlRes.json();
 
-        // In a real scenario, you'd upload the file here
-        // await fetch(signedUrl, { method: "PUT", body: photoFile });
-        console.log("Mock photo path:", path);
-        console.log("Mock signed URL:", signedUrl);
+        const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
+        if (!scriptUrl) {
+            throw new Error("Configuration error: Apps Script URL is not defined.");
+        }
         
-        // 2. Create order in our DB
-        const orderRes = await fetch("/api/orders", {
+        const orderDetails = {
+            customerName: formData.name,
+            customerEmail: formData.email,
+            petName: formData.petName,
+            style: formData.style,
+            package: selectedPackage.name,
+            price: (priceInCents / 100).toFixed(2),
+            notes: formData.notes,
+            imageBase64: imageBase64,
+        };
+
+        const response = await fetch(scriptUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                style: formData.style,
-                format: selectedPackage.name, // Using package name as format
-                size: selectedPackage.features.find(f => f.includes('canvas') || f.includes('format')) || '',
-                petName: formData.petName,
-                notes: formData.notes,
-                photoUrl: path,
-                priceCents: priceInCents,
-                name: 'John Doe', // Placeholder
-                email: 'john.doe@example.com', // Placeholder
-            }),
+            mode: 'no-cors', // Apps Script requires no-cors for cross-origin POST from client
+            cache: 'no-cache',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: 'follow',
+            body: JSON.stringify(orderDetails)
         });
 
-        if (!orderRes.ok) {
-           const errorBody = await orderRes.json();
-           throw new Error(errorBody.error || "Failed to create order.");
-        }
-        const orderData = await orderRes.json();
+        // With no-cors, we can't read the response body, so we assume success if the request doesn't throw.
+        // We'll proceed to payment. A more robust solution might involve a redirect URL from the script.
         
-        if (!orderData.orderId) {
-            throw new Error("Failed to retrieve order ID.");
-        }
-
-        setOrderId(orderData.orderId);
-        toast({ title: "Order created!", description: "Please complete your payment below." });
+        // Let's invent an order ID for PayPal as we can't get one back
+        const mockOrderId = `MOCK-${Date.now()}`;
+        setOrderId(mockOrderId);
+        
+        toast({ title: "Order submitted!", description: "Please complete your payment below." });
         setStep(4); // Move to checkout step
         
     } catch (error: any) {
-        toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred." });
+        console.error("Submission Error:", error);
+        toast({ variant: "destructive", title: "Submission Failed", description: error.message || "An unexpected error occurred. Please check the console." });
     } finally {
         setIsSubmitting(false);
     }
@@ -488,5 +490,3 @@ export default function OrderPage() {
       </div>
   );
 }
-
-    
