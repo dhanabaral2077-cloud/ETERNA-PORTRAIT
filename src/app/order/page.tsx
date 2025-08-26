@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
+import { submitOrderToServer } from "@/app/actions";
 
 const packages = {
     classic: {
@@ -71,11 +72,9 @@ function OrderForm() {
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
     const [orderId, setOrderId] = useState<string | null>(null);
     
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-    const xhrRef = useRef<XMLHttpRequest | null>(null);
 
     useEffect(() => {
         const pkg = searchParams.get('pkg') as PackageKey;
@@ -139,15 +138,7 @@ function OrderForm() {
         if (!validateForm() || !selectedPackageKey) return;
         
         setIsSubmitting(true);
-        setUploadProgress(0);
-
-        const scriptUrl = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
-        if (!scriptUrl) {
-            toast({ variant: "destructive", title: "Configuration Error", description: "Could not submit your order. Please contact support." });
-            setIsSubmitting(false);
-            return;
-        }
-
+        
         const selectedPackage = packages[selectedPackageKey];
         const orderDetails = new FormData();
         orderDetails.append('customerName', formData.name);
@@ -159,50 +150,27 @@ function OrderForm() {
         orderDetails.append('notes', formData.notes);
 
         photoFiles.forEach((file, index) => {
+             // Use a consistent key that the Apps Script expects, e.g., 'file0', 'file1'
             orderDetails.append('file' + index, file, file.name);
         });
-        
-        const xhr = new XMLHttpRequest();
-        xhrRef.current = xhr;
 
-        xhr.open("POST", scriptUrl, true);
+        try {
+            const result = await submitOrderToServer(orderDetails);
 
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 100);
-                setUploadProgress(percent);
-            }
-        };
-
-        xhr.onload = () => {
-            setIsSubmitting(false);
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const json = JSON.parse(xhr.responseText);
-                    if (json.success) {
-                        toast({
-                            title: "Order Submitted!",
-                            description: `Your commission (ID: ${json.orderId}) is now in our hands.`,
-                        });
-                        setUploadProgress(100);
-                        setStep(1); // Move to success screen
-                    } else {
-                        throw new Error(json.error || "Unknown server error.");
-                    }
-                } catch (error) {
-                    onPaymentError("Failed to parse server response.");
-                }
+            if (result.success) {
+                toast({
+                    title: "Order Submitted!",
+                    description: `Your commission is now in our hands.`,
+                });
+                setStep(1); // Move to success screen
             } else {
-                onPaymentError(`Upload failed with status ${xhr.status}.`);
+                throw new Error("Server action reported failure.");
             }
-        };
-
-        xhr.onerror = () => {
+        } catch (error) {
+            onPaymentError(error);
+        } finally {
             setIsSubmitting(false);
-            onPaymentError("A network error occurred. Please check your connection.");
-        };
-
-        xhr.send(orderDetails);
+        }
     };
 
     const onPaymentError = (error: any) => {
@@ -210,7 +178,7 @@ function OrderForm() {
         toast({
             variant: "destructive",
             title: "Submission Failed",
-            description: typeof error === 'string' ? error : "There was a problem submitting your order. Please contact support.",
+            description: error instanceof Error ? error.message : "There was a problem submitting your order. Please contact support.",
         });
         setIsSubmitting(false);
     };
@@ -343,10 +311,10 @@ function OrderForm() {
 
                         <div className="pt-4 text-center">
                             {isSubmitting ? (
-                                <div className="w-full space-y-2">
-                                  <Progress value={uploadProgress} className="w-full" />
+                                <div className="w-full flex items-center justify-center space-x-2">
+                                  <Loader2 className="h-6 w-6 animate-spin" />
                                   <p className="text-sm text-muted-foreground">
-                                    Uploading... {uploadProgress}%
+                                    Submitting your order...
                                   </p>
                                 </div>
                              ) : (
