@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { UploadCloud, Palette, Ruler, Pencil, CheckCircle, ShoppingCart, Loader2 } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
 
 const steps = [
@@ -52,18 +52,11 @@ export default function OrderPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
-  const [showPhotoError, setShowPhotoError] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    if (showPhotoError) {
-      toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
-      setShowPhotoError(false); // Reset the trigger
-    }
-  }, [showPhotoError, toast]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -89,7 +82,7 @@ export default function OrderPage() {
 
   const next = () => {
     if (step === 0 && !photoFile) {
-        setShowPhotoError(true);
+        toast({ variant: "destructive", title: "No Photo Uploaded", description: "Please upload a photo of your pet to continue." });
         return;
     }
     setStep((s) => Math.min(s + 1, steps.length - 1));
