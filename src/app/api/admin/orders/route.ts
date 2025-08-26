@@ -18,7 +18,18 @@ export async function POST(req: Request) {
 
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('id, created_at, customer_name, customer_email, package, price, status, photo_urls')
+      .select(`
+        id, 
+        created_at, 
+        package, 
+        price, 
+        status, 
+        photo_urls,
+        customers (
+          name,
+          email
+        )
+      `)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -26,7 +37,15 @@ export async function POST(req: Request) {
       throw error;
     }
 
-    return NextResponse.json({ orders });
+    // Transform the data to match the expected flat structure for the admin page
+    const transformedOrders = orders.map(order => ({
+      ...order,
+      customer_name: (order.customers as any)?.name || 'N/A',
+      customer_email: (order.customers as any)?.email || 'N/A',
+    }));
+
+
+    return NextResponse.json({ orders: transformedOrders });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'An unknown error occurred' }, { status: 500 });
   }
