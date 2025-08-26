@@ -104,7 +104,7 @@ export default function AdminPage() {
                   <TableCell><Badge variant={order.status === 'Paid' ? 'default' : 'secondary'}>{order.status}</Badge></TableCell>
                   <TableCell>
                      <div className="flex space-x-2">
-                        {order.photo_urls.map((url, i) => (
+                        {order.photo_urls && order.photo_urls.map((url, i) => (
                             <a href={url} key={i} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                                 <ExternalLink className="w-5 h-5" />
                             </a>
