@@ -10,40 +10,40 @@ export function Pricing() {
   const tiers = [
     {
       id: 'classic',
-      name: 'Classic',
-      price: '$450',
-      description: 'For those seeking timeless elegance in a smaller format.',
+      name: 'Fine Art Poster',
+      price: '$450+',
+      description: 'A beautiful, high-quality poster print of your pet.',
       features: [
         'High-resolution digital file',
         'One pet included',
-        'Fine art canvas print (12x16)',
+        'Vibrant, museum-quality poster',
+        'Multiple size options',
       ],
       highlight: false,
     },
     {
       id: 'signature',
-      name: 'Signature',
-      price: '$950',
+      name: 'Premium Canvas',
+      price: '$950+',
       description: 'Our most popular commission — premium and refined.',
       features: [
-        'High-resolution digital file',
-        'Up to two pets',
-        'Premium canvas print (18x24)',
+        'Everything in Classic, plus:',
+        'Hand-stretched canvas',
         'Hand-finished brush details',
+        'Option for elegant framing',
       ],
       highlight: true,
     },
     {
       id: 'masterpiece',
-      name: 'Masterpiece',
-      price: '$1800',
+      name: 'Luxury Print',
+      price: '$1800+',
       description: 'For collectors who demand the grandest expression.',
       features: [
-        'High-resolution digital file',
-        'Up to three pets',
-        'Large-format canvas (24x36)',
-        'Luxury gilded frame',
-        'Priority commission',
+        'Everything in Signature, plus:',
+        'Luxury print materials (Metal, Acrylic)',
+        'Up to three pets included',
+        'Priority commission queue',
       ],
       highlight: false,
     },
@@ -58,7 +58,7 @@ export function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="font-serif text-4xl md:text-5xl text-foreground"
+          className="font-headline text-4xl md:text-5xl text-foreground"
         >
           Commission Your Portrait
         </motion.h2>
@@ -69,6 +69,15 @@ export function Pricing() {
           viewport={{ once: true }}
           className="h-1 w-24 bg-accent mx-auto mt-4 rounded-full origin-left"
         />
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="mt-4 text-secondary max-w-2xl mx-auto"
+        >
+          Begin by selecting a tier. You will customize the specific print type, size, and orientation on the next page.
+        </motion.p>
       </div>
 
       {/* Pricing Grid */}
@@ -80,7 +89,7 @@ export function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.2, duration: 0.7, type: 'spring' }}
             viewport={{ once: true }}
-            className={`relative rounded-2xl bg-card p-10 shadow-lg border transition-transform hover:-translate-y-2 ${
+            className={`relative flex flex-col rounded-2xl bg-card p-10 shadow-lg border transition-transform hover:-translate-y-2 ${
               tier.highlight
                 ? 'border-accent scale-105'
                 : 'border-muted/20 hover:border-accent'
@@ -92,25 +101,27 @@ export function Pricing() {
               </div>
             )}
 
-            <h3 className="font-serif text-2xl text-foreground mb-4">{tier.name}</h3>
-            <p className="text-4xl font-serif text-foreground mb-2">{tier.price}</p>
-            <p className="text-secondary mb-6 h-12">{tier.description}</p>
+            <div className="flex-grow">
+              <h3 className="font-headline text-2xl text-foreground mb-4">{tier.name}</h3>
+              <p className="text-4xl font-serif text-foreground mb-2">{tier.price}</p>
+              <p className="text-secondary mb-6 h-12">{tier.description}</p>
 
-            <ul className="text-secondary space-y-3 mb-8">
-              {tier.features.map((feature, i) => (
-                <li key={i} className="flex items-center">
-                  <Check className="text-accent mr-2 h-5 w-5" /> {feature}
-                </li>
-              ))}
-            </ul>
+              <ul className="text-secondary space-y-3 mb-8">
+                {tier.features.map((feature, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check className="text-accent mr-2 h-4 w-4 mt-1 shrink-0" /> {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             <Button
               asChild
               size="lg"
               variant={tier.highlight ? 'default' : 'outline'}
-              className="rounded-full w-full py-4 text-lg shadow-md transition-all"
+              className="rounded-full w-full py-4 text-lg shadow-md transition-all mt-auto"
             >
-              <Link href={`/order?pkg=${tier.id}`}>Commission Now</Link>
+              <Link href={`/order`}>Start Commission</Link>
             </Button>
           </motion.div>
         ))}
@@ -118,5 +129,3 @@ export function Pricing() {
     </section>
   );
 }
-
-    

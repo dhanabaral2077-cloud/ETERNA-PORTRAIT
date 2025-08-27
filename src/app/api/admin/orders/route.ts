@@ -25,6 +25,9 @@ export async function POST(req: Request) {
         status, 
         photo_urls,
         notes,
+        print_type,
+        orientation,
+        size,
         customers (
           name,
           email,
@@ -38,9 +41,6 @@ export async function POST(req: Request) {
       `, { count: 'exact' });
 
     if (search) {
-      // The 'or' filter requires the referenced column to be unique for a join.
-      // Since customer could be non-unique across orders, we do a textSearch on multiple columns.
-      // For more complex search, a dedicated search function (e.g., pg_trgm) would be better.
       query = query.or(`package.ilike.%${search}%,customers.name.ilike.%${search}%,customers.email.ilike.%${search}%`);
     }
 

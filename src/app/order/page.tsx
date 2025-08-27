@@ -10,60 +10,54 @@ import { Footer } from "@/components/layout/footer";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, Package, Ruler, Ship } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from '@/lib/supabase-client';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const packages = {
-    classic: {
-        id: 'classic',
-        name: 'Classic',
-        price: 45000,
-        priceFormatted: '$450',
-        description: 'For those seeking timeless elegance in a smaller format.',
-        features: ['High-resolution digital file', 'One pet included', 'Fine art canvas print (12x16)'],
-        maxPets: 1,
-    },
-    signature: {
-        id: 'signature',
-        name: 'Signature',
-        price: 95000,
-        priceFormatted: '$950',
-        description: 'Our most popular commission — premium and refined.',
-        features: ['High-resolution digital file', 'Up to two pets', 'Premium canvas print (18x24)', 'Hand-finished brush details'],
-        highlight: true,
-        maxPets: 2,
-    },
-    masterpiece: {
-        id: 'masterpiece',
-        name: 'Masterpiece',
-        price: 180000,
-        priceFormatted: '$1800',
-        description: 'For collectors who demand the grandest expression.',
-        features: ['High-resolution digital file', 'Up to three pets', 'Large-format canvas (24x36)', 'Luxury gilded frame', 'Priority commission'],
-        maxPets: 3,
-    },
+
+const productOptions = {
+    types: [
+        { id: 'canvas', name: 'Canvas', price: 95000 },
+        { id: 'framed_canvas', name: 'Framed Canvas', price: 125000 },
+        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 45000 },
+        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 75000 },
+        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 85000 },
+        { id: 'aluminum_print', name: 'Aluminum Print', price: 150000 },
+        { id: 'acrylic_print', name: 'Acrylic Print', price: 180000 },
+    ],
+    orientations: [
+        { id: 'vertical', name: 'Vertical' },
+        { id: 'horizontal', name: 'Horizontal' },
+    ],
+    sizes: [
+        { id: '5x7', name: '13x18 cm / 5x7"', priceModifier: 0.5 },
+        { id: '12x16', name: '30x40 cm / 12x16"', priceModifier: 1 },
+        { id: '18x24', name: '45x60 cm / 18x24"', priceModifier: 1.5 },
+        { id: '24x36', name: '60x90 cm / 24x36"', priceModifier: 2 },
+    ]
 } as const;
 
-type PackageKey = keyof typeof packages;
 type StyleOption = "artist" | "renaissance" | "classic_oil";
 
 function OrderForm() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const { toast } = useToast();
 
     const [step, setStep] = useState(0); // 0: Form, 1: Success
-    const [selectedPackageKey, setSelectedPackageKey] = useState<PackageKey | null>(null);
-
+    
     const [formData, setFormData] = useState({
+        // Commission details
+        printType: 'canvas',
+        orientation: 'vertical',
+        size: '12x16',
         petName: '',
         style: 'artist' as StyleOption,
         notes: '',
+        // Customer details
         name: '',
         email: '',
         addressLine1: '',
@@ -73,18 +67,12 @@ function OrderForm() {
         postalCode: '',
         country: '',
     });
+
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     
-    const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-    useEffect(() => {
-        const pkg = searchParams.get('pkg') as PackageKey;
-        if (pkg && packages[pkg]) {
-            setSelectedPackageKey(pkg);
-        }
-    }, [searchParams]);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -92,12 +80,11 @@ function OrderForm() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
-        if (files && selectedPackageKey) {
-            const selectedPackage = packages[selectedPackageKey];
+        if (files) {
             const newFiles = Array.from(files);
 
-            if ((photoFiles.length + newFiles.length) > selectedPackage.maxPets) {
-                toast({ variant: "destructive", title: "Too Many Photos", description: `You can upload a maximum of ${selectedPackage.maxPets} photos for this package.` });
+             if ((photoFiles.length + newFiles.length) > 3) { // Hard limit for now
+                toast({ variant: "destructive", title: "Too Many Photos", description: `You can upload a maximum of 3 photos.` });
                 return;
             }
 
@@ -137,13 +124,11 @@ function OrderForm() {
             toast({ variant: "destructive", title: title, description: message });
             return;
         }
-        if (!selectedPackageKey) return;
         
         setIsSubmitting(true);
         
         try {
             const orderFolderName = `orders/${Date.now()}`;
-            // 1. Upload files to Supabase Storage in a dedicated folder
             const uploadPromises = photoFiles.map(file => {
                 const filePath = `${orderFolderName}/${file.name}`;
                 return supabase.storage.from('orders').upload(filePath, file);
@@ -158,15 +143,18 @@ function OrderForm() {
                 photoUrls.push(data.publicUrl);
             }
 
-            // 2. Submit order details to our backend
-            const selectedPackage = packages[selectedPackageKey];
+            const pkg = {
+                name: `${selectedType?.name} (${selectedSize?.name})`,
+                id: `${formData.printType}_${formData.size}`
+            };
+
             const response = await fetch('/api/orders/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    pkg: { name: selectedPackage.name, id: selectedPackage.id },
-                    price: selectedPackage.price,
+                    pkg,
+                    price: totalPrice,
                     photoUrls,
                     storageFolder: orderFolderName,
                     paypalOrderId,
@@ -178,7 +166,7 @@ function OrderForm() {
                 throw new Error(errorData.error || 'Failed to save order.');
             }
             
-            setStep(1); // Move to success screen
+            setStep(1);
         } catch (error) {
             onPaymentError(error);
         } finally {
@@ -196,25 +184,11 @@ function OrderForm() {
         setIsSubmitting(false);
     };
     
-    if (!selectedPackageKey) {
-        return (
-            <div className="text-center p-8">
-                <AlertCircle className="mx-auto h-12 w-12 text-destructive" />
-                <h2 className="mt-4 text-2xl font-semibold text-foreground">No Package Selected</h2>
-                <p className="mt-2 text-muted-foreground">
-                    Please start by choosing a portrait package.
-                </p>
-                <Button asChild className="mt-6">
-                    <Link href="/#pricing">View Pricing</Link>
-                </Button>
-            </div>
-        );
-    }
+    const selectedType = productOptions.types.find(t => t.id === formData.printType);
+    const selectedSize = productOptions.sizes.find(s => s.id === formData.size);
+    const totalPrice = selectedType && selectedSize ? Math.round(selectedType.price * selectedSize.priceModifier) : 0;
     
-    const selectedPackage = packages[selectedPackageKey];
-    const priceInCents = selectedPackage.price;
     const isFormIncomplete = !formData.name || !formData.email || !formData.addressLine1 || !formData.city || !formData.postalCode || !formData.country || photoFiles.length === 0;
-
 
     return (
         <AnimatePresence mode="wait">
@@ -224,32 +198,56 @@ function OrderForm() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full grid md:grid-cols-2 gap-12"
+                    className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full grid md:grid-cols-2 gap-x-12 gap-y-8"
                 >
+                    {/* Left Column: Commission Details */}
                     <div className="space-y-6">
-                        <h2 className="font-headline text-3xl text-foreground">Your Commission</h2>
+                        <h2 className="font-headline text-3xl text-foreground">1. Customize Your Artwork</h2>
                         
-                        <div>
-                            <Label>1. Contact & Shipping</Label>
-                            <div className="mt-2 space-y-4">
-                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required />
-                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required />
-                                <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required />
-                                <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required />
-                                    <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required />
-                                    <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required />
-                                </div>
+                        {/* Artwork Type */}
+                        <div className="space-y-3">
+                            <Label>Product Type</Label>
+                            <Select value={formData.printType} onValueChange={(value) => handleChange('printType', value)}>
+                                <SelectTrigger><SelectValue placeholder="Select a product type" /></SelectTrigger>
+                                <SelectContent>
+                                    {productOptions.types.map(type => (
+                                        <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Orientation */}
+                            <div className="space-y-3">
+                                <Label>Orientation</Label>
+                                <Select value={formData.orientation} onValueChange={(value) => handleChange('orientation', value)}>
+                                    <SelectTrigger><SelectValue placeholder="Select orientation" /></SelectTrigger>
+                                    <SelectContent>
+                                        {productOptions.orientations.map(o => (
+                                            <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {/* Size */}
+                             <div className="space-y-3">
+                                <Label>Size</Label>
+                                <Select value={formData.size} onValueChange={(value) => handleChange('size', value)}>
+                                    <SelectTrigger><SelectValue placeholder="Select a size" /></SelectTrigger>
+                                    <SelectContent>
+                                        {productOptions.sizes.map(s => (
+                                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
 
-                        <div>
-                            <Label>2. Your Pet's Photo(s) (up to {selectedPackage.maxPets})</Label>
-                             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                         {/* Photo Upload */}
+                        <div className="space-y-3">
+                            <Label>Upload Your Pet's Photo(s)</Label>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {photoPreviews.map((preview, index) => (
                                     <div key={index} className="relative group">
                                         <Image src={preview} alt={`Pet preview ${index + 1}`} width={150} height={150} className="rounded-lg object-cover w-full h-40" />
@@ -258,21 +256,22 @@ function OrderForm() {
                                         </button>
                                     </div>
                                 ))}
-                                {photoFiles.length < selectedPackage.maxPets && (
+                                {photoFiles.length < 3 && (
                                     <div>
-                                        <input type="file" ref={el => fileInputRefs.current[photoFiles.length] = el} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
-                                        <div onClick={() => fileInputRefs.current[photoFiles.length]?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
+                                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
+                                        <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
                                             <UploadCloud className="w-8 h-8 text-accent mb-2" />
-                                            <span className="text-sm">Upload Photo(s)</span>
-                                            <span className="text-xs mt-1">(Max 10MB)</span>
+                                            <span className="text-sm">Upload Photo</span>
+                                            <span className="text-xs mt-1">(Max 3)</span>
                                         </div>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>3. Choose a Style</Label>
+                        {/* Style Choice */}
+                        <div className="space-y-3">
+                            <Label>Choose a Style</Label>
                             <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-3 gap-4 pt-2">
                                 <div>
                                     <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
@@ -294,42 +293,73 @@ function OrderForm() {
                                 </div>
                             </RadioGroup>
                         </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="pet-name">4. Pet's Name(s) (Optional)</Label>
+                        
+                        <div className="space-y-3">
+                          <Label htmlFor="pet-name">Pet's Name(s) (Optional)</Label>
                           <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" />
                         </div>
                         
-                         <div className="space-y-2">
-                          <Label htmlFor="notes">5. Notes for the Artist (Optional)</Label>
+                         <div className="space-y-3">
+                          <Label htmlFor="notes">Notes for the Artist (Optional)</Label>
                           <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
                         </div>
                     </div>
 
+                    {/* Right Column: Customer Info, Summary, Payment */}
                     <div className="space-y-6">
-                         <h3 className="font-headline text-2xl text-foreground">Order Summary</h3>
-                         <Card>
-                             <CardContent className="p-6">
-                                <div className="flex justify-between items-center text-lg font-bold text-foreground">
-                                    <span>{selectedPackage.name} Package</span>
-                                    <span>{selectedPackage.priceFormatted}</span>
+                        <h2 className="font-headline text-3xl text-foreground">2. Shipping & Payment</h2>
+                        
+                        <div className="space-y-3">
+                            <Label>Contact & Shipping Information</Label>
+                            <div className="mt-2 space-y-4">
+                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required />
+                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required />
+                                <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required />
+                                <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required />
+                                    <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
                                 </div>
-                                <ul className="text-secondary space-y-1.5 text-sm mt-4">
-                                  {selectedPackage.features.map((feature, i) => (
-                                    <li key={i} className="flex items-start">
-                                      <Check className="text-accent mr-2 h-4 w-4 mt-0.5 shrink-0" /> {feature}
-                                    </li>
-                                  ))}
-                                </ul>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required />
+                                    <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required />
+                                </div>
+                            </div>
+                        </div>
+
+                         <h3 className="font-headline text-2xl text-foreground pt-4">Order Summary</h3>
+                         <Card>
+                             <CardContent className="p-6 space-y-4">
+                                <div className="flex justify-between items-start text-md text-foreground">
+                                    <span className="font-medium flex items-center"><Package className="mr-2 h-5 w-5 text-accent"/> Product</span>
+                                    <span className="text-right">{selectedType?.name || 'N/A'}</span>
+                                </div>
+                                 <div className="flex justify-between items-start text-md text-foreground">
+                                    <span className="font-medium flex items-center"><Ruler className="mr-2 h-5 w-5 text-accent"/> Size</span>
+                                    <span className="text-right">{selectedSize?.name || 'N/A'}</span>
+                                </div>
                                 <div className="flex justify-between items-center text-xl font-bold text-foreground mt-4 pt-4 border-t">
                                     <span>Total</span>
-                                    <span>{selectedPackage.priceFormatted}</span>
+                                    <span>${(totalPrice / 100).toFixed(2)}</span>
                                 </div>
                              </CardContent>
                         </Card>
 
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center text-lg"><Ship className="mr-2 text-accent"/>Shipping Information</CardTitle>
+                            </CardHeader>
+                             <CardContent className="text-sm text-secondary space-y-2">
+                                <p>Fulfilled in 3 countries to ensure fast delivery.</p>
+                                <p><strong>Economy shipping:</strong> estimated delivery in 4-5 business days.</p>
+                                <p><strong>Express shipping:</strong> estimated delivery in 2-3 business days.</p>
+                                <p className="text-xs text-muted-foreground pt-2">Delivery time includes order processing, production, and shipping. Estimated times may vary and are not guaranteed.</p>
+                             </CardContent>
+                        </Card>
+
+
                         <PayPalButton 
-                            amount={priceInCents / 100}
+                            amount={totalPrice / 100}
                             disabled={isFormIncomplete || isSubmitting}
                             onSuccess={onPaymentSuccess}
                             onError={onPaymentError}
@@ -371,8 +401,8 @@ export default function OrderPage() {
         <div className="flex flex-col min-h-screen bg-background">
             <Header />
             <main className="flex-1 py-24 md:py-32">
-                <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-                    <Suspense fallback={<p>Loading...</p>}>
+                <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+                    <Suspense fallback={<div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>}>
                         <OrderForm />
                     </Suspense>
                 </div>

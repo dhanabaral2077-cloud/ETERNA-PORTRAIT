@@ -25,11 +25,15 @@ type Order = {
   customer_name: string;
   customer_email: string;
   customer_address: string;
-  package: string;
+  package: string; // This now represents the full product description e.g., "Canvas (12x16)"
   price: number;
   status: string;
   photo_urls: string[];
   notes?: string;
+  // New fields for detailed view
+  print_type?: string;
+  orientation?: string;
+  size?: string;
 };
 
 type Stats = {
@@ -200,7 +204,7 @@ export default function AdminPage() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Package</TableHead>
+              <TableHead>Product Details</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Photos</TableHead>
@@ -219,9 +223,13 @@ export default function AdminPage() {
                   <TableCell>
                     <div className="font-medium text-foreground">{order.customer_name}</div>
                     <div className="text-sm text-muted-foreground">{order.customer_email}</div>
-                    <div className="text-sm text-muted-foreground mt-1">{order.customer_address}</div>
+                    <div className="text-sm text-muted-foreground mt-1 max-w-[250px] truncate">{order.customer_address}</div>
                   </TableCell>
-                  <TableCell>{order.package}</TableCell>
+                  <TableCell>
+                    <div className="font-medium text-foreground">{order.package}</div>
+                     <div className="text-sm text-muted-foreground capitalize">{order.print_type?.replace(/_/g, ' ')}</div>
+                    <div className="text-sm text-muted-foreground capitalize">{order.orientation}</div>
+                  </TableCell>
                   <TableCell>${(order.price / 100).toFixed(2)}</TableCell>
                   <TableCell>
                      <Select value={order.status} onValueChange={(newStatus) => handleStatusChange(order.id, newStatus)}>

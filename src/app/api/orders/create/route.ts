@@ -29,6 +29,10 @@ export async function POST(req: Request) {
       stateProvinceRegion,
       postalCode,
       country,
+      // New fields from upgraded order flow
+      printType,
+      orientation,
+      size,
     } = body;
 
     // --- 1. Find or Create Customer ---
@@ -86,13 +90,17 @@ export async function POST(req: Request) {
         customer_id: customer.id,
         pet_name: petName,
         style,
-        package: pkg.name,
+        package: pkg.name, // e.g., "Canvas (12x16")"
         price,
         photo_urls: photoUrls,
         storage_folder: storageFolder, // Save storage folder
         notes,
         status: 'Paid', // Assuming this is called after payment
         paypal_order_id: paypalOrderId,
+        // Storing new detailed product info
+        print_type: printType,
+        orientation: orientation,
+        size: size,
       })
       .select('id')
       .single();
