@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ExternalLink, Search, DollarSign, Package, BarChart } from 'lucide-react';
+import { Loader2, ExternalLink, Search, DollarSign, Package, BarChart, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Select,
@@ -16,6 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -49,6 +59,7 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   const fetchOrders = async (currentPassword?: string) => {
     setIsLoading(true);
@@ -116,6 +127,32 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    try {
+        const response = await fetch('/api/admin/orders/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password, orderId: orderToDelete }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete order');
+        }
+        
+        setOrders(prevOrders => prevOrders.filter(order => order.id !== orderToDelete));
+        toast({ title: "Success", description: "Order deleted successfully." });
+
+    } catch (error: any) {
+         console.error(error);
+        toast({ variant: "destructive", title: "Error", description: error.message });
+    } finally {
+        setOrderToDelete(null);
+    }
+  };
+
+
   const filteredOrders = useMemo(() => {
     if (!searchTerm) return orders;
     return orders.filter(order =>
@@ -150,6 +187,7 @@ export default function AdminPage() {
   }
 
   return (
+    <>
     <div className="container py-8 mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold font-headline text-foreground">Order Dashboard</h1>
@@ -205,12 +243,13 @@ export default function AdminPage() {
               <TableHead>Status</TableHead>
               <TableHead>Photos</TableHead>
               <TableHead>Notes</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
                 <TableRow>
-                    <TableCell colSpan={7} className="text-center h-24"><Loader2 className="animate-spin mx-auto" /></TableCell>
+                    <TableCell colSpan={8} className="text-center h-24"><Loader2 className="animate-spin mx-auto" /></TableCell>
                 </TableRow>
             ) : filteredOrders.length > 0 ? (
               filteredOrders.map((order) => (
@@ -249,16 +288,41 @@ export default function AdminPage() {
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate" title={order.notes}>{order.notes}</TableCell>
+                   <TableCell>
+                     {order.status === 'Completed' && (
+                        <Button variant="ghost" size="icon" onClick={() => setOrderToDelete(order.id)}>
+                            <Trash2 className="w-5 h-5 text-destructive" />
+                        </Button>
+                     )}
+                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">No orders found.</TableCell>
+                <TableCell colSpan={8} className="text-center">No orders found.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
     </div>
+    <AlertDialog open={!!orderToDelete} onOpenChange={(open) => !open && setOrderToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the
+                    order and all associated data from the servers.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setOrderToDelete(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteOrder} className="bg-destructive hover:bg-destructive/90">
+                    Delete
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+   </>
   );
 }
