@@ -40,7 +40,7 @@ export function Header() {
             : "bg-transparent h-36"
         }`}
       >
-        {/* Logo */}
+        {/* Left-aligned Logo (Desktop) */}
         <motion.div
           className="flex-shrink-0"
           initial={{ opacity: 0 }}
@@ -57,6 +57,20 @@ export function Header() {
               />
           </Link>
         </motion.div>
+
+        {/* Centered Logo (Mobile) */}
+         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
+             <Link href="/" className="relative block h-28 w-64">
+                <Image
+                    src="/portfolio/Eterna_Portrait_Logo.png"
+                    alt="Eterna Portrait Logo"
+                    fill
+                    className="object-contain"
+                    priority
+                />
+            </Link>
+         </div>
+
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-10 font-headline text-sm uppercase tracking-widest">

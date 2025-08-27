@@ -55,7 +55,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="/portfolio/portrait_007.jpg"
+                src="/portfolio/portrait_007.png"
                 alt="Painting in Progress"
                 layout="fill"
                 objectFit="cover"
