@@ -29,10 +29,6 @@ export async function POST(req: Request) {
       stateProvinceRegion,
       postalCode,
       country,
-      // New fields from upgraded order flow
-      printType,
-      orientation,
-      size,
     } = body;
 
     // --- 1. Find or Create Customer ---
@@ -97,10 +93,6 @@ export async function POST(req: Request) {
         notes,
         status: 'Paid', // Assuming this is called after payment
         paypal_order_id: paypalOrderId,
-        // Storing new detailed product info
-        print_type: printType,
-        orientation: orientation,
-        size: size,
       })
       .select('id')
       .single();

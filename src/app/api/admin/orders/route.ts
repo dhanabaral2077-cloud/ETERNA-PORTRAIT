@@ -25,9 +25,6 @@ export async function POST(req: Request) {
         status, 
         photo_urls,
         notes,
-        print_type,
-        orientation,
-        size,
         customers (
           name,
           email,
