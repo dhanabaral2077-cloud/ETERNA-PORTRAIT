@@ -4,18 +4,15 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, PackageCheck, Ship, XCircle } from 'lucide-react';
+import { Loader2, PackageCheck, Ship, XCircle, Check, ChevronsUpDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { countries } from '@/lib/countries'; // We will create this file
+import { countries, Country } from '@/lib/countries'; 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { cn } from "@/lib/utils"
+
 
 type ShipmentMethod = {
   shipmentMethodUid: string;
@@ -23,6 +20,56 @@ type ShipmentMethod = {
   name: string;
   hasTracking: boolean;
 };
+
+function CountryCombobox({ selectedCountry, onCountryChange }: { selectedCountry: string, onCountryChange: (value: string) => void }) {
+  const [open, setOpen] = useState(false)
+  
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between text-lg py-6"
+        >
+          {selectedCountry
+            ? countries.find((country) => country.code === selectedCountry)?.name
+            : "Select your country..."}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search country..." />
+          <CommandList>
+            <CommandEmpty>No country found.</CommandEmpty>
+            <CommandGroup>
+              {countries.map((country) => (
+                <CommandItem
+                  key={country.code}
+                  value={country.name}
+                  onSelect={() => {
+                    onCountryChange(country.code === selectedCountry ? "" : country.code)
+                    setOpen(false)
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedCountry === country.code ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {country.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 export default function ShippingPage() {
   const [selectedCountry, setSelectedCountry] = useState('');
@@ -69,18 +116,7 @@ export default function ShippingPage() {
           </div>
 
           <div className="max-w-md mx-auto mb-12">
-            <Select onValueChange={handleCountryChange} value={selectedCountry}>
-              <SelectTrigger className="text-lg py-6">
-                <SelectValue placeholder="Select your country..." />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country.code} value={country.code}>
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+             <CountryCombobox selectedCountry={selectedCountry} onCountryChange={handleCountryChange} />
           </div>
 
           {isLoading && (
