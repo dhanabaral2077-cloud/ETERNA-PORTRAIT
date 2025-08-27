@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,7 +47,15 @@ export function Header() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Link href="/">PET MASTERPIECE</Link>
+          <Link href="/">
+            <Image
+                src="/logo.png"
+                alt="Pet Masterpiece Logo"
+                width={200}
+                height={50}
+                className="object-contain"
+              />
+          </Link>
         </motion.div>
 
         {/* Desktop Menu */}
