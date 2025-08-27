@@ -1,4 +1,4 @@
-// src/app/admin/page.tsx
+// src/app/admin/[secret]/page.tsx
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
