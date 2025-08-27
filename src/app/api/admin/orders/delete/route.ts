@@ -19,42 +19,55 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
     
-    // First, delete associated files from Supabase Storage if a storage_folder is present
+    // First, fetch order details to get the storage_folder
     const { data: orderData, error: fetchError } = await supabase
         .from('orders')
         .select('storage_folder')
         .eq('id', orderId)
         .single();
     
-    if (fetchError) {
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows found, which is ok if it's already deleted.
         console.error('Supabase error fetching order for deletion:', fetchError.message);
-        // Don't throw, still try to delete the DB record
+        throw fetchError;
     }
 
+    // If a storage folder exists, delete associated files from Supabase Storage
     if (orderData && orderData.storage_folder) {
         const { data: files, error: listError } = await supabase.storage.from('orders').list(orderData.storage_folder);
+        
         if (listError) {
             console.error(`Could not list files in ${orderData.storage_folder}:`, listError.message);
+            // Don't throw, still try to delete the DB record
         } else if (files && files.length > 0) {
             const filePaths = files.map(file => `${orderData.storage_folder}/${file.name}`);
             const { error: removeError } = await supabase.storage.from('orders').remove(filePaths);
             if(removeError) {
                  console.error(`Could not remove files from ${orderData.storage_folder}:`, removeError.message);
+                 // Don't throw, proceed to DB deletion
             }
         }
     }
 
+    // Explicitly delete related order_events first to prevent foreign key violation.
+    const { error: eventDeleteError } = await supabase
+        .from('order_events')
+        .delete()
+        .eq('order_id', orderId);
+
+    if (eventDeleteError) {
+        console.error('Supabase order_events delete error:', eventDeleteError.message);
+        throw eventDeleteError;
+    }
 
     // Now, delete the order from the database.
-    // ON DELETE CASCADE will handle related order_events.
-    const { error: deleteError } = await supabase
+    const { error: orderDeleteError } = await supabase
       .from('orders')
       .delete()
       .eq('id', orderId);
 
-    if (deleteError) {
-      console.error('Supabase order delete error:', deleteError.message);
-      throw deleteError;
+    if (orderDeleteError) {
+      console.error('Supabase order delete error:', orderDeleteError.message);
+      throw orderDeleteError;
     }
 
     return NextResponse.json({ success: true });
