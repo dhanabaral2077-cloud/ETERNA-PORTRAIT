@@ -41,7 +41,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">&copy; 2025 Eterna Portrait. All rights reserved.</p>
             <div className="mt-4">
               <Image
-                src="/portfolio/Transparent_Trust_Badges.png"
+                src="/portfolio/Trust_Badges_Transparent_Gold.png"
                 alt="Accepted payment methods"
                 width={300}
                 height={50}

@@ -1,19 +1,19 @@
 
 import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
-import { Alegreya, Inter } from 'next/font/google';
+import { Playfair_Display, Montserrat } from 'next/font/google';
 import './globals.css';
 
-const alegreya = Alegreya({
+const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-alegreya',
+  variable: '--font-playfair-display',
 });
 
-const inter = Inter({
+const montserrat = Montserrat({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-montserrat',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="!scroll-smooth">
-      <body className={`${alegreya.variable} ${inter.variable} font-body bg-background text-foreground antialiased`}>
+      <body className={`${playfairDisplay.variable} ${montserrat.variable} font-body bg-background text-foreground antialiased`}>
         {children}
         <Toaster />
       </body>

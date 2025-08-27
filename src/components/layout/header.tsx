@@ -49,7 +49,7 @@ export function Header() {
         >
           <Link href="/" className="relative block h-32 w-72 md:h-36 md:w-96">
             <Image
-                src="/portfolio/Eterna_Portrait_Logo.png"
+                src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
                 alt="Eterna Portrait Logo"
                 fill
                 className="object-contain"
@@ -62,7 +62,7 @@ export function Header() {
          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
              <Link href="/" className="relative block h-28 w-64">
                 <Image
-                    src="/portfolio/Eterna_Portrait_Logo.png"
+                    src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
                     alt="Eterna Portrait Logo"
                     fill
                     className="object-contain"

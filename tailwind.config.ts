@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-alegreya)', 'serif'],
+        body: ['var(--font-montserrat)', 'sans-serif'],
+        headline: ['var(--font-playfair-display)', 'serif'],
       },
       lineHeight: {
         'extra-loose': '1.6',
