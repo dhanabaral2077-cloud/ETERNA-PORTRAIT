@@ -65,7 +65,7 @@ export function Hero() {
             style={{ opacity: photoOpacity }}
           >
             <Image
-              src="https://picsum.photos/800/1200?random=1"
+              src="/portfolio/portrait_001.jpg"
               alt="Dog Photo"
               width={800}
               height={1200}
@@ -80,7 +80,7 @@ export function Hero() {
             style={{ opacity: paintingOpacity }}
           >
             <Image
-              src="https://picsum.photos/800/1200?random=2"
+              src="/portfolio/portrait_002.jpg"
               alt="Dog Painting"
               width={800}
               height={1200}
@@ -95,7 +95,7 @@ export function Hero() {
             style={{ opacity: roomOpacity }}
           >
             <Image
-              src="https://picsum.photos/800/1200?random=3"
+              src="/portfolio/portrait_003.jpg"
               alt="Dog Painting in Room"
               width={800}
               height={1200}

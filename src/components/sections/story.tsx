@@ -32,7 +32,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: photoOpacity }}>
            <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://picsum.photos/1200/800?random=4"
+                src="/portfolio/portrait_006.jpg"
                 alt="Pet Photo"
                 layout="fill"
                 objectFit="cover"
@@ -55,7 +55,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://picsum.photos/1200/800?random=5"
+                src="/portfolio/portrait_007.jpg"
                 alt="Painting in Progress"
                 layout="fill"
                 objectFit="cover"
@@ -78,7 +78,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: portraitOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="https://picsum.photos/1200/800?random=6"
+                src="/portfolio/portrait_004.jpg"
                 alt="Final Portrait"
                 layout="fill"
                 objectFit="cover"
@@ -102,7 +102,7 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: roomOpacity }}>
             <motion.div style={{ scale }} className="relative w-full h-full">
               <Image
-                  src="https://picsum.photos/1200/800?random=7"
+                  src="/portfolio/portrait_005.jpg"
                   alt="Portrait in Room"
                   layout="fill"
                   objectFit="cover"

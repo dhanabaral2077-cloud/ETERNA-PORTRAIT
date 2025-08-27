@@ -8,12 +8,12 @@ import Link from "next/link";
 
 export function Gallery() {
   const portraits = [
-    { src: "https://picsum.photos/600/960?random=1", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
-    { src: "https://picsum.photos/600/960?random=2", title: "Max in Classic Oil", aiHint: "cat oil" },
-    { src: "https://picsum.photos/600/960?random=3", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
-    { src: "https://picsum.photos/600/960?random=4", title: "Charlie in Regal Style", aiHint: "dog regal" },
-    { src: "https://picsum.photos/600/960?random=5", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
-    { src: "https://picsum.photos/600/960?random=6", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
+    { src: "/portfolio/portrait_0001.jpg", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
+    { src: "/portfolio/portrait_0002.jpg", title: "Max in Classic Oil", aiHint: "cat oil" },
+    { src: "/portfolio/portrait_0003.jpg", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
+    { src: "/portfolio/portrait_0004.jpg", title: "Charlie in Regal Style", aiHint: "dog regal" },
+    { src: "/portfolio/portrait_0005.jpg", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
+    { src: "/portfolio/portrait_0006.jpg", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
   ];
 
   return (
