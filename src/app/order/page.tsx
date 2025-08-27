@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, Package, Ruler, Ship } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, Package, Ruler, Truck } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -347,7 +347,7 @@ function OrderForm() {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center text-lg"><Ship className="mr-2 text-accent"/>Shipping Information</CardTitle>
+                                <CardTitle className="flex items-center text-lg"><Truck className="mr-2 text-accent"/>Shipping Information</CardTitle>
                             </CardHeader>
                              <CardContent className="text-sm text-secondary space-y-2">
                                 <p>Fulfilled in 3 countries to ensure fast delivery.</p>
