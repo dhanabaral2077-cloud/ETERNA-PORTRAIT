@@ -5,13 +5,25 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
+import { productOptions } from '@/app/order/page';
+
 
 export function Pricing() {
+  
+  const getTierBasePrice = (planId: 'classic' | 'signature' | 'masterpiece') => {
+    const defaultProduct = productOptions.types.find(p => p.plan === planId);
+    const defaultSize = productOptions.sizes.find(s => s.id === '12x16'); // Base size
+    if (defaultProduct && defaultSize) {
+      return (defaultProduct.price * defaultSize.priceModifier) / 100;
+    }
+    return 0;
+  }
+
   const tiers = [
     {
       id: 'classic',
       name: 'Fine Art Poster',
-      price: '$450+',
+      price: `$${getTierBasePrice('classic')}+`,
       description: 'A beautiful, high-quality poster print of your pet.',
       features: [
         'High-resolution digital file',
@@ -24,7 +36,7 @@ export function Pricing() {
     {
       id: 'signature',
       name: 'Premium Canvas',
-      price: '$950+',
+      price: `$${getTierBasePrice('signature')}+`,
       description: 'Our most popular commission — premium and refined.',
       features: [
         'Everything in Classic, plus:',
@@ -37,7 +49,7 @@ export function Pricing() {
     {
       id: 'masterpiece',
       name: 'Luxury Print',
-      price: '$1800+',
+      price: `$${getTierBasePrice('masterpiece')}+`,
       description: 'For collectors who demand the grandest expression.',
       features: [
         'Everything in Signature, plus:',

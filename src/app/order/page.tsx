@@ -20,15 +20,15 @@ import { supabase } from '@/lib/supabase-client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
-const productOptions = {
+export const productOptions = {
     types: [
-        { id: 'canvas', name: 'Canvas', price: 950000, plan: 'signature' },
-        { id: 'framed_canvas', name: 'Framed Canvas', price: 1250000, plan: 'signature' },
-        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 450000, plan: 'classic' },
-        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 750000, plan: 'classic' },
-        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 850000, plan: 'classic' },
-        { id: 'aluminum_print', name: 'Aluminum Print', price: 1500000, plan: 'masterpiece' },
-        { id: 'acrylic_print', name: 'Acrylic Print', price: 1800000, plan: 'masterpiece' },
+        { id: 'canvas', name: 'Canvas', price: 950, plan: 'signature' },
+        { id: 'framed_canvas', name: 'Framed Canvas', price: 1250, plan: 'signature' },
+        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 450, plan: 'classic' },
+        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 750, plan: 'classic' },
+        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 850, plan: 'classic' },
+        { id: 'aluminum_print', name: 'Aluminum Print', price: 1500, plan: 'masterpiece' },
+        { id: 'acrylic_print', name: 'Acrylic Print', price: 1800, plan: 'masterpiece' },
     ],
     orientations: [
         { id: 'vertical', name: 'Vertical' },
@@ -373,7 +373,7 @@ function OrderForm() {
                                 </div>
                                 <div className="flex justify-between items-center text-xl font-bold text-foreground mt-4 pt-4 border-t">
                                     <span>Total</span>
-                                    <span>${(totalPrice / 100).toFixed(2)}</span>
+                                    <span>${(totalPrice).toFixed(2)}</span>
                                 </div>
                              </CardContent>
                         </Card>
@@ -392,7 +392,7 @@ function OrderForm() {
 
 
                         <PayPalButton 
-                            amount={totalPrice / 100}
+                            amount={totalPrice}
                             disabled={isFormIncomplete || isSubmitting}
                             onSuccess={onPaymentSuccess}
                             onError={onPaymentError}
