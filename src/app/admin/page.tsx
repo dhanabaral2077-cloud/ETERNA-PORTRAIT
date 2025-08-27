@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ExternalLink, Search, DollarSign, Package, BarChart, Trash2 } from 'lucide-react';
+import { Loader2, ExternalLink, Search, DollarSign, Package, BarChart, Trash2, ClipboardCopy } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Select,
@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -161,6 +162,11 @@ export default function AdminPage() {
     );
   }, [orders, searchTerm]);
 
+  const copyToClipboard = (order: Order) => {
+    const addressText = `${order.customer_name}\n${order.customer_email}\n${order.customer_address}`;
+    navigator.clipboard.writeText(addressText);
+    toast({ title: "Copied!", description: "Customer info copied to clipboard." });
+  }
 
   if (!isAuthenticated) {
     return (
@@ -255,9 +261,39 @@ export default function AdminPage() {
                 <TableRow key={order.id}>
                   <TableCell>{format(new Date(order.created_at), 'MMM dd, yyyy')}</TableCell>
                   <TableCell>
-                    <div className="font-medium text-foreground">{order.customer_name}</div>
-                    <div className="text-sm text-muted-foreground">{order.customer_email}</div>
-                    <div className="text-sm text-muted-foreground mt-1 max-w-[250px] truncate">{order.customer_address}</div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="link" className="px-0 font-medium text-foreground h-auto">{order.customer_name}</Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                            <div className="grid gap-4">
+                                <div className="space-y-2">
+                                    <h4 className="font-medium leading-none">Customer Details</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        View and copy customer shipping information.
+                                    </p>
+                                </div>
+                                <div className="grid gap-2 text-sm">
+                                    <div className="grid grid-cols-[80px_1fr] items-center">
+                                        <span className="font-semibold text-muted-foreground">Name</span>
+                                        <span>{order.customer_name}</span>
+                                    </div>
+                                     <div className="grid grid-cols-[80px_1fr] items-center">
+                                        <span className="font-semibold text-muted-foreground">Email</span>
+                                        <span className="truncate">{order.customer_email}</span>
+                                    </div>
+                                    <div className="grid grid-cols-[80px_1fr] items-start">
+                                        <span className="font-semibold text-muted-foreground mt-1">Address</span>
+                                        <span className="whitespace-pre-wrap">{order.customer_address}</span>
+                                    </div>
+                                </div>
+                                 <Button variant="outline" size="sm" onClick={() => copyToClipboard(order)}>
+                                    <ClipboardCopy className="mr-2 h-4 w-4" /> Copy Info
+                                </Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    <div className="text-sm text-muted-foreground truncate max-w-[200px]">{order.customer_email}</div>
                   </TableCell>
                   <TableCell>
                     <div className="font-medium text-foreground">{order.package}</div>
