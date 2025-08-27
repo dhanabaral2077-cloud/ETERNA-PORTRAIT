@@ -42,7 +42,7 @@ const productOptions = {
     ]
 } as const;
 
-type StyleOption = "artist" | "renaissance" | "classic_oil";
+type StyleOption = "artist" | "renaissance" | "classic_oil" | "watercolor" | "modern_minimalist";
 
 function OrderForm() {
     const searchParams = useSearchParams();
@@ -289,7 +289,11 @@ function OrderForm() {
                         {/* Style Choice */}
                         <div className="space-y-3">
                             <Label>Choose a Style</Label>
-                            <RadioGroup value={formData.style} onValueChange={(value) => handleChange('style', value as StyleOption)} className="grid grid-cols-3 gap-4 pt-2">
+                            <RadioGroup 
+                                value={formData.style} 
+                                onValueChange={(value) => handleChange('style', value as StyleOption)} 
+                                className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2"
+                            >
                                 <div>
                                     <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
                                     <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
@@ -306,6 +310,73 @@ function OrderForm() {
                                     <RadioGroupItem value="classic_oil" id="classic_oil" className="peer sr-only" />
                                     <Label htmlFor="classic_oil" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
                                         Classic Oil
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="watercolor" id="watercolor" className="peer sr-only" />
+                                    <Label htmlFor="watercolor" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
+                                        Watercolor
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="modern_minimalist" id="modern_minimalist" className="peer sr-only" />
+                                    <Label htmlFor="modern_minimalist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
+                                        Minimalist
+                                    </Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <Label htmlFor="pet-name">Pet's Name(s) (Optional)</Label>
+                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" />
+                        </div>
+                        
+                         <div className="space-y-3">
+                          <Label htmlFor="notes">Notes for the Artist (Optional)</Label>
+                          <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
+                        </div>
+                    </div>
+
+                    {/* Right Column: Customer Info, Summary, Payment */}
+                    <div className="space-y-6">
+                        <h2 className="font-headline text-3xl text-foreground">2. Shipping & Payment</h2>
+                        
+                        <div className="space-y-3">
+                            <Label>Contact & Shipping Information</Label>
+                            <div className="mt-2 space-y-4">
+                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required />
+                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required />
+                                <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required />
+                                <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required />
+                                    <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required />
+                                    <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required />
+                                </div>
+                            </div>
+                        </div>
+
+                         <h3 className="font-headline text-2xl text-foreground pt-4">Order Summary</h3>
+                         <Card>
+                             <CardContent className="p-6 space-y-4">
+                                <div className="flex justify-between items-start text-md text-foreground">
+                                    <span className="font-medium flex items-center"><Package className="mr-2 h-5 w-5 text-accent"/> Product</span>
+                                    <span className="text-right">{selectedType?.name || 'N/A'}</span>
+                                </div>
+                                 <div className="flex justify-between items-start text-md text-foreground">
+                                    <span className="font-medium flex items-center"><Ruler className="mr-2 h-5 w-5 text-accent"/> Size</span>
+                                    <span className="text-right">{selectedSize?.name || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xl font-bold text-foreground mt-4 pt-4 border-t">
+                                    <span>Total</span>
+                                    <span>${(totalPrice / 100).toFixed(2)}</span>
+                                d_minimalist" className="peer sr-only" />
+                                    <Label htmlFor="modern_minimalist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
+                                        Minimalist
                                     </Label>
                                 </div>
                             </RadioGroup>
