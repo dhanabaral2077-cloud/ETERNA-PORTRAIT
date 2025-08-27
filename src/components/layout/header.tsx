@@ -36,8 +36,8 @@ export function Header() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
           scrolled
-            ? "backdrop-blur-md bg-background/80 shadow-md h-20"
-            : "bg-transparent h-28"
+            ? "backdrop-blur-md bg-background/80 shadow-md h-24"
+            : "bg-transparent h-32"
         }`}
       >
         {/* Logo */}
@@ -47,7 +47,7 @@ export function Header() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Link href="/" className="relative block h-24 w-56 md:h-28 md:w-72">
+          <Link href="/" className="relative block h-28 w-64 md:h-32 md:w-80">
             <Image
                 src="/portfolio/Eterna_Portrait_Logo.png"
                 alt="Eterna Portrait Logo"
