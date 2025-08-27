@@ -13,6 +13,10 @@ export function Footer() {
           
           {/* Navigation Links */}
           <div className="flex items-center space-x-6 font-headline text-sm uppercase tracking-widest">
+            <Link href="/shipping" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Shipping</span>
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            </Link>
             <Link href="/privacy" className="relative text-muted-foreground transition-colors hover:text-primary group">
               <span>Privacy</span>
               <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
