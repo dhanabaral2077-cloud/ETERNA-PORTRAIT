@@ -121,7 +121,7 @@ export function Pricing() {
               variant={tier.highlight ? 'default' : 'outline'}
               className="rounded-full w-full py-4 text-lg shadow-md transition-all mt-auto"
             >
-              <Link href={`/order`}>Start Commission</Link>
+              <Link href={`/order?plan=${tier.id}`}>Start Commission</Link>
             </Button>
           </motion.div>
         ))}

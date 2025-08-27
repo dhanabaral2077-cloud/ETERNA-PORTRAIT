@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -22,13 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const productOptions = {
     types: [
-        { id: 'canvas', name: 'Canvas', price: 95000 },
-        { id: 'framed_canvas', name: 'Framed Canvas', price: 125000 },
-        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 45000 },
-        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 75000 },
-        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 85000 },
-        { id: 'aluminum_print', name: 'Aluminum Print', price: 150000 },
-        { id: 'acrylic_print', name: 'Acrylic Print', price: 180000 },
+        { id: 'canvas', name: 'Canvas', price: 95000, plan: 'signature' },
+        { id: 'framed_canvas', name: 'Framed Canvas', price: 125000, plan: 'signature' },
+        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 45000, plan: 'classic' },
+        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 75000, plan: 'classic' },
+        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 85000, plan: 'classic' },
+        { id: 'aluminum_print', name: 'Aluminum Print', price: 150000, plan: 'masterpiece' },
+        { id: 'acrylic_print', name: 'Acrylic Print', price: 180000, plan: 'masterpiece' },
     ],
     orientations: [
         { id: 'vertical', name: 'Vertical' },
@@ -45,13 +45,21 @@ const productOptions = {
 type StyleOption = "artist" | "renaissance" | "classic_oil";
 
 function OrderForm() {
+    const searchParams = useSearchParams();
     const { toast } = useToast();
+    const router = useRouter();
 
     const [step, setStep] = useState(0); // 0: Form, 1: Success
+
+    const selectedPlan = searchParams.get('plan') || 'signature';
+
+    const availableProductTypes = useMemo(() => {
+        return productOptions.types.filter(type => type.plan === selectedPlan);
+    }, [selectedPlan]);
     
     const [formData, setFormData] = useState({
         // Commission details
-        printType: 'canvas',
+        printType: availableProductTypes[0]?.id || 'canvas',
         orientation: 'vertical',
         size: '12x16',
         petName: '',
@@ -67,6 +75,15 @@ function OrderForm() {
         postalCode: '',
         country: '',
     });
+    
+     // Effect to update printType if the plan changes and the current printType is not available
+    useEffect(() => {
+        const isCurrentTypeAvailable = availableProductTypes.some(type => type.id === formData.printType);
+        if (!isCurrentTypeAvailable && availableProductTypes.length > 0) {
+            handleChange('printType', availableProductTypes[0].id);
+        }
+    }, [selectedPlan, availableProductTypes, formData.printType]);
+
 
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -210,7 +227,7 @@ function OrderForm() {
                             <Select value={formData.printType} onValueChange={(value) => handleChange('printType', value)}>
                                 <SelectTrigger><SelectValue placeholder="Select a product type" /></SelectTrigger>
                                 <SelectContent>
-                                    {productOptions.types.map(type => (
+                                    {availableProductTypes.map(type => (
                                         <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
                                     ))}
                                 </SelectContent>
