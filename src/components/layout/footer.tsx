@@ -36,9 +36,9 @@ export function Footer() {
           {/* Copyright & Payment Icons */}
           <div className="text-center">
             <div className="font-headline text-lg tracking-[0.1em] text-foreground mb-4">
-              PET MASTERPIECE
+              ETERNA PORTRAIT
             </div>
-            <p className="text-sm text-muted-foreground">&copy; 2025 Pet Masterpiece. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">&copy; 2025 Eterna Portrait. All rights reserved.</p>
             <div className="mt-4">
               <Image
                 src="/portfolio/Transparent_Trust_Badges.png"

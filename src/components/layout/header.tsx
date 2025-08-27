@@ -31,29 +31,29 @@ export function Header() {
     <>
       {/* Desktop / Tablet Navbar */}
       <motion.nav
-        initial={{ y: -80 }}
+        initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 w-full z-50 flex items-center justify-between px-8 transition-all duration-500 ${
+        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
           scrolled
-            ? "backdrop-blur-md bg-background/80 shadow-md h-16"
-            : "bg-transparent h-20"
+            ? "backdrop-blur-md bg-background/80 shadow-md h-20"
+            : "bg-transparent h-24"
         }`}
       >
         {/* Logo */}
         <motion.div
-          className="font-headline text-xl tracking-[0.15em] text-foreground"
+          className="flex-shrink-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Link href="/">
+          <Link href="/" className="relative block h-16 w-48 md:h-20 md:w-64">
             <Image
-                src="/logo.png"
-                alt="Pet Masterpiece Logo"
-                width={200}
-                height={50}
+                src="/Eterna_Portrait_Logo.png"
+                alt="Eterna Portrait Logo"
+                fill
                 className="object-contain"
+                priority
               />
           </Link>
         </motion.div>

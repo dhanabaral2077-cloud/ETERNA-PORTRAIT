@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import { Alegreya, Inter } from 'next/font/google';
@@ -16,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Pet Masterpiece',
+  title: 'Eterna Portrait',
   description: 'Handcrafted digital art & museum-quality prints that celebrate your companion for a lifetime.',
 };
 
