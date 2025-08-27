@@ -42,7 +42,7 @@ export function Header() {
       >
         {/* Left-aligned Logo (Desktop) */}
         <motion.div
-          className="flex-shrink-0"
+          className="hidden md:block flex-shrink-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
