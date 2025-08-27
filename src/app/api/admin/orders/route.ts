@@ -1,4 +1,3 @@
-
 // src/app/api/admin/orders/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

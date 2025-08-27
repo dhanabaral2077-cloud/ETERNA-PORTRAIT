@@ -11,7 +11,7 @@ export function CTA() {
   const [offsetY, setOffsetY] = useState(0);
   const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2 });
   const [displayedText, setDisplayedText] = useState('');
-  const fullText = "Ready to Immortalize Your Pet?";
+  const fullText = "RReady to Immortalize Your Pet?";
 
   const handleScroll = () => {
     if (ref.current) {
