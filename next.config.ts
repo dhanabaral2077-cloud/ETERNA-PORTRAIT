@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     GELATO_API_KEY: process.env.GELATO_API_KEY,
+    ADMIN_SECRET: process.env.ADMIN_SECRET,
   }
 };
 
