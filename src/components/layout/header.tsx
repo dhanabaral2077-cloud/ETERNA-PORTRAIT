@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -23,57 +22,51 @@ export function Header() {
   const navItems = [
     { href: '/#gallery', label: 'Gallery' },
     { href: '/#how-it-works', label: 'How It Works' },
-    { href: '/#testimonials', 'label': 'Testimonials' },
+    { href: '/#testimonials', label: 'Testimonials' },
     { href: '/#pricing', label: 'Pricing' },
   ];
 
   return (
     <>
-      {/* Desktop / Tablet Navbar */}
+      {/* Navbar */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${
+        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${
           scrolled
-            ? "backdrop-blur-md bg-background/80 shadow-md h-28"
-            : "bg-transparent h-36"
-        }`}
+            ? "backdrop-blur-md bg-background/80 shadow-md h-20"
+            : "bg-transparent h-24"
+        } md:justify-between`}
       >
-        {/* Left-aligned Logo (Desktop) */}
-        <motion.div
-          className="hidden md:block flex-shrink-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Link href="/" className="relative block h-32 w-72 md:h-36 md:w-96">
+        {/* Mobile Logo (Centered) */}
+        <div className="flex md:hidden justify-center flex-1">
+          <Link href="/" className="relative block h-20 w-64">
             <Image
-                src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
-                alt="Eterna Portrait Logo"
-                fill
-                className="object-contain"
-                priority
-              />
+              src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
+              alt="Eterna Portrait Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Centered Logo (Mobile) */}
-         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
-             <Link href="/" className="relative block h-28 w-64">
-                <Image
-                    src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
-                    alt="Eterna Portrait Logo"
-                    fill
-                    className="object-contain"
-                    priority
-                />
-            </Link>
-         </div>
-
+        {/* Desktop Logo (Left-Aligned) */}
+        <div className="hidden md:flex items-center">
+          <Link href="/" className="relative block h-20 w-64">
+            <Image
+              src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
+              alt="Eterna Portrait Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </Link>
+        </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex gap-10 font-headline text-sm uppercase tracking-widest">
+        <div className="hidden md:flex flex-1 justify-center items-center gap-10 font-headline text-sm uppercase tracking-widest">
           {navItems.map((item, idx) => (
             <motion.a
               key={idx}
@@ -93,16 +86,16 @@ export function Header() {
           ))}
         </div>
 
-        {/* CTA Button */}
-        <Button asChild className="hidden md:block rounded-full bg-primary text-primary-foreground px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
-          <Link href="/#pricing">Order Now</Link>
-        </Button>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+        {/* CTA Button & Mobile Menu Button */}
+        <div className="flex items-center justify-end">
+          <Button asChild className="hidden md:block rounded-full bg-primary text-primary-foreground px-6 py-2 text-base shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
+            <Link href="/#pricing">Order Now</Link>
+          </Button>
+          <div className="md:hidden">
+            <button onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
       </motion.nav>
 

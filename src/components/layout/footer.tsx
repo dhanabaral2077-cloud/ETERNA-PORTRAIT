@@ -1,11 +1,9 @@
-
 "use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
 
 export function Footer() {
-
   return (
     <footer className="w-full bg-background border-t animate-fade-in">
       <div className="container mx-auto py-12 px-4 md:px-6">
@@ -33,8 +31,21 @@ export function Footer() {
 
           <div className="w-full max-w-lg border-b border-border/50 my-4"></div>
 
-          {/* Copyright & Payment Icons */}
+          {/* Logo, Description, Copyright & Payment Icons */}
           <div className="text-center">
+            <div className="mb-4">
+              <Image
+                src="/portfolio/Eterna_Portrait_Logo_Gold_Transparent.png"
+                alt="Eterna Portrait Logo"
+                width={240}
+                height={80}
+                className="mx-auto"
+                priority
+              />
+            </div>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">
+              Transform your pet’s photo into timeless, handcrafted art. Our museum-grade portraits, crafted with unparalleled care, are designed to be cherished for generations.
+            </p>
             <div className="font-headline text-lg tracking-[0.1em] text-foreground mb-4">
               ETERNA PORTRAIT
             </div>

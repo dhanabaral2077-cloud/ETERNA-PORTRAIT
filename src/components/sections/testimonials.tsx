@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function Testimonials() {
   const testimonials = [
     {
-      src: "https://picsum.photos/80/80?random=1",
+      src: "/portfolio/collector1.png",
       quote:
         "The portrait of Bella is the centerpiece of our home. It feels like museum art.",
       name: "Sophia L.",
@@ -17,7 +17,7 @@ export default function Testimonials() {
       aiHint: "woman portrait",
     },
     {
-      src: "https://picsum.photos/80/80?random=2",
+      src: "/portfolio/collector2.png",
       quote:
         "Max’s portrait captures his soul. It’s more than art—it’s a family heirloom.",
       name: "Jonathan M.",
@@ -25,7 +25,7 @@ export default function Testimonials() {
       aiHint: "man portrait",
     },
     {
-      src: "https://picsum.photos/80/80?random=3",
+      src: "/portfolio/collector3.png",
       quote:
         "When guests visit, they always ask about Luna’s painting. It has elevated our home.",
       name: "Elena R.",
