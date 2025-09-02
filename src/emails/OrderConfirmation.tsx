@@ -1,8 +1,4 @@
-// /emails/OrderConfirmation.tsx
 import * as React from 'react';
-
-// NOTE: Remember to set NEXT_PUBLIC_BASE_URL in your Vercel environment variables.
-// It should be the full URL of your deployed site. (e.g., https://your-site.vercel.app)
 
 type OrderConfirmationProps = {
   name: string;
