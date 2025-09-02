@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect, Suspense, useMemo } from "react";
@@ -18,7 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { supabase } from '@/lib/supabase-client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const productOptions = {
     types: [
@@ -76,7 +75,18 @@ function OrderForm() {
         country: '',
     });
     
-     // Effect to update printType if the plan changes and the current printType is not available
+    // Errors for real-time validation
+    const [errors, setErrors] = useState<Record<string, string | null>>({
+        name: null,
+        email: null,
+        addressLine1: null,
+        city: null,
+        postalCode: null,
+        country: null,
+        photos: null,
+    });
+    
+    // Effect to update printType if the plan changes and the current printType is not available
     useEffect(() => {
         const isCurrentTypeAvailable = availableProductTypes.some(type => type.id === formData.printType);
         if (!isCurrentTypeAvailable && availableProductTypes.length > 0) {
@@ -84,23 +94,57 @@ function OrderForm() {
         }
     }, [selectedPlan, availableProductTypes, formData.printType]);
 
-
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false); // For upload progress
     
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const dropZoneRef = useRef<HTMLDivElement | null>(null);
 
     const handleChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+        validateField(field, value);
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            const newFiles = Array.from(files);
+    const validateField = (field: string, value: string) => {
+        let error: string | null = null;
+        switch (field) {
+            case 'name':
+                error = !value ? 'Full name is required.' : null;
+                break;
+            case 'email':
+                error = !value ? 'Email is required.' : !/\S+@\S+\.\S+/.test(value) ? 'Invalid email format.' : null;
+                break;
+            case 'addressLine1':
+                error = !value ? 'Address is required.' : null;
+                break;
+            case 'city':
+                error = !value ? 'City is required.' : null;
+                break;
+            case 'postalCode':
+                error = !value ? 'Postal code is required.' : null;
+                break;
+            case 'country':
+                error = !value ? 'Country is required.' : null;
+                break;
+            default:
+                break;
+        }
+        setErrors(prev => ({ ...prev, [field]: error }));
+    };
 
-             if ((photoFiles.length + newFiles.length) > 3) { // Hard limit for now
+    const handleFileChange = (files: FileList | null) => {
+        if (files) {
+            const newFiles = Array.from(files).filter(file => {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    toast({ variant: "destructive", title: "File Too Large", description: `${file.name} exceeds 5MB limit.` });
+                    return false;
+                }
+                return true;
+            });
+
+            if ((photoFiles.length + newFiles.length) > 3) {
                 toast({ variant: "destructive", title: "Too Many Photos", description: `You can upload a maximum of 3 photos.` });
                 return;
             }
@@ -109,6 +153,8 @@ function OrderForm() {
 
             const newPreviews = newFiles.map(file => URL.createObjectURL(file));
             setPhotoPreviews(prev => [...prev, ...newPreviews]);
+
+            setErrors(prev => ({ ...prev, photos: newFiles.length === 0 && photoFiles.length === 0 ? 'At least one photo is required.' : null }));
         }
     };
 
@@ -120,29 +166,34 @@ function OrderForm() {
             URL.revokeObjectURL(removed[0]);
             return newPreviews;
         });
+        if (photoFiles.length - 1 === 0) {
+            setErrors(prev => ({ ...prev, photos: 'At least one photo is required.' }));
+        }
     };
 
-    const validateForm = (): { isValid: boolean; title?: string, message?: string } => {
-        if (!formData.name) return { isValid: false, title: "Missing Information", message: "Please enter your full name." };
-        if (!formData.email) return { isValid: false, title: "Missing Information", message: "Please enter your email address." };
-        if (!/\S+@\S+\.\S+/.test(formData.email)) return { isValid: false, title: "Invalid Email", message: "Please enter a valid email address." };
-        if (!formData.addressLine1) return { isValid: false, title: "Missing Information", message: "Please enter your address." };
-        if (!formData.city) return { isValid: false, title: "Missing Information", message: "Please enter your city." };
-        if (!formData.postalCode) return { isValid: false, title: "Missing Information", message: "Please enter your postal code." };
-        if (!formData.country) return { isValid: false, title: "Missing Information", message: "Please enter your country." };
-        if (photoFiles.length === 0) return { isValid: false, title: "No Photo Uploaded", message: "Please upload at least one photo of your pet." };
-        
-        return { isValid: true };
+    const validateForm = (): boolean => {
+        let isValid = true;
+        Object.keys(formData).forEach(key => {
+            if (['name', 'email', 'addressLine1', 'city', 'postalCode', 'country'].includes(key)) {
+                validateField(key, formData[key as keyof typeof formData]);
+                if (errors[key]) isValid = false;
+            }
+        });
+        if (photoFiles.length === 0) {
+            setErrors(prev => ({ ...prev, photos: 'At least one photo is required.' }));
+            isValid = false;
+        }
+        return isValid;
     };
     
     const onPaymentSuccess = async (paypalOrderId: string) => {
-        const { isValid, title, message } = validateForm();
-        if (!isValid) {
-            toast({ variant: "destructive", title: title, description: message });
+        if (!validateForm()) {
+            toast({ variant: "destructive", title: "Form Incomplete", description: "Please fix the errors in the form." });
             return;
         }
         
         setIsSubmitting(true);
+        setIsUploading(true);
         
         try {
             const orderFolderName = `orders/${Date.now()}`;
@@ -188,24 +239,67 @@ function OrderForm() {
             onPaymentError(error);
         } finally {
             setIsSubmitting(false);
+            setIsUploading(false);
         }
     };
 
     const onPaymentError = (error: any) => {
         console.error("Submission or Payment Error:", error);
+        let errorMessage = "There was a problem submitting your order. Please contact support.";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+            if (errorMessage.includes('upload')) {
+                errorMessage = "File upload failed. Please try again.";
+            } else if (errorMessage.includes('save order')) {
+                errorMessage = "Order saving failed. Please try again.";
+            }
+        }
         toast({
             variant: "destructive",
             title: "Submission Failed",
-            description: error instanceof Error ? error.message : "There was a problem submitting your order. Please contact support.",
+            description: errorMessage,
         });
         setIsSubmitting(false);
     };
     
-    const selectedType = productOptions.types.find(t => t.id === formData.printType);
-    const selectedSize = productOptions.sizes.find(s => s.id === formData.size);
+    const selectedType = useMemo(() => productOptions.types.find(t => t.id === formData.printType), [formData.printType]);
+    const selectedSize = useMemo(() => productOptions.sizes.find(s => s.id === formData.size), [formData.size]);
     const totalPrice = selectedType && selectedSize ? Math.round(selectedType.price * selectedSize.priceModifier) : 0;
     
-    const isFormIncomplete = !formData.name || !formData.email || !formData.addressLine1 || !formData.city || !formData.postalCode || !formData.country || photoFiles.length === 0;
+    const isFormIncomplete = Object.values(errors).some(err => err !== null) || photoFiles.length === 0;
+
+    // Drag-and-drop handlers
+    useEffect(() => {
+        const dropZone = dropZoneRef.current;
+        if (!dropZone) return;
+
+        const handleDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            dropZone.classList.add('border-primary');
+        };
+
+        const handleDragLeave = () => {
+            dropZone.classList.remove('border-primary');
+        };
+
+        const handleDrop = (e: DragEvent) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-primary');
+            if (e.dataTransfer?.files) {
+                handleFileChange(e.dataTransfer.files);
+            }
+        };
+
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+
+        return () => {
+            dropZone.removeEventListener('dragover', handleDragOver);
+            dropZone.removeEventListener('dragleave', handleDragLeave);
+            dropZone.removeEventListener('drop', handleDrop);
+        };
+    }, [photoFiles.length]);
 
     return (
         <AnimatePresence mode="wait">
@@ -264,26 +358,31 @@ function OrderForm() {
                          {/* Photo Upload */}
                         <div className="space-y-3">
                             <Label>Upload Your Pet's Photo(s)</Label>
-                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                             <div ref={dropZoneRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-2 border-dashed border-accent rounded-xl p-4 min-h-[10rem]">
                                 {photoPreviews.map((preview, index) => (
                                     <div key={index} className="relative group">
-                                        <Image src={preview} alt={`Pet preview ${index + 1}`} width={150} height={150} className="rounded-lg object-cover w-full h-40" />
+                                        <Image src={preview} alt={`Pet photo ${index + 1}${formData.petName ? ` of ${formData.petName}` : ''}`} width={150} height={150} className="rounded-lg object-cover w-full h-40" />
                                         <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 ))}
                                 {photoFiles.length < 3 && (
-                                    <div>
-                                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" className="hidden" />
-                                        <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-accent rounded-xl p-4 text-center text-muted-foreground flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group">
-                                            <UploadCloud className="w-8 h-8 text-accent mb-2" />
-                                            <span className="text-sm">Upload Photo</span>
-                                            <span className="text-xs mt-1">(Max 3)</span>
-                                        </div>
+                                    <div className="flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group w-full" onClick={() => fileInputRef.current?.click()}>
+                                        <UploadCloud className="w-8 h-8 text-accent mb-2" />
+                                        <span className="text-sm">Upload or Drop Photo</span>
+                                        <span className="text-xs mt-1">(Max 3, 5MB each)</span>
                                     </div>
                                 )}
                             </div>
+                            <input type="file" ref={fileInputRef} onChange={(e) => handleFileChange(e.target.files)} accept="image/jpeg,image/png,image/webp" className="hidden" multiple />
+                            {errors.photos && <p className="text-destructive text-sm mt-1">{errors.photos}</p>}
+                            {isUploading && (
+                                <div className="flex items-center text-secondary mt-2">
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    <span>Uploading photos...</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Style Choice */}
@@ -329,12 +428,21 @@ function OrderForm() {
                         
                         <div className="space-y-3">
                           <Label htmlFor="pet-name">Pet's Name(s) (Optional)</Label>
-                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" />
+                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" maxLength={50} />
                         </div>
                         
                          <div className="space-y-3">
-                          <Label htmlFor="notes">Notes for the Artist (Optional)</Label>
-                          <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" />
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Label htmlFor="notes">Notes for the Artist (Optional)</Label>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Provide details like specific features to highlight or background preferences.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" maxLength={200} />
                         </div>
                     </div>
 
@@ -345,17 +453,35 @@ function OrderForm() {
                         <div className="space-y-3">
                             <Label>Contact & Shipping Information</Label>
                             <div className="mt-2 space-y-4">
-                                <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required />
-                                <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required />
-                                <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required />
+                                <div>
+                                    <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required aria-invalid={errors.name ? 'true' : 'false'} />
+                                    {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
+                                </div>
+                                <div>
+                                    <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required aria-invalid={errors.email ? 'true' : 'false'} />
+                                    {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
+                                </div>
+                                <div>
+                                    <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required aria-invalid={errors.addressLine1 ? 'true' : 'false'} />
+                                    {errors.addressLine1 && <p className="text-destructive text-sm mt-1">{errors.addressLine1}</p>}
+                                </div>
                                 <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required />
+                                    <div>
+                                        <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required aria-invalid={errors.city ? 'true' : 'false'} />
+                                        {errors.city && <p className="text-destructive text-sm mt-1">{errors.city}</p>}
+                                    </div>
                                     <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required />
-                                    <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required />
+                                    <div>
+                                        <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required aria-invalid={errors.postalCode ? 'true' : 'false'} />
+                                        {errors.postalCode && <p className="text-destructive text-sm mt-1">{errors.postalCode}</p>}
+                                    </div>
+                                    <div>
+                                        <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required aria-invalid={errors.country ? 'true' : 'false'} />
+                                        {errors.country && <p className="text-destructive text-sm mt-1">{errors.country}</p>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -444,5 +570,3 @@ export default function OrderPage() {
         </div>
     );
 }
-
-    
