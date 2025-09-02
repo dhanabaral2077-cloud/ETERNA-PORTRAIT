@@ -33,7 +33,7 @@ export default function RefundsPage() {
 
             <h2 className="font-headline text-2xl md:text-3xl text-foreground pt-6">Contact Us</h2>
             <p>
-              For any questions regarding our refund policy or issues with your order, please contact us at <a href="mailto:support@eternaportraits.com" className="text-accent hover:underline">support@eternaportraits.com</a>.
+              For any questions regarding our refund policy or issues with your order, please contact us at <a href="mailto:eternaportrait@gmail.com" className="text-accent hover:underline">eternaportrait@gmail.com</a>.
             </p>
           </div>
         </div>

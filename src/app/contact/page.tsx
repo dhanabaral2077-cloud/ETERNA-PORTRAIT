@@ -17,7 +17,7 @@ export default function ContactPage() {
                 We would be delighted to hear from you. Whether you have a question about our process, a query about your order, or a special commission request, please do not hesitate to reach out. Our studio is dedicated to providing you with exceptional service.
               </p>
               <div className="space-y-2 text-secondary">
-                <p><strong>Email:</strong> <a href="mailto:studio@eternaportraits.com" className="text-accent hover:underline">studio@eternaportraits.com</a></p>
+                <p><strong>Email:</strong> <a href="mailto:eternaportrait@gmail.com" className="text-accent hover:underline">eternaportrait@gmail.com</a></p>
                 <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 5:00 PM EST</p>
               </div>
             </div>
