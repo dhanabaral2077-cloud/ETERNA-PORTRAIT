@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UploadCloud, CheckCircle, Loader2, Check, AlertCircle, Trash2, Package, Ruler, Truck } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Package, Ruler, Truck, Trash2 } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -57,14 +57,12 @@ function OrderForm() {
     }, [selectedPlan]);
     
     const [formData, setFormData] = useState({
-        // Commission details
         printType: availableProductTypes[0]?.id || 'canvas',
         orientation: 'vertical',
         size: '12x16',
         petName: '',
         style: 'artist' as StyleOption,
         notes: '',
-        // Customer details
         name: '',
         email: '',
         addressLine1: '',
@@ -75,7 +73,6 @@ function OrderForm() {
         country: '',
     });
     
-    // Errors for real-time validation
     const [errors, setErrors] = useState<Record<string, string | null>>({
         name: null,
         email: null,
@@ -86,7 +83,6 @@ function OrderForm() {
         photos: null,
     });
     
-    // Effect to update printType if the plan changes and the current printType is not available
     useEffect(() => {
         const isCurrentTypeAvailable = availableProductTypes.some(type => type.id === formData.printType);
         if (!isCurrentTypeAvailable && availableProductTypes.length > 0) {
@@ -97,7 +93,7 @@ function OrderForm() {
     const [photoFiles, setPhotoFiles] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isUploading, setIsUploading] = useState(false); // For upload progress
+    const [isUploading, setIsUploading] = useState(false);
     
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const dropZoneRef = useRef<HTMLDivElement | null>(null);
@@ -111,22 +107,22 @@ function OrderForm() {
         let error: string | null = null;
         switch (field) {
             case 'name':
-                error = !value ? 'Full name is required.' : null;
+                error = !value.trim() ? 'Full name is required.' : null;
                 break;
             case 'email':
-                error = !value ? 'Email is required.' : !/\S+@\S+\.\S+/.test(value) ? 'Invalid email format.' : null;
+                error = !value.trim() ? 'Email is required.' : !/\S+@\S+\.\S+/.test(value) ? 'Invalid email format.' : null;
                 break;
             case 'addressLine1':
-                error = !value ? 'Address is required.' : null;
+                error = !value.trim() ? 'Address is required.' : null;
                 break;
             case 'city':
-                error = !value ? 'City is required.' : null;
+                error = !value.trim() ? 'City is required.' : null;
                 break;
             case 'postalCode':
-                error = !value ? 'Postal code is required.' : null;
+                error = !value.trim() ? 'Postal code is required.' : null;
                 break;
             case 'country':
-                error = !value ? 'Country is required.' : null;
+                error = !value.trim() ? 'Country is required.' : null;
                 break;
             default:
                 break;
@@ -137,7 +133,7 @@ function OrderForm() {
     const handleFileChange = (files: FileList | null) => {
         if (files) {
             const newFiles = Array.from(files).filter(file => {
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                if (file.size > 5 * 1024 * 1024) {
                     toast({ variant: "destructive", title: "File Too Large", description: `${file.name} exceeds 5MB limit.` });
                     return false;
                 }
@@ -150,10 +146,7 @@ function OrderForm() {
             }
 
             setPhotoFiles(prev => [...prev, ...newFiles]);
-
-            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-            setPhotoPreviews(prev => [...prev, ...newPreviews]);
-
+            setPhotoPreviews(prev => [...prev, ...newFiles.map(file => URL.createObjectURL(file))]);
             setErrors(prev => ({ ...prev, photos: newFiles.length === 0 && photoFiles.length === 0 ? 'At least one photo is required.' : null }));
         }
     };
@@ -188,7 +181,7 @@ function OrderForm() {
     
     const onPaymentSuccess = async (paypalOrderId: string) => {
         if (!validateForm()) {
-            toast({ variant: "destructive", title: "Form Incomplete", description: "Please fix the errors in the form." });
+            toast({ variant: "destructive", title: "Form Incomplete", description: "Please complete all required fields." });
             return;
         }
         
@@ -245,14 +238,13 @@ function OrderForm() {
 
     const onPaymentError = (error: any) => {
         console.error("Submission or Payment Error:", error);
-        let errorMessage = "There was a problem submitting your order. Please contact support.";
+        let errorMessage = "There was an issue finalizing your commission. Please contact our concierge team.";
         if (error instanceof Error) {
-            errorMessage = error.message;
-            if (errorMessage.includes('upload')) {
-                errorMessage = "File upload failed. Please try again.";
-            } else if (errorMessage.includes('save order')) {
-                errorMessage = "Order saving failed. Please try again.";
-            }
+            errorMessage = error.message.includes('upload') 
+                ? "Photo upload failed. Please try again." 
+                : error.message.includes('save order') 
+                ? "Order processing failed. Please try again." 
+                : error.message;
         }
         toast({
             variant: "destructive",
@@ -268,7 +260,6 @@ function OrderForm() {
     
     const isFormIncomplete = Object.values(errors).some(err => err !== null) || photoFiles.length === 0;
 
-    // Drag-and-drop handlers
     useEffect(() => {
         const dropZone = dropZoneRef.current;
         if (!dropZone) return;
@@ -306,20 +297,20 @@ function OrderForm() {
             {step === 0 && (
                 <motion.div
                     key="form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                     className="bg-card p-8 md:p-12 rounded-2xl shadow-xl w-full grid md:grid-cols-2 gap-x-12 gap-y-8"
                 >
                     {/* Left Column: Commission Details */}
-                    <div className="space-y-6">
-                        <h2 className="font-headline text-3xl text-foreground">1. Customize Your Artwork</h2>
+                    <div className="space-y-8">
+                        <h2 className="font-headline text-3xl md:text-4xl text-foreground">1. Craft Your Masterpiece</h2>
                         
-                        {/* Artwork Type */}
-                        <div className="space-y-3">
-                            <Label>Product Type</Label>
+                        <div className="space-y-4">
+                            <Label className="text-lg font-semibold">Product Type</Label>
                             <Select value={formData.printType} onValueChange={(value) => handleChange('printType', value)}>
-                                <SelectTrigger><SelectValue placeholder="Select a product type" /></SelectTrigger>
+                                <SelectTrigger className="rounded-full"><SelectValue placeholder="Select a product type" /></SelectTrigger>
                                 <SelectContent>
                                     {availableProductTypes.map(type => (
                                         <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
@@ -329,11 +320,10 @@ function OrderForm() {
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4">
-                            {/* Orientation */}
-                            <div className="space-y-3">
-                                <Label>Orientation</Label>
+                            <div className="space-y-4">
+                                <Label className="text-lg font-semibold">Orientation</Label>
                                 <Select value={formData.orientation} onValueChange={(value) => handleChange('orientation', value)}>
-                                    <SelectTrigger><SelectValue placeholder="Select orientation" /></SelectTrigger>
+                                    <SelectTrigger className="rounded-full"><SelectValue placeholder="Select orientation" /></SelectTrigger>
                                     <SelectContent>
                                         {productOptions.orientations.map(o => (
                                             <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
@@ -341,11 +331,10 @@ function OrderForm() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {/* Size */}
-                             <div className="space-y-3">
-                                <Label>Size</Label>
+                            <div className="space-y-4">
+                                <Label className="text-lg font-semibold">Size</Label>
                                 <Select value={formData.size} onValueChange={(value) => handleChange('size', value)}>
-                                    <SelectTrigger><SelectValue placeholder="Select a size" /></SelectTrigger>
+                                    <SelectTrigger className="rounded-full"><SelectValue placeholder="Select a size" /></SelectTrigger>
                                     <SelectContent>
                                         {productOptions.sizes.map(s => (
                                             <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
@@ -355,145 +344,210 @@ function OrderForm() {
                             </div>
                         </div>
 
-                         {/* Photo Upload */}
-                        <div className="space-y-3">
-                            <Label>Upload Your Pet's Photo(s)</Label>
-                             <div ref={dropZoneRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-2 border-dashed border-accent rounded-xl p-4 min-h-[10rem]">
+                        <div className="space-y-4">
+                            <Label className="text-lg font-semibold">Upload Your Pet's Photo(s)</Label>
+                            <div ref={dropZoneRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-2 border-dashed border-accent rounded-xl p-4 min-h-[10rem]">
                                 {photoPreviews.map((preview, index) => (
                                     <div key={index} className="relative group">
-                                        <Image src={preview} alt={`Pet photo ${index + 1}${formData.petName ? ` of ${formData.petName}` : ''}`} width={150} height={150} className="rounded-lg object-cover w-full h-40" />
-                                        <button onClick={(e) => { e.stopPropagation(); removePhoto(index); }} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Image 
+                                            src={preview} 
+                                            alt={`Pet photo ${index + 1}${formData.petName ? ` of ${formData.petName}` : ''}`} 
+                                            width={150} 
+                                            height={150} 
+                                            className="rounded-lg object-cover w-full h-40" 
+                                        />
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); removePhoto(index); }} 
+                                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 ))}
                                 {photoFiles.length < 3 && (
-                                    <div className="flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group w-full" onClick={() => fileInputRef.current?.click()}>
+                                    <div 
+                                        className="flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group w-full" 
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
                                         <UploadCloud className="w-8 h-8 text-accent mb-2" />
-                                        <span className="text-sm">Upload or Drop Photo</span>
-                                        <span className="text-xs mt-1">(Max 3, 5MB each)</span>
+                                        <span className="text-sm font-medium">Upload or Drop Photo</span>
+                                        <span className="text-xs mt-1 text-muted-foreground">(Max 3, 5MB each)</span>
                                     </div>
                                 )}
                             </div>
-                            <input type="file" ref={fileInputRef} onChange={(e) => handleFileChange(e.target.files)} accept="image/jpeg,image/png,image/webp" className="hidden" multiple />
+                            <input 
+                                type="file" 
+                                ref={fileInputRef} 
+                                onChange={(e) => handleFileChange(e.target.files)} 
+                                accept="image/jpeg,image/png,image/webp" 
+                                className="hidden" 
+                                multiple 
+                            />
                             {errors.photos && <p className="text-destructive text-sm mt-1">{errors.photos}</p>}
                             {isUploading && (
                                 <div className="flex items-center text-secondary mt-2">
                                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                    <span>Uploading photos...</span>
+                                    <span>Uploading your masterpiece's inspiration...</span>
                                 </div>
                             )}
                         </div>
 
-                        {/* Style Choice */}
-                        <div className="space-y-3">
-                            <Label>Choose a Style</Label>
+                        <div className="space-y-4">
+                            <Label className="text-lg font-semibold">Choose a Style</Label>
                             <RadioGroup 
                                 value={formData.style} 
                                 onValueChange={(value) => handleChange('style', value as StyleOption)} 
                                 className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2"
                             >
-                                <div>
-                                    <RadioGroupItem value="artist" id="artist" className="peer sr-only" />
-                                    <Label htmlFor="artist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
-                                        Artist Choice
-                                    </Label>
-                                </div>
-                                <div>
-                                    <RadioGroupItem value="renaissance" id="renaissance" className="peer sr-only" />
-                                    <Label htmlFor="renaissance" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
-                                        Renaissance
-                                    </Label>
-                                </div>
-                                <div>
-                                    <RadioGroupItem value="classic_oil" id="classic_oil" className="peer sr-only" />
-                                    <Label htmlFor="classic_oil" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
-                                        Classic Oil
-                                    </Label>
-                                </div>
-                                <div>
-                                    <RadioGroupItem value="watercolor" id="watercolor" className="peer sr-only" />
-                                    <Label htmlFor="watercolor" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
-                                        Watercolor
-                                    </Label>
-                                </div>
-                                <div>
-                                    <RadioGroupItem value="modern_minimalist" id="modern_minimalist" className="peer sr-only" />
-                                    <Label htmlFor="modern_minimalist" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary">
-                                        Minimalist
-                                    </Label>
-                                </div>
+                                {['artist', 'renaissance', 'classic_oil', 'watercolor', 'modern_minimalist'].map(style => (
+                                    <div key={style}>
+                                        <RadioGroupItem value={style} id={style} className="peer sr-only" />
+                                        <Label 
+                                            htmlFor={style} 
+                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            {style.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                        </Label>
+                                    </div>
+                                ))}
                             </RadioGroup>
                         </div>
                         
-                        <div className="space-y-3">
-                          <Label htmlFor="pet-name">Pet's Name(s) (Optional)</Label>
-                          <Input id="pet-name" value={formData.petName} onChange={(e) => handleChange('petName', e.target.value)} placeholder="E.g., Bella, Max & Luna" maxLength={50} />
+                        <div className="space-y-4">
+                            <Label htmlFor="pet-name" className="text-lg font-semibold">Pet's Name(s) (Optional)</Label>
+                            <Input 
+                                id="pet-name" 
+                                value={formData.petName} 
+                                onChange={(e) => handleChange('petName', e.target.value)} 
+                                placeholder="E.g., Bella, Max & Luna" 
+                                maxLength={50} 
+                                className="rounded-full"
+                            />
                         </div>
                         
-                         <div className="space-y-3">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Label htmlFor="notes">Notes for the Artist (Optional)</Label>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Provide details like specific features to highlight or background preferences.</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <Input id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} placeholder="E.g., capture the white spot on his chest" maxLength={200} />
+                        <div className="space-y-4">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Label htmlFor="notes" className="text-lg font-semibold">Notes for the Artist (Optional)</Label>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Share details like specific features to highlight or background preferences.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <Input 
+                                id="notes" 
+                                value={formData.notes} 
+                                onChange={(e) => handleChange('notes', e.target.value)} 
+                                placeholder="E.g., Emphasize the white spot on her chest" 
+                                maxLength={200} 
+                                className="rounded-full"
+                            />
                         </div>
                     </div>
 
                     {/* Right Column: Customer Info, Summary, Payment */}
-                    <div className="space-y-6">
-                        <h2 className="font-headline text-3xl text-foreground">2. Shipping & Payment</h2>
+                    <div className="space-y-8">
+                        <h2 className="font-headline text-3xl md:text-4xl text-foreground">2. Shipping & Payment</h2>
                         
-                        <div className="space-y-3">
-                            <Label>Contact & Shipping Information</Label>
+                        <div className="space-y-4">
+                            <Label className="text-lg font-semibold">Contact & Shipping Information</Label>
                             <div className="mt-2 space-y-4">
                                 <div>
-                                    <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full Name" required aria-invalid={errors.name ? 'true' : 'false'} />
+                                    <Input 
+                                        value={formData.name} 
+                                        onChange={(e) => handleChange('name', e.target.value)} 
+                                        placeholder="Full Name" 
+                                        required 
+                                        aria-invalid={errors.name ? 'true' : 'false'} 
+                                        className="rounded-full"
+                                    />
                                     {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
-                                    <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="your.email@example.com" required aria-invalid={errors.email ? 'true' : 'false'} />
+                                    <Input 
+                                        type="email" 
+                                        value={formData.email} 
+                                        onChange={(e) => handleChange('email', e.target.value)} 
+                                        placeholder="your.email@example.com" 
+                                        required 
+                                        aria-invalid={errors.email ? 'true' : 'false'} 
+                                        className="rounded-full"
+                                    />
                                     {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
                                 </div>
                                 <div>
-                                    <Input value={formData.addressLine1} onChange={(e) => handleChange('addressLine1', e.target.value)} placeholder="Address Line 1" required aria-invalid={errors.addressLine1 ? 'true' : 'false'} />
+                                    <Input 
+                                        value={formData.addressLine1} 
+                                        onChange={(e) => handleChange('addressLine1', e.target.value)} 
+                                        placeholder="Address Line 1" 
+                                        required 
+                                        aria-invalid={errors.addressLine1 ? 'true' : 'false'} 
+                                        className="rounded-full"
+                                    />
                                     {errors.addressLine1 && <p className="text-destructive text-sm mt-1">{errors.addressLine1}</p>}
                                 </div>
-                                <Input value={formData.addressLine2} onChange={(e) => handleChange('addressLine2', e.target.value)} placeholder="Address Line 2 (Optional)" />
+                                <Input 
+                                    value={formData.addressLine2} 
+                                    onChange={(e) => handleChange('addressLine2', e.target.value)} 
+                                    placeholder="Address Line 2 (Optional)" 
+                                    className="rounded-full"
+                                />
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Input value={formData.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" required aria-invalid={errors.city ? 'true' : 'false'} />
+                                        <Input 
+                                            value={formData.city} 
+                                            onChange={(e) => handleChange('city', e.target.value)} 
+                                            placeholder="City" 
+                                            required 
+                                            aria-invalid={errors.city ? 'true' : 'false'} 
+                                            className="rounded-full"
+                                        />
                                         {errors.city && <p className="text-destructive text-sm mt-1">{errors.city}</p>}
                                     </div>
-                                    <Input value={formData.stateProvinceRegion} onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} placeholder="State / Province" />
+                                    <Input 
+                                        value={formData.stateProvinceRegion} 
+                                        onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} 
+                                        placeholder="State / Province" 
+                                        className="rounded-full"
+                                    />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Input value={formData.postalCode} onChange={(e) => handleChange('postalCode', e.target.value)} placeholder="Postal Code" required aria-invalid={errors.postalCode ? 'true' : 'false'} />
+                                        <Input 
+                                            value={formData.postalCode} 
+                                            onChange={(e) => handleChange('postalCode', e.target.value)} 
+                                            placeholder="Postal Code" 
+                                            required 
+                                            aria-invalid={errors.postalCode ? 'true' : 'false'} 
+                                            className="rounded-full"
+                                        />
                                         {errors.postalCode && <p className="text-destructive text-sm mt-1">{errors.postalCode}</p>}
                                     </div>
                                     <div>
-                                        <Input value={formData.country} onChange={(e) => handleChange('country', e.target.value)} placeholder="Country" required aria-invalid={errors.country ? 'true' : 'false'} />
+                                        <Input 
+                                            value={formData.country} 
+                                            onChange={(e) => handleChange('country', e.target.value)} 
+                                            placeholder="Country" 
+                                            required 
+                                            aria-invalid={errors.country ? 'true' : 'false'} 
+                                            className="rounded-full"
+                                        />
                                         {errors.country && <p className="text-destructive text-sm mt-1">{errors.country}</p>}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                         <h3 className="font-headline text-2xl text-foreground pt-4">Order Summary</h3>
-                         <Card>
-                             <CardContent className="p-6 space-y-4">
+                        <h3 className="font-headline text-2xl md:text-3xl text-foreground pt-4">Commission Summary</h3>
+                        <Card className="border-none shadow-lg">
+                            <CardContent className="p-6 space-y-4">
                                 <div className="flex justify-between items-start text-md text-foreground">
                                     <span className="font-medium flex items-center"><Package className="mr-2 h-5 w-5 text-accent"/> Product</span>
                                     <span className="text-right">{selectedType?.name || 'N/A'}</span>
                                 </div>
-                                 <div className="flex justify-between items-start text-md text-foreground">
+                                <div className="flex justify-between items-start text-md text-foreground">
                                     <span className="font-medium flex items-center"><Ruler className="mr-2 h-5 w-5 text-accent"/> Size</span>
                                     <span className="text-right">{selectedSize?.name || 'N/A'}</span>
                                 </div>
@@ -501,21 +555,20 @@ function OrderForm() {
                                     <span>Total</span>
                                     <span>${(totalPrice).toFixed(2)}</span>
                                 </div>
-                             </CardContent>
+                            </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-none shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center text-lg"><Truck className="mr-2 text-accent"/>Shipping Information</CardTitle>
                             </CardHeader>
-                             <CardContent className="text-sm text-secondary space-y-2">
-                                <p>Fulfilled in 3 countries to ensure fast delivery.</p>
-                                <p><strong>Economy shipping:</strong> estimated delivery in 4-5 business days.</p>
-                                <p><strong>Express shipping:</strong> estimated delivery in 2-3 business days.</p>
-                                <p className="text-xs text-muted-foreground pt-2">Delivery time includes order processing, production, and shipping. Estimated times may vary and are not guaranteed.</p>
-                             </CardContent>
+                            <CardContent className="text-sm text-secondary space-y-2">
+                                <p>Fulfilled in 3 countries to ensure swift delivery.</p>
+                                <p><strong>Economy shipping:</strong> Estimated 4-5 business days.</p>
+                                <p><strong>Express shipping:</strong> Estimated 2-3 business days.</p>
+                                <p className="text-xs text-muted-foreground pt-2">Delivery times include order processing, artisan crafting, and shipping. Estimates may vary.</p>
+                            </CardContent>
                         </Card>
-
 
                         <PayPalButton 
                             amount={totalPrice}
@@ -527,7 +580,7 @@ function OrderForm() {
                         {isSubmitting && (
                             <div className="flex items-center justify-center text-secondary">
                                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                <span>Finalizing your commission...</span>
+                                <span>Finalizing your bespoke commission...</span>
                             </div>
                         )}
                     </div>
@@ -537,17 +590,48 @@ function OrderForm() {
             {step === 1 && (
                 <motion.div
                     key="success"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-center p-12 bg-card rounded-2xl shadow-xl flex flex-col items-center"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="text-center p-12 md:p-16 bg-card rounded-2xl shadow-xl flex flex-col items-center max-w-2xl mx-auto"
                 >
                     <CheckCircle className="w-16 h-16 text-accent mb-6" />
-                    <h2 className="font-headline text-3xl text-foreground">Commission Submitted!</h2>
-                    <p className="mt-4 text-secondary max-w-md">
-                        Thank you for your trust. Our artists are honored to begin creating your masterpiece. You will receive an email confirmation shortly with your order details.
+                    <h2 className="font-headline text-3xl md:text-4xl text-foreground">Your Masterpiece is Commissioned!</h2>
+                    <p className="mt-4 text-secondary max-w-md text-lg">
+                        We are thrilled to begin crafting your bespoke portrait for {formData.petName || 'your cherished pet'}. Our master artisans are inspired and will ensure a creation of timeless elegance. Expect an email confirmation with all details shortly.
                     </p>
-                    <Button asChild className="mt-8 rounded-full">
-                        <Link href="/">Back to Home</Link>
+                    <p className="mt-6 text-secondary max-w-md text-base">
+                        Join our exclusive community to follow the artistry behind your masterpiece and discover more luxurious creations.
+                    </p>
+                    <div className="flex items-center justify-center gap-4 mt-6">
+                        <a href="https://x.com/EternaPortrait" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on X">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/eter.naportrait/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on Instagram">
+                          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.02.049 1.717.209 2.328.444a4.69 4.69 0 011.702 1.113 4.69 4.69 0 011.113 1.702c.235.611.395 1.308.444 2.328.047 1.024.06 1.378.06 3.808s-.013 2.784-.06 3.808c-.049 1.02-.209 1.717-.444 2.328a4.69 4.69 0 01-1.113 1.702 4.69 4.69 0 01-1.702 1.113c-.611.235-1.308.395-2.328.444-1.024.047-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.02-.049-1.717-.209-2.328-.444a4.69 4.69 0 01-1.702-1.113 4.69 4.69 0 01-1.113-1.702c-.235-.611-.395-1.308-.444-2.328-.047-1.024-.06-1.378-.06-3.808s.013-2.784.06-3.808c.049-1.02.209-1.717.444-2.328a4.69 4.69 0 011.113-1.702 4.69 4.69 0 011.702-1.113c.611-.235 1.308-.395 2.328-.444 1.024-.047 1.378-.06 3.808-.06zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.339-9.87a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                           </svg>
+                        </a>
+                        <a href="https://www.facebook.com/people/Eterna-Portrait/61580466892802/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on Facebook">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="https://www.tiktok.com/@eternaportrait" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on TikTok">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.81 2.89 2.89 0 011.1.22v-3.4a6.28 6.28 0 00-1.1-.12 6.29 6.29 0 00 0 12.57 6.29 6.29 0 004.78-2.07 6.29 6.29 0 001.51-4.46V8.43a8.27 8.27 0 004.82 1.55V6.69z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.pinterest.com/eternaportrait/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on Pinterest">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.164 6.839 9.489-.093-.783-.179-1.983.037-2.837.196-.771 1.256-4.828 1.256-4.828s-.32-.642-.32-1.591c0-1.491.865-2.604 1.941-2.604.914 0 1.356.687 1.356 1.509 0 .92-.584 2.295-.885 3.567-.251 1.062.531 1.929 1.575 1.929 1.891 0 3.345-1.991 3.345-4.861 0-2.541-1.825-4.317-4.431-4.317-3.016 0-4.786 2.264-4.786 4.601 0 .912.351 1.891.789 2.424.087.105.149.197.107.305-.031.079-.101.242-.146.312-.064.098-.204.119-.297.073-1.389-.685-2.242-2.837-2.242-4.567 0-3.345 2.432-6.419 7.013-6.419 3.678 0 6.537 2.622 6.537 6.128 0 3.651-2.304 6.591-5.502 6.591-1.077 0-2.087-.561-2.432-1.222 0 0-.531 2.023-.66 2.519-.24.91-.885 2.052-1.317 2.746C9.432 21.945 10.678 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" clipRule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                    <Button asChild className="mt-8 rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8">
+                        <Link href="/">Explore More Creations</Link>
                     </Button>
                 </motion.div>
             )}
