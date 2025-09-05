@@ -55,6 +55,7 @@ export default function PayPalButton({
                   },
                 },
               ],
+              intent: "CAPTURE"
             });
             return orderId;
           } catch (error) {
