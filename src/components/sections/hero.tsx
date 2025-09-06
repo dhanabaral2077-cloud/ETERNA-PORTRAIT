@@ -73,7 +73,7 @@ export function Hero() {
             {/* Stage 1: Dog Photo */}
             <motion.div className="absolute inset-0" style={{ opacity: photoOpacity }}>
               <Image
-                src="/portfolio/test1.jpg"
+                src="/portfolio/Brenden Dog1.jpg"
                 alt="Dog Photo"
                 fill
                 className="object-cover rounded-2xl shadow-md"
@@ -84,7 +84,7 @@ export function Hero() {
             {/* Stage 2: Dog Painting */}
             <motion.div className="absolute inset-0" style={{ opacity: paintingOpacity }}>
               <Image
-                src="/portfolio/test2.jpg"
+                src="/portfolio/Brenden Dog2.jpg"
                 alt="Dog Painting"
                 fill
                 className="object-cover rounded-2xl shadow-md"
@@ -95,7 +95,7 @@ export function Hero() {
             {/* Stage 3: Painting in Room */}
             <motion.div className="absolute inset-0" style={{ opacity: roomOpacity }}>
               <Image
-                src="/portfolio/test.jpeg"
+                src="/portfolio/Brenden Dog3.png"
                 alt="Dog Painting in Room"
                 fill
                 className="object-cover rounded-2xl shadow-md"
