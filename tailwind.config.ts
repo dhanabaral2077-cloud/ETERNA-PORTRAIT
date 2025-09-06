@@ -15,6 +15,22 @@ export default {
         "2xl": "1400px",
       },
     },
+
+    keyframes: {
+      blink: {
+        "0%, 50%, 100%": { opacity: "1" },
+        "25%, 75%": { opacity: "0" },
+      },
+      glow: {
+        "0%, 100%": { boxShadow: "0 0 20px rgba(250, 204, 21, 0.6)" },
+        "50%": { boxShadow: "0 0 40px rgba(250, 204, 21, 0.9)" },
+      },
+    },
+    animation: {
+      blink: "blink 1s step-start infinite",
+      glow: "glow 3s ease-in-out infinite",
+    },
+    
     extend: {
       fontFamily: {
         body: ['var(--font-montserrat)', 'sans-serif'],
@@ -191,3 +207,4 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -7,9 +6,7 @@ import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { productOptions } from '@/app/order/page';
 
-
 export function Pricing() {
-  
   const getTierBasePrice = (planId: 'classic' | 'signature' | 'masterpiece') => {
     const defaultProduct = productOptions.types.find(p => p.plan === planId);
     const defaultSize = productOptions.sizes.find(s => s.id === '12x16'); // Base size
@@ -17,7 +14,7 @@ export function Pricing() {
       return (defaultProduct.price * defaultSize.priceModifier) / 100;
     }
     return 0;
-  }
+  };
 
   const tiers = [
     {
@@ -62,9 +59,14 @@ export function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="bg-background py-24 px-6 md:px-16">
+    <section id="pricing" className="bg-background py-24 px-6 md:px-16 relative overflow-hidden">
+      {/* Background spotlight for middle card */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none">
+        <div className="w-[600px] h-[600px] bg-accent/20 rounded-full blur-3xl -mt-20" />
+      </div>
+
       {/* Section Heading */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-16 relative z-10">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -81,7 +83,7 @@ export function Pricing() {
           viewport={{ once: true }}
           className="h-1 w-24 bg-accent mx-auto mt-4 rounded-full origin-left"
         />
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -93,32 +95,49 @@ export function Pricing() {
       </div>
 
       {/* Pricing Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto relative z-10">
         {tiers.map((tier, idx) => (
           <motion.div
             key={idx}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: idx * 0.2, duration: 0.7, type: 'spring' }}
             viewport={{ once: true }}
-            className={`relative flex flex-col rounded-2xl bg-card p-10 shadow-lg border transition-transform hover:-translate-y-2 ${
-              tier.highlight
-                ? 'border-accent scale-105'
-                : 'border-muted/20 hover:border-accent'
-            }`}
+            whileHover={{ scale: 1.07, rotate: tier.highlight ? 0.5 : 0 }}
+            className={`relative flex flex-col rounded-2xl p-10 shadow-xl border backdrop-blur-sm transition-all
+              ${tier.highlight
+                ? 'z-20 scale-105 shadow-2xl border-accent/60 -mt-4'
+                : 'z-10 border-muted/20 hover:border-accent/40'}
+            `}
           >
+            {/* Badge floats above card */}
             {tier.highlight && (
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-sm font-semibold px-4 py-1 rounded-full shadow-md">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="absolute -top-7 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-sm font-semibold px-6 py-1.5 rounded-full shadow-lg z-30"
+              >
                 Most Popular
-              </div>
+              </motion.div>
             )}
 
-            <div className="flex-grow">
-              <h3 className="font-headline text-2xl text-foreground mb-4">{tier.name}</h3>
-              <p className="text-4xl font-serif text-foreground mb-2">{tier.price}</p>
+            {/* Highlight background (luxury glass gradient) */}
+            {tier.highlight && (
+              <motion.div
+                className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/40 via-primary/30 to-background/10 backdrop-blur-xl border border-accent/40 -z-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.6, 0.8, 0.6] }}
+                transition={{ duration: 4, repeat: Infinity }}
+              />
+            )}
+
+            <div className="flex-grow relative z-10">
+              <h3 className="font-headline text-2xl mb-4">{tier.name}</h3>
+              <p className="text-4xl font-serif mb-2">{tier.price}</p>
               <p className="text-secondary mb-6 h-12">{tier.description}</p>
 
-              <ul className="text-secondary space-y-3 mb-8">
+              <ul className="space-y-3 mb-8">
                 {tier.features.map((feature, i) => (
                   <li key={i} className="flex items-start">
                     <Check className="text-accent mr-2 h-4 w-4 mt-1 shrink-0" /> {feature}
@@ -131,9 +150,21 @@ export function Pricing() {
               asChild
               size="lg"
               variant={tier.highlight ? 'default' : 'outline'}
-              className="rounded-full w-full py-4 text-lg shadow-md transition-all mt-auto"
+              className={`rounded-full w-full py-4 text-lg shadow-md transition-all relative overflow-hidden ${
+                tier.highlight ? 'bg-accent text-accent-foreground hover:shadow-2xl' : ''
+              }`}
             >
-              <Link href={`/order?plan=${tier.id}`}>Start Commission</Link>
+              <Link href={`/order?plan=${tier.id}`}>
+                <span className="relative z-10">Start Commission</span>
+                {tier.highlight && (
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    initial={{ x: '-100%' }}
+                    animate={{ x: ['-100%', '100%'] }}
+                    transition={{ duration: 2.5, repeat: Infinity }}
+                  />
+                )}
+              </Link>
             </Button>
           </motion.div>
         ))}

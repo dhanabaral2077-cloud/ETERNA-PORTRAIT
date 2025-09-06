@@ -14,10 +14,10 @@ export function Story() {
   const portraitOpacity = useTransform(scrollYProgress, [0.5, 0.65, 0.8], [0, 1, 0]);
   const roomOpacity = useTransform(scrollYProgress, [0.75, 0.9, 1], [0, 1, 1]);
 
-  // Scale subtle zoom in/out for luxury feel
+  // Subtle zoom for luxury feel
   const scale = useTransform(scrollYProgress, [0, 1], [1.05, 1]);
 
-  // Animate text opacity along with its corresponding image
+  // Animate text opacity + vertical movement
   const textAnimation = (opacity: any) => ({
     opacity,
     y: useTransform(opacity, [0, 1], [20, 0]),
@@ -30,22 +30,20 @@ export function Story() {
         
         {/* Stage 1: Pet Photo */}
         <motion.div className="absolute w-full h-full" style={{ opacity: photoOpacity }}>
-           <motion.div style={{ scale }} className="relative w-full h-full">
+          <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="/portfolio/portrait_006.jpg"
-                alt="Pet Photo"
-                layout="fill"
-                objectFit="cover"
-                data-ai-hint="pet photo"
+              src="/portfolio/portrait_006.jpg"
+              alt="Pet Photo"
+              layout="fill"
+              objectFit="cover"
+              data-ai-hint="pet photo"
             />
           </motion.div>
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(photoOpacity)}
           >
-            <p
-              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
-            >
+            <p className="text-foreground font-headline text-xl md:text-2xl bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg shadow-md">
               It starts with your favorite memory.
             </p>
           </motion.div>
@@ -55,20 +53,18 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="/portfolio/portrait_007.png"
-                alt="Painting in Progress"
-                layout="fill"
-                objectFit="cover"
-                data-ai-hint="painting process"
+              src="/portfolio/portrait_007.png"
+              alt="Painting in Progress"
+              layout="fill"
+              objectFit="cover"
+              data-ai-hint="painting process"
             />
           </motion.div>
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(paintingOpacity)}
           >
-            <p
-              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
-            >
+            <p className="text-foreground font-headline text-xl md:text-2xl bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg shadow-md">
               Hand-painted with care by our artists.
             </p>
           </motion.div>
@@ -78,47 +74,47 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: portraitOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-                src="/portfolio/portrait_004.jpg"
-                alt="Final Portrait"
-                layout="fill"
-                objectFit="cover"
-                className="border-8 border-primary"
-                data-ai-hint="pet portrait"
+              src="/portfolio/portrait_004.jpg"
+              alt="Final Portrait"
+              layout="fill"
+              objectFit="cover"
+              className="border-8 border-primary"
+              data-ai-hint="pet portrait"
             />
           </motion.div>
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={textAnimation(portraitOpacity)}
           >
-            <p
-              className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
-            >
+            <p className="text-foreground font-headline text-xl md:text-2xl bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg shadow-md">
               A timeless masterpiece.
             </p>
           </motion.div>
         </motion.div>
 
-        {/* Stage 4: Interior Showcase */}
+        {/* Stage 4: Interior Showcase (dramatic glass cutout with shimmer) */}
         <motion.div className="absolute w-full h-full" style={{ opacity: roomOpacity }}>
-            <motion.div style={{ scale }} className="relative w-full h-full">
-              <Image
-                  src="/portfolio/portrait_005.jpg"
-                  alt="Portrait in Room"
-                  layout="fill"
-                  objectFit="cover"
-                  data-ai-hint="art gallery"
-              />
-            </motion.div>
-             <motion.div
-                className="absolute inset-0 flex items-center justify-center"
-                style={textAnimation(roomOpacity)}
-            >
-              <p
-                className="text-foreground font-headline text-xl max-w-md bg-background/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md"
-              >
+          <motion.div style={{ scale }} className="relative w-full h-full">
+            <Image
+              src="/portfolio/portrait_005.jpg"
+              alt="Portrait in Room"
+              layout="fill"
+              objectFit="cover"
+              data-ai-hint="art gallery"
+            />
+          </motion.div>
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            style={textAnimation(roomOpacity)}
+          >
+            <div className="relative px-6 py-4 rounded-2xl backdrop-blur-xl bg-white/10 shadow-lg overflow-hidden">
+              {/* Shimmer layer */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-shimmer" />
+              <p className="relative font-headline text-3xl md:text-4xl 2xl:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-white/90 to-white/40">
                 Ready to elevate your space.
               </p>
-            </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

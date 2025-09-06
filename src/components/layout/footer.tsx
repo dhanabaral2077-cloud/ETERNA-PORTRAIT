@@ -75,9 +75,6 @@ export function Footer() {
             <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">
               Transform your pet’s photo into timeless, handcrafted art. Our museum-grade portraits, crafted with unparalleled care, are designed to be cherished for generations.
             </p>
-            <div className="font-headline text-lg tracking-[0.1em] text-foreground mb-4">
-              ETERNA PORTRAIT
-            </div>
             <p className="text-sm text-muted-foreground">&copy; 2025 Eterna Portrait. All rights reserved.</p>
             <div className="mt-4">
               <Image
