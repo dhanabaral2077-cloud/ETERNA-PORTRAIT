@@ -1,4 +1,4 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -12,13 +12,19 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'picsum.photos',
+        hostname: 'www.paypalobjects.com',
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'www.paypalobjects.com',
+        hostname: 'i.pinimg.com', 
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.pinterest.com', 
         port: '',
         pathname: '/**',
       },
@@ -34,7 +40,7 @@ const nextConfig: NextConfig = {
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     GELATO_API_KEY: process.env.GELATO_API_KEY,
     ADMIN_SECRET: process.env.ADMIN_SECRET,
-  }
+  },
 };
 
 export default nextConfig;

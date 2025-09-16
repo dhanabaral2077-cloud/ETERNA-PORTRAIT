@@ -32,10 +32,10 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: photoOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-              src="/portfolio/portrait_006.jpg"
+              src="https://i.pinimg.com/1200x/21/f2/a1/21f2a107dcdbb48b1d942286d13ca2bc.jpg"
               alt="Pet Photo"
-              layout="fill"
-              objectFit="cover"
+              fill
+              className="object-cover"
               data-ai-hint="pet photo"
             />
           </motion.div>
@@ -53,10 +53,10 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: paintingOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-              src="/portfolio/portrait_007.png"
+              src="https://i.pinimg.com/1200x/58/75/db/5875db632f386162b8b436c11152444e.jpg"
               alt="Painting in Progress"
-              layout="fill"
-              objectFit="cover"
+              fill
+              className="object-cover"
               data-ai-hint="painting process"
             />
           </motion.div>
@@ -74,11 +74,10 @@ export function Story() {
         <motion.div className="absolute w-full h-full" style={{ opacity: portraitOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-              src="/portfolio/portrait_004.jpg"
+              src="https://i.pinimg.com/1200x/03/81/a2/0381a2ada56bf48e372ca9eb37a9b8be.jpg"
               alt="Final Portrait"
-              layout="fill"
-              objectFit="cover"
-              className="border-8 border-primary"
+              fill
+              className="object-cover border-8 border-primary"
               data-ai-hint="pet portrait"
             />
           </motion.div>
@@ -92,14 +91,14 @@ export function Story() {
           </motion.div>
         </motion.div>
 
-        {/* Stage 4: Interior Showcase (dramatic glass cutout with shimmer) */}
+        {/* Stage 4: Interior Showcase */}
         <motion.div className="absolute w-full h-full" style={{ opacity: roomOpacity }}>
           <motion.div style={{ scale }} className="relative w-full h-full">
             <Image
-              src="/portfolio/portrait_005.jpg"
+              src="https://i.pinimg.com/1200x/18/0f/4b/180f4b7aefadec786f3eba3e1c6c4f66.jpg"
               alt="Portrait in Room"
-              layout="fill"
-              objectFit="cover"
+              fill
+              className="object-cover"
               data-ai-hint="art gallery"
             />
           </motion.div>

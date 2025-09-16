@@ -7,12 +7,36 @@ import Link from "next/link";
 
 export function Gallery() {
   const portraits = [
-    { src: "/portfolio/portrait_0001.jpg", title: "Bella in Renaissance Style", aiHint: "dog renaissance" },
-    { src: "/portfolio/portrait_0002.jpg", title: "Max in Classic Oil", aiHint: "cat oil" },
-    { src: "/portfolio/portrait3.jpg", title: "Luna in Modern Minimalist", aiHint: "pet minimalist" },
-    { src: "/portfolio/portrait_0004.jpg", title: "Charlie in Regal Style", aiHint: "dog regal" },
-    { src: "/portfolio/portrait_0005.jpg", title: "Daisy in Soft Pastel", aiHint: "pet pastel" },
-    { src: "/portfolio/portrait_0006.jpg", title: "Rocky in Contemporary Ink", aiHint: "pet ink" },
+    { 
+      src: "https://i.pinimg.com/736x/f2/c5/e7/f2c5e7faef71372a364cec114b950d49.jpg", 
+      title: "Bella in Renaissance Style", 
+      aiHint: "dog renaissance" 
+    },
+    { 
+      src: "https://i.pinimg.com/736x/9f/23/cb/9f23cb991c51c130f83ad8169a75388b.jpg", 
+      title: "Max in Classic Oil", 
+      aiHint: "cat oil" 
+    },
+    { 
+      src: "https://i.pinimg.com/1200x/cd/5a/ca/cd5acac70dd4da1454ef66b95543676b.jpg", 
+      title: "Luna in Modern Minimalist", 
+      aiHint: "pet minimalist" 
+    },
+    { 
+      src: "https://i.pinimg.com/1200x/1f/38/b7/1f38b71214e5233cd9ad8c4fb9d1d947.jpg", 
+      title: "Charlie in Regal Style", 
+      aiHint: "dog regal" 
+    },
+    { 
+      src: "https://i.pinimg.com/736x/38/b9/21/38b92132530a0bea91d48138380b624d.jpg", 
+      title: "Daisy in Soft Pastel", 
+      aiHint: "pet pastel" 
+    },
+    { 
+      src: "https://i.pinimg.com/1200x/53/b9/73/53b973489c2b94f4cadcc19c6bc49aca.jpg", 
+      title: "Rocky in Contemporary Ink", 
+      aiHint: "pet ink" 
+    },
   ];
 
   // Parent animation for stagger effect
