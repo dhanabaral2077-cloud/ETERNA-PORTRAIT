@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Playfair_Display, Montserrat } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -49,6 +50,7 @@ export default function RootLayout({
         {/* End Google Tag Manager (noscript) */}
         {children}
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );
