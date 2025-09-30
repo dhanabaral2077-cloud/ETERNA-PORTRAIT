@@ -28,7 +28,7 @@ export function Gallery() {
       aiHint: "dog regal" 
     },
     { 
-      src: "https://i.pinimg.com/736x/38/b9/21/38b92132530a0bea91d48138380b624d.jpg", 
+      src: "https://i.pinimg.com/1200x/33/63/2d/33632d69759732a62a1204666c250b0e.jpg", 
       title: "Daisy in Soft Pastel", 
       aiHint: "pet pastel" 
     },
