@@ -26,24 +26,24 @@ export function Hero() {
     <section
       ref={ref}
       id="hero"
-      className="relative h-[200vh] w-full bg-background overflow-hidden"
+      className="relative h-[200vh] w-full bg-background"
     >
-      <div className="sticky top-0 h-screen w-full grid grid-cols-1 md:grid-cols-2">
+      <div className="sticky top-0 h-screen w-full flex flex-col md:grid md:grid-cols-2 pt-20 md:pt-24 pb-4">
         {/* Left Column - Text */}
-        <div className="flex flex-col justify-center h-full px-6 md:px-12 lg:px-20 z-10">
+        <div className="flex flex-col justify-center px-6 md:px-12 lg:px-20 z-10 order-1 md:order-none flex-shrink-0 md:flex-shrink md:h-full py-4 md:py-0">
           <div className="max-w-xl 2xl:max-w-3xl">
             <motion.h1
-              className="font-headline text-5xl md:text-7xl 2xl:text-8xl text-foreground leading-[1.1] tracking-tight"
+              className="font-headline text-4xl md:text-7xl 2xl:text-8xl text-foreground leading-[1.1] tracking-tight text-center md:text-left"
               style={{ y: textY }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} // Custom ease for "heavy" feel
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
               Transform Your Pet’s Photo Into <span className="italic text-primary">Timeless Art.</span>
             </motion.h1>
 
             <motion.p
-              className="mt-8 text-lg md:text-xl 2xl:text-2xl text-secondary font-light leading-relaxed max-w-lg"
+              className="mt-4 md:mt-8 text-base md:text-xl 2xl:text-2xl text-secondary font-light leading-relaxed max-w-lg text-center md:text-left mx-auto md:mx-0"
               style={{ y: textY }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -54,7 +54,7 @@ export function Hero() {
             </motion.p>
 
             <motion.div
-              className="mt-12 flex flex-col sm:flex-row gap-6"
+              className="mt-6 md:mt-12 flex flex-row justify-center md:justify-start gap-4 md:gap-6"
               style={{ y: textY }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -63,25 +63,25 @@ export function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full bg-primary text-primary-foreground px-10 py-6 text-lg shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all duration-500"
+                className="rounded-full bg-primary text-primary-foreground px-6 md:px-10 py-4 md:py-6 text-base md:text-lg shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all duration-500"
               >
-                <Link href="/order">Order Your Portrait</Link>
+                <Link href="/order">Order Now</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="rounded-full border-foreground/20 text-foreground px-10 py-6 text-lg hover:bg-foreground hover:text-background transition-all duration-500"
+                className="rounded-full border-foreground/20 text-foreground px-6 md:px-10 py-4 md:py-6 text-base md:text-lg hover:bg-foreground hover:text-background transition-all duration-500"
               >
-                <Link href="/#gallery">View Gallery</Link>
+                <Link href="/#gallery">Gallery</Link>
               </Button>
             </motion.div>
           </div>
         </div>
 
         {/* Right Column - Scroll Animation */}
-        <div className="flex items-center justify-center h-full p-6 md:p-12">
-          <div className="relative w-full h-full max-h-[85vh] aspect-[3/4] md:aspect-[4/5] mx-auto overflow-hidden rounded-[2rem] shadow-2xl border border-white/10">
+        <div className="flex items-center justify-center p-4 md:p-12 order-2 md:order-none flex-grow md:h-full overflow-hidden">
+          <div className="relative w-full h-full max-h-[45vh] md:max-h-[85vh] aspect-[3/4] md:aspect-[4/5] mx-auto overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-white/10">
             {/* Stage 1: Dog Photo */}
             <motion.div className="absolute inset-0" style={{ opacity: photoOpacity, scale }}>
               <Image
