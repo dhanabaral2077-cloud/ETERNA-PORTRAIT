@@ -23,6 +23,7 @@ export function Header() {
     { href: '/#gallery', label: 'Gallery' },
     { href: '/#how-it-works', label: 'How It Works' },
     { href: '/#testimonials', label: 'Testimonials' },
+    { href: '/blog', label: 'Blog' },
     { href: '/#pricing', label: 'Pricing' },
   ];
 
@@ -33,11 +34,10 @@ export function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${scrolled
             ? "backdrop-blur-md bg-background/80 shadow-md h-20"
             : "bg-transparent h-24"
-        } md:justify-between`}
+          } md:justify-between`}
       >
         {/* Mobile Logo (Centered) */}
         <div className="flex md:hidden justify-center flex-1">

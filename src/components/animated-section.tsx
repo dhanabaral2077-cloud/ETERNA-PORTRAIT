@@ -11,7 +11,7 @@ type AnimatedSectionProps = {
 };
 
 export function AnimatedSection({ children, className }: AnimatedSectionProps) {
-  const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2 });
+  const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2, triggerOnce: true });
 
   return (
     <div

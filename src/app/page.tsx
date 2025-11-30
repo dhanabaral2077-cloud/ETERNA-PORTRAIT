@@ -9,6 +9,8 @@ import { CTA } from '@/components/sections/cta';
 import { Footer } from '@/components/layout/footer';
 import { AnimatedSection } from '@/components/animated-section';
 
+import { TrustBadges } from '@/components/sections/trust-badges';
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -37,6 +39,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <TrustBadges />
         <AnimatedSection>
           <Gallery />
         </AnimatedSection>

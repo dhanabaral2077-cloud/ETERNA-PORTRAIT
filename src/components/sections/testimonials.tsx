@@ -57,6 +57,21 @@ export default function Testimonials() {
         />
       </div>
 
+      {/* Reviews Summary */}
+      <div className="flex justify-center mb-12">
+        <div className="flex items-center space-x-2 bg-card border border-muted/20 px-6 py-3 rounded-full shadow-sm">
+          <div className="flex text-yellow-400">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+              </svg>
+            ))}
+          </div>
+          <span className="font-medium text-foreground">4.9/5 Stars</span>
+          <span className="text-muted-foreground text-sm">(500+ Verified Reviews)</span>
+        </div>
+      </div>
+
       {/* Testimonials Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
         {testimonials.map((t, idx) => (
@@ -71,6 +86,14 @@ export default function Testimonials() {
                        border border-muted/20 shadow-lg 
                        hover:shadow-xl transition-all duration-300"
           >
+            {/* Verified Badge */}
+            <div className="absolute top-4 right-4 flex items-center space-x-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full text-xs font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+              </svg>
+              <span>Verified Buyer</span>
+            </div>
+
             {/* Collector Image */}
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
