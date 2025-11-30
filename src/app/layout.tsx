@@ -1,5 +1,5 @@
 
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import { Playfair_Display, Montserrat } from 'next/font/google';
 import './globals.css';
@@ -19,8 +19,23 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Eterna Portrait',
-  description: 'Handcrafted digital art & museum-quality prints that celebrate your companion for a lifetime.',
+  metadataBase: new URL('https://eternaportrait.com'),
+  title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
+  description: 'Transform your pet\'s photo into a timeless masterpiece. Commission handcrafted digital art and museum-quality prints that celebrate your companion for a lifetime.',
+  keywords: ['pet portrait', 'dog portrait', 'cat portrait', 'custom pet art', 'digital oil painting', 'pet memorial', 'gift for pet lovers'],
+  openGraph: {
+    title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
+    description: 'Transform your pet\'s photo into a timeless masterpiece. Commission handcrafted digital art and museum-quality prints.',
+    url: 'https://eternaportrait.com',
+    siteName: 'Eterna Portrait',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
+    description: 'Transform your pet\'s photo into a timeless masterpiece.',
+  },
 };
 
 export default function RootLayout({
@@ -29,25 +44,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="!scroll-smooth">
+    <html lang="en" className="!scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Google Tag Manager */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-H0T84MYGN3`}
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-P8PRPLKL');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-H0T84MYGN3');
           `}
         </Script>
-        {/* End Google Tag Manager */}
+        {/* End Google Analytics */}
       </head>
       <body className={`${playfairDisplay.variable} ${montserrat.variable} font-body bg-background text-foreground antialiased`}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P8PRPLKL"
-        height="0" width="0" style={{display:"none",visibility:"hidden"}}></iframe></noscript>
-        {/* End Google Tag Manager (noscript) */}
         {children}
         <Toaster />
         <SpeedInsights />

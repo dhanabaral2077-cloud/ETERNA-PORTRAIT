@@ -2,11 +2,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 export async function POST(req: Request) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
   try {
     const { password, search } = await req.json();
 
@@ -47,21 +51,21 @@ export async function POST(req: Request) {
       console.error('Supabase error fetching orders:', error.message);
       throw error;
     }
-    
+
     const formatAddress = (customer: any) => {
-        if (!customer) return 'No address';
-        const parts = [
-            customer.address_line1,
-            customer.address_line2,
-            customer.city,
-            customer.state_province_region,
-            customer.postal_code,
-            customer.country
-        ];
-        return parts.filter(Boolean).join(', ');
+      if (!customer) return 'No address';
+      const parts = [
+        customer.address_line1,
+        customer.address_line2,
+        customer.city,
+        customer.state_province_region,
+        customer.postal_code,
+        customer.country
+      ];
+      return parts.filter(Boolean).join(', ');
     }
 
-    const transformedOrders = orders.map(order => ({
+    const transformedOrders = orders.map((order: any) => ({
       ...order,
       customer_name: (order.customers as any)?.name || 'N/A',
       customer_email: (order.customers as any)?.email || 'N/A',
@@ -69,17 +73,17 @@ export async function POST(req: Request) {
     }));
 
     // Calculate stats
-    const totalRevenue = orders.reduce((acc, order) => acc + order.price, 0);
+    const totalRevenue = orders.reduce((acc: number, order: any) => acc + order.price, 0);
     const totalOrders = count || 0;
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    return NextResponse.json({ 
-        orders: transformedOrders,
-        stats: {
-            totalRevenue,
-            totalOrders,
-            averageOrderValue
-        }
+    return NextResponse.json({
+      orders: transformedOrders,
+      stats: {
+        totalRevenue,
+        totalOrders,
+        averageOrderValue
+      }
     });
   } catch (err: any) {
     console.error('API Error:', err);

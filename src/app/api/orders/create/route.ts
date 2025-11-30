@@ -4,12 +4,20 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase Admin client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-// IMPORTANT: Use the Service Role Key for admin operations
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 export async function POST(req: Request) {
+  // Initialize Supabase Admin client inside the handler
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  // IMPORTANT: Use the Service Role Key for admin operations
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Supabase environment variables are missing.');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+
   try {
     const body = await req.json();
     const {
@@ -42,7 +50,7 @@ export async function POST(req: Request) {
       console.error('Error finding customer:', customerError.message);
       throw customerError;
     }
-    
+
     const customerDetails = {
       email,
       name,
@@ -60,23 +68,23 @@ export async function POST(req: Request) {
         .insert(customerDetails)
         .select('id')
         .single();
-      
+
       if (newCustomerError) {
         console.error('Error creating customer:', newCustomerError.message);
         throw newCustomerError;
       }
       customer = newCustomer;
     } else {
-        // Update existing customer's address
-         const { error: updateCustomerError } = await supabase
-            .from('customers')
-            .update(customerDetails)
-            .eq('id', customer.id);
-        
-        if (updateCustomerError) {
-            console.error('Error updating customer:', updateCustomerError.message);
-            // Non-fatal, we can still create the order
-        }
+      // Update existing customer's address
+      const { error: updateCustomerError } = await supabase
+        .from('customers')
+        .update(customerDetails)
+        .eq('id', customer.id);
+
+      if (updateCustomerError) {
+        console.error('Error updating customer:', updateCustomerError.message);
+        // Non-fatal, we can still create the order
+      }
     }
 
     // --- 2. Create Order ---
@@ -101,12 +109,12 @@ export async function POST(req: Request) {
       console.error('Error creating order:', orderError.message);
       throw orderError;
     }
-      
+
     // --- 3. Create Order Event (Optional but good practice) ---
-     await supabase.from('order_events').insert({
-        order_id: order.id,
-        type: 'payment_succeeded',
-        meta: { source: 'paypal', paypal_order_id: paypalOrderId },
+    await supabase.from('order_events').insert({
+      order_id: order.id,
+      type: 'payment_succeeded',
+      meta: { source: 'paypal', paypal_order_id: paypalOrderId },
     });
 
 
