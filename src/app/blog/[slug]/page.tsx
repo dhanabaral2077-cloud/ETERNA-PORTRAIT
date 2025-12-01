@@ -5,6 +5,10 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { format } from 'date-fns';
+import { Reactions } from '@/components/blog/reactions';
+import { Comments } from '@/components/blog/comments';
+import { RelatedPosts } from '@/components/blog/related-posts';
+import { Badge } from '@/components/ui/badge';
 
 interface Props {
     params: Promise<{ slug: string }>;
@@ -41,10 +45,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
         title: `${post.title} | Eterna Portrait Blog`,
-        description: post.excerpt,
+        description: post.search_description || post.excerpt,
         openGraph: {
             title: post.title,
-            description: post.excerpt,
+            description: post.search_description || post.excerpt,
             images: post.image ? [post.image] : [],
             type: 'article',
         },
@@ -107,9 +111,29 @@ export default async function BlogPostPage({ params }: Props) {
                     )}
 
                     <div
-                        className="prose prose-lg prose-stone mx-auto dark:prose-invert"
+                        className="prose prose-lg prose-stone mx-auto dark:prose-invert mb-12"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
+
+                    {/* Tags */}
+                    {post.tags && post.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-12">
+                            {post.tags.map((tag: string) => (
+                                <Badge key={tag} variant="secondary" className="text-sm px-3 py-1">
+                                    #{tag}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Reactions */}
+                    <Reactions postId={post.id} />
+
+                    {/* Related Posts */}
+                    <RelatedPosts currentSlug={post.slug} tags={post.tags} />
+
+                    {/* Comments */}
+                    <Comments postId={post.id} />
                 </article>
             </main>
             <Footer />

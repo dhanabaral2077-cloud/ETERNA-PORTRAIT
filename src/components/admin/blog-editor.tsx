@@ -23,7 +23,8 @@ import {
     Link as LinkIcon,
     Image as ImageIcon,
     Loader2,
-    Save,
+    Code,
+    Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +35,7 @@ interface BlogEditorProps {
 export function BlogEditor({ post }: BlogEditorProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isHtmlView, setIsHtmlView] = useState(false);
     const [formData, setFormData] = useState({
         title: post?.title || "",
         slug: post?.slug || "",
@@ -41,6 +43,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
         author: post?.author || "Eterna Team",
         image: post?.image || "",
         published: post?.published || false,
+        tags: post?.tags?.join(", ") || "",
+        search_description: post?.search_description || "",
     });
 
     const supabase = createClient(
@@ -133,10 +137,25 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
         setIsSubmitting(true);
 
+        const content = isHtmlView
+            ? (document.getElementById("html-editor") as HTMLTextAreaElement)?.value
+            : editor?.getHTML();
+
+        const tagsArray = formData.tags
+            .split(",")
+            .map((tag: string) => tag.trim())
+            .filter((tag: string) => tag.length > 0);
+
         const dataToSave = {
-            ...formData,
-            content: editor?.getHTML(),
+            title: formData.title,
+            slug: formData.slug,
+            excerpt: formData.excerpt,
+            author: formData.author,
+            image: formData.image,
             published: publishStatus,
+            content: content,
+            tags: tagsArray,
+            search_description: formData.search_description,
         };
 
         try {
@@ -179,78 +198,114 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 </div>
 
                 {/* Toolbar */}
-                <div className="border rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-1 sticky top-20 z-10">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={cn(editor.isActive("bold") && "bg-gray-200")}
-                    >
-                        <Bold className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={cn(editor.isActive("italic") && "bg-gray-200")}
-                    >
-                        <Italic className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={cn(editor.isActive("bulletList") && "bg-gray-200")}
-                    >
-                        <List className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={cn(editor.isActive("orderedList") && "bg-gray-200")}
-                    >
-                        <ListOrdered className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                        className={cn(editor.isActive("blockquote") && "bg-gray-200")}
-                    >
-                        <Quote className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={setLink}
-                        className={cn(editor.isActive("link") && "bg-gray-200")}
-                    >
-                        <LinkIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={addImageToEditor}>
-                        <ImageIcon className="h-4 w-4" />
-                    </Button>
-                    <div className="w-px h-6 bg-gray-300 mx-2" />
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().undo().run()}
-                    >
-                        <Undo className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().redo().run()}
-                    >
-                        <Redo className="h-4 w-4" />
-                    </Button>
+                <div className="border rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-1 sticky top-20 z-10 items-center">
+                    <div className="flex gap-1 mr-auto">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().toggleBold().run()}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("bold") && "bg-gray-200")}
+                        >
+                            <Bold className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().toggleItalic().run()}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("italic") && "bg-gray-200")}
+                        >
+                            <Italic className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().toggleBulletList().run()}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("bulletList") && "bg-gray-200")}
+                        >
+                            <List className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("orderedList") && "bg-gray-200")}
+                        >
+                            <ListOrdered className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("blockquote") && "bg-gray-200")}
+                        >
+                            <Quote className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={setLink}
+                            disabled={isHtmlView}
+                            className={cn(editor.isActive("link") && "bg-gray-200")}
+                        >
+                            <LinkIcon className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={addImageToEditor} disabled={isHtmlView}>
+                            <ImageIcon className="h-4 w-4" />
+                        </Button>
+                        <div className="w-px h-6 bg-gray-300 mx-2" />
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().undo().run()}
+                            disabled={isHtmlView}
+                        >
+                            <Undo className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => editor.chain().focus().redo().run()}
+                            disabled={isHtmlView}
+                        >
+                            <Redo className="h-4 w-4" />
+                        </Button>
+                    </div>
+
+                    <div className="flex gap-1 border-l pl-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsHtmlView(!isHtmlView)}
+                            className={cn(isHtmlView && "bg-gray-200 text-primary")}
+                            title={isHtmlView ? "Switch to Visual View" : "Switch to HTML View"}
+                        >
+                            {isHtmlView ? <Eye className="h-4 w-4 mr-2" /> : <Code className="h-4 w-4 mr-2" />}
+                            {isHtmlView ? "Visual View" : "HTML View"}
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Editor Content */}
-                <div className="border rounded-b-lg min-h-[500px] bg-white">
-                    <EditorContent editor={editor} />
+                <div className="border rounded-b-lg min-h-[500px] bg-white relative">
+                    {isHtmlView ? (
+                        <textarea
+                            id="html-editor"
+                            className="w-full h-[500px] p-4 font-mono text-sm focus:outline-none resize-y"
+                            defaultValue={editor.getHTML()}
+                            onChange={(e) => {
+                                // Optional: Update editor content on change if needed, 
+                                // but usually we sync back when switching views or submitting.
+                                // For now, we'll sync on submit or view switch.
+                            }}
+                        />
+                    ) : (
+                        <EditorContent editor={editor} />
+                    )}
                 </div>
             </div>
 
@@ -279,7 +334,33 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label>URL Slug</Label>
+                            <Label>Labels (Tags)</Label>
+                            <Input
+                                placeholder="Separate with commas"
+                                value={formData.tags}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, tags: e.target.value })
+                                }
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                E.g. Portrait, Gift Ideas, Dogs
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Search Description</Label>
+                            <Textarea
+                                value={formData.search_description}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, search_description: e.target.value })
+                                }
+                                rows={2}
+                                placeholder="Meta description for SEO..."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Permalink</Label>
                             <Input
                                 value={formData.slug}
                                 onChange={(e) =>
@@ -289,14 +370,14 @@ export function BlogEditor({ post }: BlogEditorProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Excerpt</Label>
+                            <Label>Excerpt (Summary)</Label>
                             <Textarea
                                 value={formData.excerpt}
                                 onChange={(e) =>
                                     setFormData({ ...formData, excerpt: e.target.value })
                                 }
                                 rows={3}
-                                placeholder="Short summary for SEO..."
+                                placeholder="Short summary shown on blog list..."
                             />
                         </div>
 
