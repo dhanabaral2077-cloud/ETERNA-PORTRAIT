@@ -18,13 +18,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'i.pinimg.com', 
+        hostname: 'i.pinimg.com',
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'assets.pinterest.com', 
+        hostname: 'assets.pinterest.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
         port: '',
         pathname: '/**',
       },

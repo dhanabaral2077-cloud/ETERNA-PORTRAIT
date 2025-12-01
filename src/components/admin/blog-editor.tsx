@@ -182,6 +182,18 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
     if (!editor) return null;
 
+    // Sync content when switching views
+    const toggleView = () => {
+        if (isHtmlView) {
+            // Switching from HTML to Visual
+            const textArea = document.getElementById("html-editor") as HTMLTextAreaElement;
+            if (textArea && editor) {
+                editor.commands.setContent(textArea.value);
+            }
+        }
+        setIsHtmlView(!isHtmlView);
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Editor Area */}
@@ -280,7 +292,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setIsHtmlView(!isHtmlView)}
+                            onClick={toggleView}
                             className={cn(isHtmlView && "bg-gray-200 text-primary")}
                             title={isHtmlView ? "Switch to Visual View" : "Switch to HTML View"}
                         >
