@@ -111,5 +111,33 @@ begin
   on conflict (post_id, reaction_type)
   do update set count = post_reactions.count + 1;
 end;
-$$ language plpgsql security definer;
 
+-- Create marketing_campaigns table
+create table if not exists public.marketing_campaigns (
+  id uuid default gen_random_uuid() primary key,
+  is_active boolean default false,
+  title text not null,
+  description text,
+  discount_code text,
+  discount_percent integer,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS
+alter table public.marketing_campaigns enable row level security;
+
+-- Allow public read access (so the popup can show)
+create policy "Public can view marketing campaigns"
+  on public.marketing_campaigns for select
+  using ( true );
+
+-- Allow admins to update (we'll assume authenticated users are admins for now, or use specific role)
+create policy "Admins can manage marketing campaigns"
+  on public.marketing_campaigns for all
+  using ( auth.role() = 'authenticated' );
+
+-- Insert a default row if it doesn't exist (we only need one row for the site-wide campaign)
+insert into public.marketing_campaigns (is_active, title, description, discount_code, discount_percent)
+select false, 'Welcome Offer', 'Get 10% off your first order', 'WELCOME10', 10
+where not exists (select 1 from public.marketing_campaigns);

@@ -1,10 +1,10 @@
-
 import type { Metadata } from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import { Playfair_Display, Montserrat } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { MarketingPopup } from '@/components/marketing-popup';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -63,6 +63,7 @@ export default function RootLayout({
       </head>
       <body className={`${playfairDisplay.variable} ${montserrat.variable} font-body bg-background text-foreground antialiased`}>
         {children}
+        <MarketingPopup />
         <Toaster />
         <SpeedInsights />
       </body>
