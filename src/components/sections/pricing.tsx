@@ -4,16 +4,14 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { productOptions } from '@/app/order/page';
+import { PRODUCT_PRICES } from '@/lib/pricing';
 
 export function Pricing() {
   const getTierBasePrice = (planId: 'classic' | 'signature' | 'masterpiece') => {
-    const defaultProduct = productOptions.types.find(p => p.plan === planId);
-    const defaultSize = productOptions.sizes.find(s => s.id === '12x16'); // Base size
-    if (defaultProduct && defaultSize) {
-      return (defaultProduct.price * defaultSize.priceModifier) / 100;
-    }
-    return 0;
+    const productsInPlan = Object.values(PRODUCT_PRICES).filter(p => p.plan === planId);
+    if (productsInPlan.length === 0) return 0;
+    // Find the lowest base price in the plan
+    return Math.min(...productsInPlan.map(p => p.basePrice));
   };
 
   const tiers = [
@@ -150,9 +148,8 @@ export function Pricing() {
               asChild
               size="lg"
               variant={tier.highlight ? 'default' : 'outline'}
-              className={`rounded-full w-full py-4 text-lg shadow-md transition-all relative overflow-hidden ${
-                tier.highlight ? 'bg-accent text-accent-foreground hover:shadow-2xl' : ''
-              }`}
+              className={`rounded-full w-full py-4 text-lg shadow-md transition-all relative overflow-hidden ${tier.highlight ? 'bg-accent text-accent-foreground hover:shadow-2xl' : ''
+                }`}
             >
               <Link href={`/order?plan=${tier.id}`}>
                 <span className="relative z-10">Start Commission</span>
