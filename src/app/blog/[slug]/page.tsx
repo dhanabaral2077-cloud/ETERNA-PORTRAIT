@@ -1,17 +1,37 @@
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { blogPosts } from '@/lib/blog-data';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { createClient } from '@supabase/supabase-js';
+import { format } from 'date-fns';
 
 interface Props {
     params: Promise<{ slug: string }>;
 }
 
+// Revalidate every 60 seconds
+export const revalidate = 60;
+
+async function getPost(slug: string) {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: post } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .single();
+
+    return post;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
-    const post = blogPosts.find((p) => p.slug === slug);
+    const post = await getPost(slug);
 
     if (!post) {
         return {
@@ -25,21 +45,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title: post.title,
             description: post.excerpt,
-            images: [post.image],
+            images: post.image ? [post.image] : [],
             type: 'article',
         },
     };
 }
 
 export async function generateStaticParams() {
-    return blogPosts.map((post) => ({
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: posts } = await supabase
+        .from('posts')
+        .select('slug')
+        .eq('published', true);
+
+    return (posts || []).map((post) => ({
         slug: post.slug,
     }));
 }
 
 export default async function BlogPostPage({ params }: Props) {
     const { slug } = await params;
-    const post = blogPosts.find((p) => p.slug === slug);
+    const post = await getPost(slug);
 
     if (!post) {
         notFound();
@@ -52,9 +82,9 @@ export default async function BlogPostPage({ params }: Props) {
                 <article className="max-w-3xl mx-auto">
                     <div className="mb-8 text-center">
                         <div className="flex items-center justify-center text-sm text-muted-foreground mb-4 space-x-2">
-                            <span>{post.date}</span>
+                            <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
                             <span>•</span>
-                            <span>{post.readTime}</span>
+                            <span>{Math.ceil(post.content?.split(' ').length / 200) || 5} min read</span>
                         </div>
                         <h1 className="font-headline text-4xl md:text-5xl text-foreground mb-6 leading-tight">
                             {post.title}
@@ -64,15 +94,17 @@ export default async function BlogPostPage({ params }: Props) {
                         </div>
                     </div>
 
-                    <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 shadow-lg">
-                        <Image
-                            src={post.image}
-                            alt={post.title}
-                            fill
-                            className="object-cover"
-                            priority
-                        />
-                    </div>
+                    {post.image && (
+                        <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 shadow-lg">
+                            <Image
+                                src={post.image}
+                                alt={post.title}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                        </div>
+                    )}
 
                     <div
                         className="prose prose-lg prose-stone mx-auto dark:prose-invert"
