@@ -79,8 +79,38 @@ export default async function BlogPostPage({ params }: Props) {
         notFound();
     }
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        image: post.image ? [post.image] : [],
+        datePublished: post.created_at,
+        dateModified: post.updated_at || post.created_at,
+        author: {
+            '@type': 'Person',
+            name: post.author || 'Eterna Team',
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: 'Eterna Portrait',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://eternaportrait.com/logo.png',
+            },
+        },
+        description: post.search_description || post.excerpt,
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `https://eternaportrait.com/blog/${post.slug}`,
+        },
+    };
+
     return (
         <div className="flex flex-col min-h-screen">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <Header />
             <main className="flex-1 bg-background py-24 px-6 md:px-16">
                 <article className="max-w-3xl mx-auto">
