@@ -18,28 +18,7 @@ import Link from "next/link";
 import { supabase } from '@/lib/supabase-client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-export const productOptions = {
-    types: [
-        { id: 'canvas', name: 'Canvas', price: 950, plan: 'signature' },
-        { id: 'framed_canvas', name: 'Framed Canvas', price: 1250, plan: 'signature' },
-        { id: 'fine_art_poster', name: 'Fine Art Poster', price: 450, plan: 'classic' },
-        { id: 'framed_poster_wood', name: 'Wooden Framed Poster', price: 750, plan: 'classic' },
-        { id: 'framed_poster_metal', name: 'Metal Framed Poster', price: 850, plan: 'classic' },
-        { id: 'aluminum_print', name: 'Aluminum Print', price: 1500, plan: 'masterpiece' },
-        { id: 'acrylic_print', name: 'Acrylic Print', price: 1800, plan: 'masterpiece' },
-    ],
-    orientations: [
-        { id: 'vertical', name: 'Vertical' },
-        { id: 'horizontal', name: 'Horizontal' },
-    ],
-    sizes: [
-        { id: '5x7', name: '13x18 cm / 5x7"', priceModifier: 0.5 },
-        { id: '12x16', name: '30x40 cm / 12x16"', priceModifier: 1 },
-        { id: '18x24', name: '45x60 cm / 18x24"', priceModifier: 1.5 },
-        { id: '24x36', name: '60x90 cm / 24x36"', priceModifier: 2 },
-    ]
-} as const;
+import { PRODUCT_PRICES, SIZE_MODIFIERS, calculatePrice, ProductType, SizeType } from "@/lib/pricing";
 
 type StyleOption = "artist" | "renaissance" | "classic_oil" | "watercolor" | "modern_minimalist";
 
@@ -52,14 +31,22 @@ function OrderForm() {
 
     const selectedPlan = searchParams.get('plan') || 'signature';
 
+    // Convert PRODUCT_PRICES object to array for UI
+    const productTypes = useMemo(() => {
+        return Object.entries(PRODUCT_PRICES).map(([id, details]) => ({
+            id: id as ProductType,
+            ...details
+        }));
+    }, []);
+
     const availableProductTypes = useMemo(() => {
-        return productOptions.types.filter(type => type.plan === selectedPlan);
-    }, [selectedPlan]);
-    
+        return productTypes.filter(type => type.plan === selectedPlan);
+    }, [selectedPlan, productTypes]);
+
     const [formData, setFormData] = useState({
-        printType: availableProductTypes[0]?.id || 'canvas',
+        printType: (availableProductTypes[0]?.id || 'canvas') as ProductType,
         orientation: 'vertical',
-        size: '12x16',
+        size: '12x16' as SizeType,
         petName: '',
         style: 'artist' as StyleOption,
         notes: '',
@@ -72,7 +59,7 @@ function OrderForm() {
         postalCode: '',
         country: '',
     });
-    
+
     const [errors, setErrors] = useState<Record<string, string | null>>({
         name: null,
         email: null,
@@ -82,7 +69,7 @@ function OrderForm() {
         country: null,
         photos: null,
     });
-    
+
     useEffect(() => {
         const isCurrentTypeAvailable = availableProductTypes.some(type => type.id === formData.printType);
         if (!isCurrentTypeAvailable && availableProductTypes.length > 0) {
@@ -94,7 +81,7 @@ function OrderForm() {
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    
+
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const dropZoneRef = useRef<HTMLDivElement | null>(null);
 
@@ -178,16 +165,28 @@ function OrderForm() {
         }
         return isValid;
     };
-    
+
+    // Calculate price using shared logic
+    const totalPrice = useMemo(() => {
+        try {
+            return calculatePrice(formData.printType, formData.size);
+        } catch (e) {
+            return 0;
+        }
+    }, [formData.printType, formData.size]);
+
+    const selectedTypeName = PRODUCT_PRICES[formData.printType]?.name;
+    const selectedSizeName = SIZE_MODIFIERS[formData.size]?.name;
+
     const onPaymentSuccess = async (paypalOrderId: string) => {
         if (!validateForm()) {
             toast({ variant: "destructive", title: "Form Incomplete", description: "Please complete all required fields." });
             return;
         }
-        
+
         setIsSubmitting(true);
         setIsUploading(true);
-        
+
         try {
             const orderFolderName = `orders/${Date.now()}`;
             const uploadPromises = photoFiles.map(file => {
@@ -205,7 +204,7 @@ function OrderForm() {
             }
 
             const pkg = {
-                name: `${selectedType?.name} (${selectedSize?.name})`,
+                name: `${selectedTypeName} (${selectedSizeName})`,
                 id: `${formData.printType}_${formData.size}`
             };
 
@@ -215,6 +214,8 @@ function OrderForm() {
                 body: JSON.stringify({
                     ...formData,
                     pkg,
+                    // We don't send price anymore, or if we do, server ignores/verifies it.
+                    // But for now let's send it for reference, but server MUST verify.
                     price: totalPrice,
                     photoUrls,
                     storageFolder: orderFolderName,
@@ -226,7 +227,7 @@ function OrderForm() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save order.');
             }
-            
+
             setStep(1);
         } catch (error) {
             onPaymentError(error);
@@ -240,11 +241,11 @@ function OrderForm() {
         console.error("Submission or Payment Error:", error);
         let errorMessage = "There was an issue finalizing your commission. Please contact our concierge team.";
         if (error instanceof Error) {
-            errorMessage = error.message.includes('upload') 
-                ? "Photo upload failed. Please try again." 
-                : error.message.includes('save order') 
-                ? "Order processing failed. Please try again." 
-                : error.message;
+            errorMessage = error.message.includes('upload')
+                ? "Photo upload failed. Please try again."
+                : error.message.includes('save order')
+                    ? "Order processing failed. Please try again."
+                    : error.message;
         }
         toast({
             variant: "destructive",
@@ -253,11 +254,7 @@ function OrderForm() {
         });
         setIsSubmitting(false);
     };
-    
-    const selectedType = useMemo(() => productOptions.types.find(t => t.id === formData.printType), [formData.printType]);
-    const selectedSize = useMemo(() => productOptions.sizes.find(s => s.id === formData.size), [formData.size]);
-    const totalPrice = selectedType && selectedSize ? Math.round(selectedType.price * selectedSize.priceModifier) : 0;
-    
+
     const isFormIncomplete = Object.values(errors).some(err => err !== null) || photoFiles.length === 0;
 
     useEffect(() => {
@@ -306,7 +303,7 @@ function OrderForm() {
                     {/* Left Column: Commission Details */}
                     <div className="space-y-8">
                         <h2 className="font-headline text-3xl md:text-4xl text-foreground">1. Craft Your Masterpiece</h2>
-                        
+
                         <div className="space-y-4">
                             <Label className="text-lg font-semibold">Product Type</Label>
                             <Select value={formData.printType} onValueChange={(value) => handleChange('printType', value)}>
@@ -318,16 +315,15 @@ function OrderForm() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-4">
                                 <Label className="text-lg font-semibold">Orientation</Label>
                                 <Select value={formData.orientation} onValueChange={(value) => handleChange('orientation', value)}>
                                     <SelectTrigger className="rounded-full"><SelectValue placeholder="Select orientation" /></SelectTrigger>
                                     <SelectContent>
-                                        {productOptions.orientations.map(o => (
-                                            <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
-                                        ))}
+                                        <SelectItem value="vertical">Vertical</SelectItem>
+                                        <SelectItem value="horizontal">Horizontal</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -336,8 +332,8 @@ function OrderForm() {
                                 <Select value={formData.size} onValueChange={(value) => handleChange('size', value)}>
                                     <SelectTrigger className="rounded-full"><SelectValue placeholder="Select a size" /></SelectTrigger>
                                     <SelectContent>
-                                        {productOptions.sizes.map(s => (
-                                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                        {Object.entries(SIZE_MODIFIERS).map(([id, details]) => (
+                                            <SelectItem key={id} value={id}>{details.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -349,15 +345,15 @@ function OrderForm() {
                             <div ref={dropZoneRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-2 border-dashed border-accent rounded-xl p-4 min-h-[10rem]">
                                 {photoPreviews.map((preview, index) => (
                                     <div key={index} className="relative group">
-                                        <Image 
-                                            src={preview} 
-                                            alt={`Pet photo ${index + 1}${formData.petName ? ` of ${formData.petName}` : ''}`} 
-                                            width={150} 
-                                            height={150} 
-                                            className="rounded-lg object-cover w-full h-40" 
+                                        <Image
+                                            src={preview}
+                                            alt={`Pet photo ${index + 1}${formData.petName ? ` of ${formData.petName}` : ''}`}
+                                            width={150}
+                                            height={150}
+                                            className="rounded-lg object-cover w-full h-40"
                                         />
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); removePhoto(index); }} 
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); removePhoto(index); }}
                                             className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -365,8 +361,8 @@ function OrderForm() {
                                     </div>
                                 ))}
                                 {photoFiles.length < 3 && (
-                                    <div 
-                                        className="flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group w-full" 
+                                    <div
+                                        className="flex flex-col items-center justify-center cursor-pointer hover:bg-accent/10 transition-colors h-40 relative group w-full"
                                         onClick={() => fileInputRef.current?.click()}
                                     >
                                         <UploadCloud className="w-8 h-8 text-accent mb-2" />
@@ -375,13 +371,13 @@ function OrderForm() {
                                     </div>
                                 )}
                             </div>
-                            <input 
-                                type="file" 
-                                ref={fileInputRef} 
-                                onChange={(e) => handleFileChange(e.target.files)} 
-                                accept="image/jpeg,image/png,image/webp" 
-                                className="hidden" 
-                                multiple 
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={(e) => handleFileChange(e.target.files)}
+                                accept="image/jpeg,image/png,image/webp"
+                                className="hidden"
+                                multiple
                             />
                             {errors.photos && <p className="text-destructive text-sm mt-1">{errors.photos}</p>}
                             {isUploading && (
@@ -394,16 +390,16 @@ function OrderForm() {
 
                         <div className="space-y-4">
                             <Label className="text-lg font-semibold">Choose a Style</Label>
-                            <RadioGroup 
-                                value={formData.style} 
-                                onValueChange={(value) => handleChange('style', value as StyleOption)} 
+                            <RadioGroup
+                                value={formData.style}
+                                onValueChange={(value) => handleChange('style', value as StyleOption)}
                                 className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2"
                             >
                                 {['artist', 'renaissance', 'classic_oil', 'watercolor', 'modern_minimalist'].map(style => (
                                     <div key={style}>
                                         <RadioGroupItem value={style} id={style} className="peer sr-only" />
-                                        <Label 
-                                            htmlFor={style} 
+                                        <Label
+                                            htmlFor={style}
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors duration-300 ease-in-out hover:border-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             {style.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -412,19 +408,19 @@ function OrderForm() {
                                 ))}
                             </RadioGroup>
                         </div>
-                        
+
                         <div className="space-y-4">
                             <Label htmlFor="pet-name" className="text-lg font-semibold">Pet's Name(s) (Optional)</Label>
-                            <Input 
-                                id="pet-name" 
-                                value={formData.petName} 
-                                onChange={(e) => handleChange('petName', e.target.value)} 
-                                placeholder="E.g., Bella, Max & Luna" 
-                                maxLength={50} 
+                            <Input
+                                id="pet-name"
+                                value={formData.petName}
+                                onChange={(e) => handleChange('petName', e.target.value)}
+                                placeholder="E.g., Bella, Max & Luna"
+                                maxLength={50}
                                 className="rounded-full"
                             />
                         </div>
-                        
+
                         <div className="space-y-4">
                             <TooltipProvider>
                                 <Tooltip>
@@ -436,12 +432,12 @@ function OrderForm() {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                            <Input 
-                                id="notes" 
-                                value={formData.notes} 
-                                onChange={(e) => handleChange('notes', e.target.value)} 
-                                placeholder="E.g., Emphasize the white spot on her chest" 
-                                maxLength={200} 
+                            <Input
+                                id="notes"
+                                value={formData.notes}
+                                onChange={(e) => handleChange('notes', e.target.value)}
+                                placeholder="E.g., Emphasize the white spot on her chest"
+                                maxLength={200}
                                 className="rounded-full"
                             />
                         </div>
@@ -450,88 +446,88 @@ function OrderForm() {
                     {/* Right Column: Customer Info, Summary, Payment */}
                     <div className="space-y-8">
                         <h2 className="font-headline text-3xl md:text-4xl text-foreground">2. Shipping & Payment</h2>
-                        
+
                         <div className="space-y-4">
                             <Label className="text-lg font-semibold">Contact & Shipping Information</Label>
                             <div className="mt-2 space-y-4">
                                 <div>
-                                    <Input 
-                                        value={formData.name} 
-                                        onChange={(e) => handleChange('name', e.target.value)} 
-                                        placeholder="Full Name" 
-                                        required 
-                                        aria-invalid={errors.name ? 'true' : 'false'} 
+                                    <Input
+                                        value={formData.name}
+                                        onChange={(e) => handleChange('name', e.target.value)}
+                                        placeholder="Full Name"
+                                        required
+                                        aria-invalid={errors.name ? 'true' : 'false'}
                                         className="rounded-full"
                                     />
                                     {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
-                                    <Input 
-                                        type="email" 
-                                        value={formData.email} 
-                                        onChange={(e) => handleChange('email', e.target.value)} 
-                                        placeholder="your.email@example.com" 
-                                        required 
-                                        aria-invalid={errors.email ? 'true' : 'false'} 
+                                    <Input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => handleChange('email', e.target.value)}
+                                        placeholder="your.email@example.com"
+                                        required
+                                        aria-invalid={errors.email ? 'true' : 'false'}
                                         className="rounded-full"
                                     />
                                     {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
                                 </div>
                                 <div>
-                                    <Input 
-                                        value={formData.addressLine1} 
-                                        onChange={(e) => handleChange('addressLine1', e.target.value)} 
-                                        placeholder="Address Line 1" 
-                                        required 
-                                        aria-invalid={errors.addressLine1 ? 'true' : 'false'} 
+                                    <Input
+                                        value={formData.addressLine1}
+                                        onChange={(e) => handleChange('addressLine1', e.target.value)}
+                                        placeholder="Address Line 1"
+                                        required
+                                        aria-invalid={errors.addressLine1 ? 'true' : 'false'}
                                         className="rounded-full"
                                     />
                                     {errors.addressLine1 && <p className="text-destructive text-sm mt-1">{errors.addressLine1}</p>}
                                 </div>
-                                <Input 
-                                    value={formData.addressLine2} 
-                                    onChange={(e) => handleChange('addressLine2', e.target.value)} 
-                                    placeholder="Address Line 2 (Optional)" 
+                                <Input
+                                    value={formData.addressLine2}
+                                    onChange={(e) => handleChange('addressLine2', e.target.value)}
+                                    placeholder="Address Line 2 (Optional)"
                                     className="rounded-full"
                                 />
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Input 
-                                            value={formData.city} 
-                                            onChange={(e) => handleChange('city', e.target.value)} 
-                                            placeholder="City" 
-                                            required 
-                                            aria-invalid={errors.city ? 'true' : 'false'} 
+                                        <Input
+                                            value={formData.city}
+                                            onChange={(e) => handleChange('city', e.target.value)}
+                                            placeholder="City"
+                                            required
+                                            aria-invalid={errors.city ? 'true' : 'false'}
                                             className="rounded-full"
                                         />
                                         {errors.city && <p className="text-destructive text-sm mt-1">{errors.city}</p>}
                                     </div>
-                                    <Input 
-                                        value={formData.stateProvinceRegion} 
-                                        onChange={(e) => handleChange('stateProvinceRegion', e.target.value)} 
-                                        placeholder="State / Province" 
+                                    <Input
+                                        value={formData.stateProvinceRegion}
+                                        onChange={(e) => handleChange('stateProvinceRegion', e.target.value)}
+                                        placeholder="State / Province"
                                         className="rounded-full"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Input 
-                                            value={formData.postalCode} 
-                                            onChange={(e) => handleChange('postalCode', e.target.value)} 
-                                            placeholder="Postal Code" 
-                                            required 
-                                            aria-invalid={errors.postalCode ? 'true' : 'false'} 
+                                        <Input
+                                            value={formData.postalCode}
+                                            onChange={(e) => handleChange('postalCode', e.target.value)}
+                                            placeholder="Postal Code"
+                                            required
+                                            aria-invalid={errors.postalCode ? 'true' : 'false'}
                                             className="rounded-full"
                                         />
                                         {errors.postalCode && <p className="text-destructive text-sm mt-1">{errors.postalCode}</p>}
                                     </div>
                                     <div>
-                                        <Input 
-                                            value={formData.country} 
-                                            onChange={(e) => handleChange('country', e.target.value)} 
-                                            placeholder="Country" 
-                                            required 
-                                            aria-invalid={errors.country ? 'true' : 'false'} 
+                                        <Input
+                                            value={formData.country}
+                                            onChange={(e) => handleChange('country', e.target.value)}
+                                            placeholder="Country"
+                                            required
+                                            aria-invalid={errors.country ? 'true' : 'false'}
                                             className="rounded-full"
                                         />
                                         {errors.country && <p className="text-destructive text-sm mt-1">{errors.country}</p>}
@@ -544,12 +540,12 @@ function OrderForm() {
                         <Card className="border-none shadow-lg">
                             <CardContent className="p-6 space-y-4">
                                 <div className="flex justify-between items-start text-md text-foreground">
-                                    <span className="font-medium flex items-center"><Package className="mr-2 h-5 w-5 text-accent"/> Product</span>
-                                    <span className="text-right">{selectedType?.name || 'N/A'}</span>
+                                    <span className="font-medium flex items-center"><Package className="mr-2 h-5 w-5 text-accent" /> Product</span>
+                                    <span className="text-right">{selectedTypeName || 'N/A'}</span>
                                 </div>
                                 <div className="flex justify-between items-start text-md text-foreground">
-                                    <span className="font-medium flex items-center"><Ruler className="mr-2 h-5 w-5 text-accent"/> Size</span>
-                                    <span className="text-right">{selectedSize?.name || 'N/A'}</span>
+                                    <span className="font-medium flex items-center"><Ruler className="mr-2 h-5 w-5 text-accent" /> Size</span>
+                                    <span className="text-right">{selectedSizeName || 'N/A'}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-xl font-bold text-foreground mt-4 pt-4 border-t">
                                     <span>Total</span>
@@ -560,7 +556,7 @@ function OrderForm() {
 
                         <Card className="border-none shadow-lg">
                             <CardHeader>
-                                <CardTitle className="flex items-center text-lg"><Truck className="mr-2 text-accent"/>Shipping Information</CardTitle>
+                                <CardTitle className="flex items-center text-lg"><Truck className="mr-2 text-accent" />Shipping Information</CardTitle>
                             </CardHeader>
                             <CardContent className="text-sm text-secondary space-y-2">
                                 <p>Fulfilled in 3 countries to ensure swift delivery.</p>
@@ -570,7 +566,7 @@ function OrderForm() {
                             </CardContent>
                         </Card>
 
-                        <PayPalButton 
+                        <PayPalButton
                             amount={totalPrice}
                             disabled={isFormIncomplete || isSubmitting}
                             onSuccess={onPaymentSuccess}
@@ -610,9 +606,9 @@ function OrderForm() {
                             </svg>
                         </a>
                         <a href="https://www.instagram.com/eter.naportrait/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on Instagram">
-                          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.02.049 1.717.209 2.328.444a4.69 4.69 0 011.702 1.113 4.69 4.69 0 011.113 1.702c.235.611.395 1.308.444 2.328.047 1.024.06 1.378.06 3.808s-.013 2.784-.06 3.808c-.049 1.02-.209 1.717-.444 2.328a4.69 4.69 0 01-1.113 1.702 4.69 4.69 0 01-1.702 1.113c-.611.235-1.308.395-2.328.444-1.024.047-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.02-.049-1.717-.209-2.328-.444a4.69 4.69 0 01-1.702-1.113 4.69 4.69 0 01-1.113-1.702c-.235-.611-.395-1.308-.444-2.328-.047-1.024-.06-1.378-.06-3.808s.013-2.784.06-3.808c.049-1.02.209-1.717.444-2.328a4.69 4.69 0 011.113-1.702 4.69 4.69 0 011.702-1.113c.611-.235 1.308-.395 2.328-.444 1.024-.047 1.378-.06 3.808-.06zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.339-9.87a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                           </svg>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.02.049 1.717.209 2.328.444a4.69 4.69 0 011.702 1.113 4.69 4.69 0 011.113 1.702c.235.611.395 1.308.444 2.328.047 1.024.06 1.378.06 3.808s-.013 2.784-.06 3.808c-.049 1.02-.209 1.717-.444 2.328a4.69 4.69 0 01-1.113 1.702 4.69 4.69 0 01-1.702 1.113c-.611.235-1.308.395-2.328.444 1.024.047-1.378.06-3.808.06zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.339-9.87a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                            </svg>
                         </a>
                         <a href="https://www.facebook.com/people/Eterna-Portrait/61580466892802/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors" title="Follow us on Facebook">
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

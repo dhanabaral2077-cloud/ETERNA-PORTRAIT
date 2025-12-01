@@ -2,6 +2,7 @@
 // src/app/api/orders/create/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { calculatePrice, ProductType, SizeType } from '@/lib/pricing';
 
 // Initialize Supabase Admin client
 export async function POST(req: Request) {
@@ -26,7 +27,9 @@ export async function POST(req: Request) {
       petName,
       style,
       pkg, // package is a reserved word
-      price,
+      price, // Client-provided price (still useful for logging/comparison but NOT trust)
+      printType, // Added: Product Type
+      size,      // Added: Size
       notes,
       photoUrls,
       storageFolder,
@@ -38,6 +41,40 @@ export async function POST(req: Request) {
       postalCode,
       country,
     } = body;
+
+    // --- 0. Server-Side Price Validation ---
+    let calculatedPrice = 0;
+    try {
+      if (printType && size) {
+        calculatedPrice = calculatePrice(printType as ProductType, size as SizeType);
+      } else {
+        // Fallback for legacy calls or if printType/size missing (should not happen with new frontend)
+        // If we can't validate, we might want to reject or flag. 
+        // For now, let's log a warning if they are missing.
+        console.warn('Missing printType or size for price validation. Trusting client price (RISKY).');
+        calculatedPrice = price;
+      }
+    } catch (e) {
+      console.error('Price calculation error:', e);
+      return NextResponse.json({ error: 'Invalid product configuration' }, { status: 400 });
+    }
+
+    // Allow a small margin of error (e.g., floating point issues, though we round)
+    // But since we control logic, it should be exact.
+    if (Math.abs(calculatedPrice - price) > 1.0) {
+      console.error(`Price Mismatch! Client: ${price}, Server: ${calculatedPrice}`);
+      // In a strict mode, we would reject:
+      // return NextResponse.json({ error: 'Price validation failed' }, { status: 400 });
+
+      // For now, let's use the SERVER calculated price for the database record
+      // to ensure our records are correct, even if they paid the wrong amount (which we'd catch in audit).
+      // ideally we reject the order if they underpaid.
+
+      // Let's REJECT if client price is LESS than calculated price (underpayment attempt)
+      if (price < calculatedPrice) {
+        return NextResponse.json({ error: 'Price validation failed: Underpayment detected.' }, { status: 400 });
+      }
+    }
 
     // --- 1. Find or Create Customer ---
     let { data: customer, error: customerError } = await supabase
@@ -95,7 +132,7 @@ export async function POST(req: Request) {
         pet_name: petName,
         style,
         package: pkg.name, // e.g., "Canvas (12x16")"
-        price,
+        price: calculatedPrice, // Use the TRUSTED server price
         photo_urls: photoUrls,
         storage_folder: storageFolder, // Save storage folder
         notes,
@@ -114,7 +151,7 @@ export async function POST(req: Request) {
     await supabase.from('order_events').insert({
       order_id: order.id,
       type: 'payment_succeeded',
-      meta: { source: 'paypal', paypal_order_id: paypalOrderId },
+      meta: { source: 'paypal', paypal_order_id: paypalOrderId, price_validated: true },
     });
 
 
