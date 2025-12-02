@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -11,6 +11,9 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [topBarActive, setTopBarActive] = useState(false);
+
+  const { scrollY } = useScroll();
+  const headerTop = useTransform(scrollY, [0, 40], [40, 0], { clamp: true });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,7 +54,7 @@ export function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        style={{ top: topBarActive ? '40px' : '0' }}
+        style={{ top: topBarActive ? headerTop : 0 }}
         className={`fixed w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${scrolled
           ? "backdrop-blur-md bg-background/80 shadow-md h-20"
           : "bg-transparent h-24"
