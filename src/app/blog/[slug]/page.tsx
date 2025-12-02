@@ -8,6 +8,8 @@ import { format } from 'date-fns';
 import { Reactions } from '@/components/blog/reactions';
 import { Comments } from '@/components/blog/comments';
 import { RelatedPosts } from '@/components/blog/related-posts';
+import { ShareButtons } from '@/components/blog/share-buttons';
+import { BackToTop } from '@/components/blog/back-to-top';
 import { Badge } from '@/components/ui/badge';
 
 interface Props {
@@ -156,6 +158,9 @@ export default async function BlogPostPage({ params }: Props) {
                         </div>
                     )}
 
+                    {/* Share Buttons */}
+                    <ShareButtons title={post.title} slug={post.slug} />
+
                     {/* Reactions */}
                     <Reactions postId={post.id} />
 
@@ -166,6 +171,7 @@ export default async function BlogPostPage({ params }: Props) {
                     <Comments postId={post.id} />
                 </article>
             </main>
+            <BackToTop />
             <Footer />
         </div>
     );

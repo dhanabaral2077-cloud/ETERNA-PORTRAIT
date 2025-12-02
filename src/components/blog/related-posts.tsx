@@ -41,7 +41,7 @@ export function RelatedPosts({ currentSlug, tags }: RelatedPostsProps) {
 
     return (
         <div className="py-12 border-t">
-            <h3 className="text-2xl font-headline font-bold mb-8">You May Also Like</h3>
+            <h3 className="text-2xl font-headline font-bold mb-8">Related Articles You'll Love</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {posts.map((post) => (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="group">
