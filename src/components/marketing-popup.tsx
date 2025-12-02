@@ -34,7 +34,8 @@ export function MarketingPopup() {
                     const hoursSinceDismissal = (now - dismissedTime) / (1000 * 60 * 60);
 
                     // If dismissed less than 24 hours ago, don't show
-                    if (hoursSinceDismissal < 24) return;
+                    // if (hoursSinceDismissal < 24) return;
+                    console.log("Marketing Popup: Cooldown check skipped for testing. Hours since dismissal:", hoursSinceDismissal);
                 }
 
                 // 2. Fetch active campaign
