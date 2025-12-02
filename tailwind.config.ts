@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -30,7 +30,7 @@ export default {
       blink: "blink 1s step-start infinite",
       glow: "glow 3s ease-in-out infinite",
     },
-    
+
     extend: {
       fontFamily: {
         body: ['var(--font-montserrat)', 'sans-serif'],
@@ -38,7 +38,7 @@ export default {
       },
       lineHeight: {
         'extra-loose': '1.6',
-       },
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -129,16 +129,16 @@ export default {
           'to': { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-up-slow': {
-            'from': { opacity: '0', transform: 'translateY(20px)' },
-            'to': { opacity: '1', transform: 'translateY(0)' },
+          'from': { opacity: '0', transform: 'translateY(20px)' },
+          'to': { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-down': {
-            'from': { transform: 'translateY(-100%)' },
-            'to': { transform: 'translateY(0)' },
+          'from': { transform: 'translateY(-100%)' },
+          'to': { transform: 'translateY(0)' },
         },
         'slide-up': {
-            'from': { transform: 'translateY(0)' },
-            'to': { transform: 'translateY(-100%)' },
+          'from': { transform: 'translateY(0)' },
+          'to': { transform: 'translateY(-100%)' },
         },
         'fade-in-left': {
           'from': { opacity: '0', transform: 'translateX(-20px)' },
@@ -166,9 +166,9 @@ export default {
           '50%': { borderColor: 'hsl(var(--primary))', boxShadow: '0 0 12px 3px hsl(var(--primary) / 0.4)' },
         },
         'star-animation': {
-            '0%': { transform: 'scale(0) rotate(0deg)', opacity: '0' },
-            '50%': { transform: 'scale(1.3) rotate(180deg)', opacity: '0.7' },
-            '100%': { transform: 'scale(1) rotate(360deg)', opacity: '1' }
+          '0%': { transform: 'scale(0) rotate(0deg)', opacity: '0' },
+          '50%': { transform: 'scale(1.3) rotate(180deg)', opacity: '0.7' },
+          '100%': { transform: 'scale(1) rotate(360deg)', opacity: '1' }
         },
       },
       animation: {
@@ -205,6 +205,6 @@ export default {
       }
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;
 

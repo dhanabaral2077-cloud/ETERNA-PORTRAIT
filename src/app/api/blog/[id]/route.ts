@@ -38,7 +38,15 @@ export async function PUT(
 
     try {
         const body = await req.json();
-        const { title, slug, excerpt, content, image, author, published } = body;
+        let { title, slug, excerpt, content, image, author, published } = body;
+
+        // If no feature image is provided, try to extract the first image from the content
+        if (!image && content) {
+            const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+            if (imgMatch) {
+                image = imgMatch[1];
+            }
+        }
 
         const { data, error } = await supabase
             .from('posts')
