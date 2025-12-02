@@ -74,7 +74,9 @@ export function MarketingPopup() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (!campaign) return null;
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    if (!campaign || pathname.startsWith('/admin')) return null;
 
     return (
         <AnimatePresence>
@@ -86,15 +88,15 @@ export function MarketingPopup() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={handleDismiss}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
                     />
 
                     {/* Popup Card */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] w-full max-w-4xl px-4"
+                        initial={{ opacity: 0, scale: 0.95, y: "-40%", x: "-50%" }}
+                        animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
+                        exit={{ opacity: 0, scale: 0.95, y: "-40%", x: "-50%" }}
+                        className="fixed left-1/2 top-1/2 z-[9999] w-full max-w-4xl px-4"
                     >
                         <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl flex flex-col md:flex-row max-h-[85vh] md:max-h-[600px]">
 
