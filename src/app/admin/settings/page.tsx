@@ -27,6 +27,9 @@ export default function AdminSettingsPage() {
         discount_percent: 0,
         image_url: "",
         delay_seconds: 3,
+        top_bar_active: false,
+        top_bar_text: "",
+        top_bar_link: "",
     });
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -58,6 +61,9 @@ export default function AdminSettingsPage() {
                             discount_percent: data.discount_percent || 0,
                             image_url: data.image_url || "",
                             delay_seconds: data.delay_seconds || 3,
+                            top_bar_active: data.top_bar_active || false,
+                            top_bar_text: data.top_bar_text || "",
+                            top_bar_link: data.top_bar_link || "",
                         });
                     }
                 }
@@ -276,6 +282,50 @@ export default function AdminSettingsPage() {
                         >
                             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                             Save Campaign Settings
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {/* Top Announcement Bar Section */}
+                <Card className="border-primary/20 shadow-md">
+                    <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                            Top Announcement Bar
+                            <Switch
+                                checked={campaign.top_bar_active}
+                                onCheckedChange={(checked) => setCampaign(prev => ({ ...prev, top_bar_active: checked }))}
+                            />
+                        </CardTitle>
+                        <CardDescription>
+                            A slim banner at the top of the site for urgent news or offers.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Announcement Text</Label>
+                            <Input
+                                value={campaign.top_bar_text}
+                                onChange={(e) => setCampaign(prev => ({ ...prev, top_bar_text: e.target.value }))}
+                                placeholder="e.g., Limited Time: Free Shipping!"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Link URL (Optional)</Label>
+                            <Input
+                                value={campaign.top_bar_link}
+                                onChange={(e) => setCampaign(prev => ({ ...prev, top_bar_link: e.target.value }))}
+                                placeholder="e.g., /order or https://example.com"
+                            />
+                        </div>
+
+                        <Button
+                            onClick={handleSaveCampaign}
+                            disabled={saving}
+                            className="w-full mt-4"
+                        >
+                            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                            Save Announcement Settings
                         </Button>
                     </CardContent>
                 </Card>

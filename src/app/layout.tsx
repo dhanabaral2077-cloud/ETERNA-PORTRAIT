@@ -5,6 +5,7 @@ import './globals.css';
 import Script from 'next/script';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { MarketingPopup } from '@/components/marketing-popup';
+import { AnnouncementBar } from '@/components/announcement-bar';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -62,6 +63,7 @@ export default function RootLayout({
         {/* End Google Analytics */}
       </head>
       <body className={`${playfairDisplay.variable} ${montserrat.variable} font-body bg-background text-foreground antialiased`}>
+        <AnnouncementBar />
         {children}
         <MarketingPopup />
         <Toaster />
