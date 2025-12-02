@@ -13,6 +13,8 @@ interface Campaign {
     description: string;
     discount_code: string;
     discount_percent: number;
+    image_url?: string;
+    delay_seconds?: number;
 }
 
 export function MarketingPopup() {
@@ -43,8 +45,9 @@ export function MarketingPopup() {
 
                 if (data && data.is_active) {
                     setCampaign(data);
-                    // Small delay before showing to not overwhelm user immediately
-                    setTimeout(() => setIsOpen(true), 3000);
+                    // Use dynamic delay or default to 3 seconds
+                    const delay = (data.delay_seconds || 3) * 1000;
+                    setTimeout(() => setIsOpen(true), delay);
                 }
             } catch (error) {
                 console.error("Failed to load marketing campaign", error);
@@ -105,9 +108,9 @@ export function MarketingPopup() {
                             {/* Left Side: Image */}
                             <div className="relative w-full md:w-1/2 h-48 md:h-auto bg-muted">
                                 <Image
-                                    src="/popup-pet.png"
-                                    alt="Cute puppy portrait"
-                                    fill
+                                    src={campaign.image_url || "/popup-pet.png"}
+                                    alt="Campaign visual"
+                                    fill={true}
                                     className="object-cover"
                                     priority
                                 />

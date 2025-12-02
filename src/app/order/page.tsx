@@ -200,13 +200,45 @@ function OrderForm() {
     };
 
     // Calculate price using shared logic
-    const totalPrice = useMemo(() => {
+    const totalPriceBeforeDiscount = useMemo(() => {
         try {
             return calculatePrice(formData.printType, formData.size);
         } catch (e) {
             return 0;
         }
     }, [formData.printType, formData.size]);
+
+    const [discountCode, setDiscountCode] = useState("");
+    const [appliedDiscount, setAppliedDiscount] = useState<{ code: string, percent: number } | null>(null);
+    const [verifyingDiscount, setVerifyingDiscount] = useState(false);
+
+    const handleApplyDiscount = async () => {
+        if (!discountCode) return;
+        setVerifyingDiscount(true);
+        try {
+            const res = await fetch('/api/marketing/campaign');
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.is_active && data.discount_code === discountCode) {
+                    setAppliedDiscount({ code: data.discount_code, percent: data.discount_percent });
+                    toast({ title: "Discount Applied!", description: `You saved ${data.discount_percent}%!` });
+                } else {
+                    toast({ variant: "destructive", title: "Invalid Code", description: "This code is invalid or expired." });
+                    setAppliedDiscount(null);
+                }
+            }
+        } catch (error) {
+            toast({ variant: "destructive", title: "Error", description: "Could not verify discount code." });
+        } finally {
+            setVerifyingDiscount(false);
+        }
+    };
+
+    const finalPrice = useMemo(() => {
+        if (!appliedDiscount) return totalPriceBeforeDiscount;
+        const discountAmount = Math.round(totalPriceBeforeDiscount * (appliedDiscount.percent / 100));
+        return totalPriceBeforeDiscount - discountAmount;
+    }, [totalPriceBeforeDiscount, appliedDiscount]);
 
     const selectedTypeName = PRODUCT_PRICES[formData.printType]?.name;
     const selectedSizeName = SIZE_MODIFIERS[formData.size]?.name;
@@ -247,7 +279,7 @@ function OrderForm() {
                 body: JSON.stringify({
                     ...formData,
                     pkg,
-                    price: totalPrice,
+                    price: finalPrice,
                     photoUrls,
                     storageFolder: orderFolderName,
                     paypalOrderId,
@@ -599,13 +631,39 @@ function OrderForm() {
                                     <span>Shipping</span>
                                     <span className="text-green-600 font-semibold">Free</span>
                                 </div>
+                                {appliedDiscount && (
+                                    <div className="flex justify-between text-primary">
+                                        <span>Discount ({appliedDiscount.code})</span>
+                                        <span className="font-semibold">-{appliedDiscount.percent}% (-${Math.round(totalPriceBeforeDiscount * (appliedDiscount.percent / 100))})</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="my-6 border-t-2 border-dashed border-muted/50" />
 
+                            {/* Discount Input */}
+                            <div className="flex gap-2 mb-6">
+                                <Input
+                                    placeholder="Discount Code"
+                                    value={discountCode}
+                                    onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                                    className="h-10 text-sm"
+                                    disabled={!!appliedDiscount}
+                                />
+                                {appliedDiscount ? (
+                                    <Button variant="outline" size="sm" onClick={() => { setAppliedDiscount(null); setDiscountCode(""); }} className="h-10">
+                                        Remove
+                                    </Button>
+                                ) : (
+                                    <Button size="sm" onClick={handleApplyDiscount} disabled={!discountCode || verifyingDiscount} className="h-10">
+                                        {verifyingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                                    </Button>
+                                )}
+                            </div>
+
                             <div className="flex justify-between items-center">
                                 <span className="font-serif text-lg text-foreground">Total</span>
-                                <span className="font-serif text-3xl text-primary font-medium">${totalPrice}</span>
+                                <span className="font-serif text-3xl text-primary font-medium">${finalPrice}</span>
                             </div>
                         </div>
 
@@ -622,7 +680,7 @@ function OrderForm() {
                         </div>
 
                         <PayPalButton
-                            amount={totalPrice}
+                            amount={finalPrice}
                             disabled={isFormIncomplete || isSubmitting}
                             onSuccess={onPaymentSuccess}
                             onError={onPaymentError}

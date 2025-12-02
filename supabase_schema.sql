@@ -120,6 +120,8 @@ create table if not exists public.marketing_campaigns (
   description text,
   discount_code text,
   discount_percent integer,
+  image_url text,
+  delay_seconds integer default 3,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -141,3 +143,27 @@ create policy "Admins can manage marketing campaigns"
 insert into public.marketing_campaigns (is_active, title, description, discount_code, discount_percent)
 select false, 'Welcome Offer', 'Get 10% off your first order', 'WELCOME10', 10
 where not exists (select 1 from public.marketing_campaigns);
+
+-- Create a storage bucket for marketing assets
+insert into storage.buckets (id, name, public)
+values ('marketing-assets', 'marketing-assets', true)
+on conflict (id) do nothing;
+
+-- Allow public access to marketing assets
+create policy "Marketing assets are publicly accessible"
+  on storage.objects for select
+  using ( bucket_id = 'marketing-assets' );
+
+-- Allow authenticated users (admins) to upload marketing assets
+create policy "Admins can upload marketing assets"
+  on storage.objects for insert
+  with check ( bucket_id = 'marketing-assets' and auth.role() = 'authenticated' );
+
+-- Allow admins to update/delete
+create policy "Admins can update marketing assets"
+  on storage.objects for update
+  using ( bucket_id = 'marketing-assets' and auth.role() = 'authenticated' );
+
+create policy "Admins can delete marketing assets"
+  on storage.objects for delete
+  using ( bucket_id = 'marketing-assets' and auth.role() = 'authenticated' );
