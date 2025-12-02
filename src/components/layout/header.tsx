@@ -10,12 +10,29 @@ import Image from "next/image";
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [topBarActive, setTopBarActive] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
+
+    const checkTopBar = async () => {
+      try {
+        const res = await fetch('/api/marketing/campaign');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.top_bar_active) {
+            setTopBarActive(true);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    checkTopBar();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -34,9 +51,10 @@ export function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${scrolled
-            ? "backdrop-blur-md bg-background/80 shadow-md h-20"
-            : "bg-transparent h-24"
+        style={{ top: topBarActive ? '40px' : '0' }}
+        className={`fixed w-full z-50 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${scrolled
+          ? "backdrop-blur-md bg-background/80 shadow-md h-20"
+          : "bg-transparent h-24"
           } md:justify-between`}
       >
         {/* Mobile Logo (Centered) */}
