@@ -4,6 +4,7 @@ import { Playfair_Display, Montserrat } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 import { MarketingPopup } from '@/components/marketing-popup';
 import { AnnouncementBar } from '@/components/announcement-bar';
 
@@ -68,6 +69,7 @@ export default function RootLayout({
         <MarketingPopup />
         <Toaster />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
