@@ -21,6 +21,9 @@ export function MarketingPopup() {
     const [isOpen, setIsOpen] = useState(false);
     const [campaign, setCampaign] = useState<Campaign | null>(null);
     const [copied, setCopied] = useState(false);
+    const [email, setEmail] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [hasSubscribed, setHasSubscribed] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -60,6 +63,29 @@ export function MarketingPopup() {
     const handleDismiss = () => {
         setIsOpen(false);
         localStorage.setItem('marketing_popup_dismissed', new Date().toISOString());
+    };
+
+    const handleSubscribe = async () => {
+        if (!email || !email.includes('@')) {
+            toast({ title: "Please enter a valid email", variant: "destructive" });
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await fetch('/api/newsletter/subscribe', {
+                method: 'POST',
+                body: JSON.stringify({ email }),
+            });
+            // Even if it fails (e.g. duplicate), we show success to not block the user
+            setHasSubscribed(true);
+            toast({ title: "Thanks for subscribing!", description: "Here is your discount code." });
+        } catch (error) {
+            console.error(error);
+            setHasSubscribed(true); // Fallback
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleCopyCode = () => {
@@ -147,32 +173,57 @@ export function MarketingPopup() {
                                             {campaign.description}
                                         </p>
 
-                                        <div className="space-y-6">
-                                            {/* Discount Code Box */}
-                                            <div
-                                                onClick={handleCopyCode}
-                                                className="group relative flex items-center justify-between bg-secondary/5 border-2 border-dashed border-primary/30 rounded-xl p-5 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
-                                            >
-                                                <div className="text-left">
-                                                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Use Code at Checkout</p>
-                                                    <p className="text-2xl font-mono font-bold text-primary tracking-wide">{campaign.discount_code}</p>
+                                        {!hasSubscribed ? (
+                                            <div className="space-y-4">
+                                                <p className="text-sm font-medium text-muted-foreground">
+                                                    Enter your email to unlock your {campaign.discount_percent}% discount code.
+                                                </p>
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="email"
+                                                        placeholder="your@email.com"
+                                                        className="w-full px-4 py-3 rounded-lg border border-input focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                                        value={email}
+                                                        onChange={(e) => setEmail(e.target.value)}
+                                                    />
+                                                    <Button
+                                                        onClick={handleSubscribe}
+                                                        disabled={isSubmitting}
+                                                        className="w-full py-6 text-lg rounded-full"
+                                                    >
+                                                        {isSubmitting ? "Unlocking..." : "Unlock Discount"}
+                                                    </Button>
                                                 </div>
-                                                <div className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform text-primary">
-                                                    {copied ? <Check size={20} /> : <Copy size={20} />}
-                                                </div>
+                                                <p className="text-xs text-center text-muted-foreground pt-2">
+                                                    We respect your inbox. No spam.
+                                                </p>
                                             </div>
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {/* Discount Code Box */}
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    onClick={handleCopyCode}
+                                                    className="group relative flex items-center justify-between bg-secondary/5 border-2 border-dashed border-primary/30 rounded-xl p-5 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
+                                                >
+                                                    <div className="text-left">
+                                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Use Code at Checkout</p>
+                                                        <p className="text-2xl font-mono font-bold text-primary tracking-wide">{campaign.discount_code}</p>
+                                                    </div>
+                                                    <div className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform text-primary">
+                                                        {copied ? <Check size={20} /> : <Copy size={20} />}
+                                                    </div>
+                                                </motion.div>
 
-                                            <Button
-                                                onClick={handleDismiss}
-                                                className="w-full rounded-full py-7 text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all bg-primary text-primary-foreground"
-                                            >
-                                                Claim My {campaign.discount_percent}% Off
-                                            </Button>
-
-                                            <p className="text-center text-xs text-muted-foreground">
-                                                *Valid for first-time customers only.
-                                            </p>
-                                        </div>
+                                                <Button
+                                                    onClick={handleDismiss}
+                                                    className="w-full rounded-full py-7 text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all bg-primary text-primary-foreground"
+                                                >
+                                                    Start Shopping
+                                                </Button>
+                                            </div>
+                                        )}
                                     </motion.div>
                                 </div>
                             </div>

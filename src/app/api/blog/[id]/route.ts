@@ -38,7 +38,7 @@ export async function PUT(
 
     try {
         const body = await req.json();
-        let { title, slug, excerpt, content, image, author, published } = body;
+        let { title, slug, excerpt, content, image, author, published, image_alt } = body;
 
         // If no feature image is provided, try to extract the first image from the content
         if (!image && content) {
@@ -50,7 +50,7 @@ export async function PUT(
 
         const { data, error } = await supabase
             .from('posts')
-            .update({ title, slug, excerpt, content, image, author, published, updated_at: new Date().toISOString() })
+            .update({ title, slug, excerpt, content, image, author, published, image_alt, updated_at: new Date().toISOString() })
             .eq('id', id)
             .select()
             .single();

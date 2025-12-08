@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { MarketingPopup } from '@/components/marketing-popup';
 import { AnnouncementBar } from '@/components/announcement-bar';
+import { JsonLd } from '@/components/seo/json-ld';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -22,6 +23,9 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://eternaportrait.com'),
+  alternates: {
+    canonical: '/',
+  },
   title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
   description: 'Transform your pet\'s photo into a timeless masterpiece. Commission handcrafted digital art and museum-quality prints that celebrate your companion for a lifetime.',
   keywords: ['pet portrait', 'dog portrait', 'cat portrait', 'custom pet art', 'digital oil painting', 'pet memorial', 'gift for pet lovers'],
@@ -32,11 +36,20 @@ export const metadata: Metadata = {
     siteName: 'Eterna Portrait',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg', // Ensure this image exists in public folder
+        width: 1200,
+        height: 630,
+        alt: 'Eterna Portrait Custom Pet Art',
+      }
+    ]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
     description: 'Transform your pet\'s photo into a timeless masterpiece.',
+    images: ['/og-image.jpg'],
   },
 };
 
@@ -64,6 +77,7 @@ export default function RootLayout({
         {/* End Google Analytics */}
       </head>
       <body className={`${playfairDisplay.variable} ${montserrat.variable} font-body bg-background text-foreground antialiased`}>
+        <JsonLd />
         <AnnouncementBar />
         {children}
         <MarketingPopup />

@@ -48,6 +48,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
         published: post?.published || false,
         tags: post?.tags?.join(", ") || "",
         search_description: post?.search_description || "",
+        image_alt: post?.image_alt || "",
     });
 
     const supabase = createClient(
@@ -159,6 +160,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
             content: content,
             tags: tagsArray,
             search_description: formData.search_description,
+            image_alt: formData.image_alt,
         };
 
         try {
@@ -456,6 +458,19 @@ export function BlogEditor({ post }: BlogEditorProps) {
                                 )}
                             </div>
                         </div>
+
+                        {formData.image && (
+                            <div className="space-y-2">
+                                <Label>Feature Image Alt Text (SEO)</Label>
+                                <Input
+                                    placeholder="Describe the image for accessibility and SEO"
+                                    value={formData.image_alt}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, image_alt: e.target.value })
+                                    }
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

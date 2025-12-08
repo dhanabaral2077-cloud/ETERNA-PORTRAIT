@@ -11,6 +11,7 @@ import { RelatedPosts } from '@/components/blog/related-posts';
 import { ShareButtons } from '@/components/blog/share-buttons';
 import { BackToTop } from '@/components/blog/back-to-top';
 import { Badge } from '@/components/ui/badge';
+import { BlogCTA } from '@/components/blog/blog-cta';
 
 interface Props {
     params: Promise<{ slug: string }>;
@@ -134,7 +135,7 @@ export default async function BlogPostPage({ params }: Props) {
                         <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 shadow-lg">
                             <Image
                                 src={post.image}
-                                alt={post.title}
+                                alt={post.image_alt || post.title}
                                 fill
                                 className="object-cover"
                                 priority
@@ -146,6 +147,8 @@ export default async function BlogPostPage({ params }: Props) {
                         className="prose prose-lg prose-stone mx-auto dark:prose-invert mb-12"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
+
+                    <BlogCTA />
 
                     {/* Tags */}
                     {post.tags && post.tags.length > 0 && (
