@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { MarketingPopup } from '@/components/marketing-popup';
 import { AnnouncementBar } from '@/components/announcement-bar';
+import { StickyCTA } from '@/components/layout/sticky-cta';
 import { JsonLd } from '@/components/seo/json-ld';
 
 const playfairDisplay = Playfair_Display({
@@ -80,6 +81,7 @@ export default function RootLayout({
         <JsonLd />
         <AnnouncementBar />
         {children}
+        <StickyCTA />
         <MarketingPopup />
         <Toaster />
         <SpeedInsights />

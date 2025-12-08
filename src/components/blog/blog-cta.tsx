@@ -5,7 +5,44 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
 
+import { useState, useEffect } from "react";
+
 export function BlogCTA() {
+    const portraits = [
+        {
+            src: "https://i.pinimg.com/736x/f2/c5/e7/f2c5e7faef71372a364cec114b950d49.jpg",
+            title: "Bella in Renaissance Style",
+        },
+        {
+            src: "https://i.pinimg.com/736x/9f/23/cb/9f23cb991c51c130f83ad8169a75388b.jpg",
+            title: "Max in Classic Oil",
+        },
+        {
+            src: "https://i.pinimg.com/1200x/cd/5a/ca/cd5acac70dd4da1454ef66b95543676b.jpg",
+            title: "Luna in Modern Minimalist",
+        },
+        {
+            src: "https://i.pinimg.com/1200x/1f/38/b7/1f38b71214e5233cd9ad8c4fb9d1d947.jpg",
+            title: "Charlie in Regal Style",
+        },
+        {
+            src: "https://i.pinimg.com/1200x/33/63/2d/33632d69759732a62a1204666c250b0e.jpg",
+            title: "Daisy in Soft Pastel",
+        },
+        {
+            src: "https://i.pinimg.com/1200x/53/b9/73/53b973489c2b94f4cadcc19c6bc49aca.jpg",
+            title: "Rocky in Contemporary Ink",
+        },
+    ];
+
+    const [randomPortrait, setRandomPortrait] = useState(portraits[0]);
+
+    useEffect(() => {
+        // Randomly select a portrait on client-side mount
+        const randomIndex = Math.floor(Math.random() * portraits.length);
+        setRandomPortrait(portraits[randomIndex]);
+    }, []);
+
     return (
         <div className="my-12 relative overflow-hidden rounded-3xl bg-primary/5 border border-primary/10 p-8 md:p-12">
             {/* Background Decorative Elements */}
@@ -43,8 +80,8 @@ export function BlogCTA() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-2xl rotate-3 transform scale-95" />
                     <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-0 hover:rotate-2 transition-transform duration-500">
                         <Image
-                            src="/portfolio/p1.png"
-                            alt="Example of a custom pet portrait"
+                            src={randomPortrait.src}
+                            alt={randomPortrait.title}
                             fill
                             className="object-cover"
                         />
