@@ -3,12 +3,67 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Mail } from "lucide-react";
+
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) {
+      toast({ title: "Please enter a valid email", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      toast({ title: "Subscribed!", description: "You have joined our newsletter." });
+      setEmail("");
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <footer className="w-full bg-background border-t animate-fade-in">
       <div className="container mx-auto py-12 px-4 md:px-6">
         <div className="flex flex-col items-center gap-8">
-          
+
+          {/* Newsletter Section */}
+          <div className="w-full max-w-md text-center space-y-4 mb-4">
+            <h3 className="font-headline text-2xl font-bold">Join the Eterna Family</h3>
+            <p className="text-muted-foreground text-sm">
+              Subscribe for exclusive offers, new art style drops, and pet care tips.
+            </p>
+            <form onSubmit={handleSubscribe} className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-background"
+                required
+              />
+              <Button type="submit" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : "Subscribe"}
+              </Button>
+            </form>
+          </div>
+
           {/* Navigation Links */}
           <div className="flex items-center space-x-6 font-headline text-sm uppercase tracking-widest">
             <Link href="/shipping" className="relative text-muted-foreground transition-colors hover:text-primary group">
