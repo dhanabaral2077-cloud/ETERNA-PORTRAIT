@@ -286,12 +286,17 @@ function OrderForm() {
                 })
             });
 
+            const responseData = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to save order.');
+                throw new Error(responseData.error || 'Failed to save order.');
             }
 
-            setStep(1);
+            // Redirect to success page for tracking
+            const params = new URLSearchParams();
+            params.set('orderId', responseData.orderId || 'unknown');
+            params.set('name', formData.name.split(' ')[0]);
+            router.push(`/order/success?${params.toString()}`);
         } catch (error) {
             onPaymentError(error);
         } finally {
