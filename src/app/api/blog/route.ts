@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        let { title, slug, excerpt, content, image, author, published, image_alt } = body;
+        let { title, slug, excerpt, content, image, author, published, tags, search_description, image_alt } = body;
 
         // If no feature image is provided, try to extract the first image from the content
         if (!image && content) {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         const { data, error } = await supabase
             .from('posts')
             .insert([
-                { title, slug, excerpt, content, image, author, published, image_alt }
+                { title, slug, excerpt, content, image, author, published, tags, search_description, image_alt }
             ])
             .select()
             .single();
