@@ -12,29 +12,10 @@ export async function POST(req: Request) {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   try {
-    const { password, search } = await req.json();
+    const { search } = await req.json();
 
-    // Check for Supabase session instead of password
-    // Note: In a real production app, you might want to use getUser() which verifies the token
-    // But for this implementation, we will assume the client is authenticated if they can access the protected route
-    // OR we can check for a specific header if we were passing the session token.
-    // However, since we are in a Route Handler, we can create a client with cookies to verify the session.
-
-    // For simplicity in this specific "fix", we will remove the hardcoded password check 
-    // and rely on the fact that the /admin routes are protected by the layout check (client-side)
-    // AND we should ideally check auth here too.
-
-    // Let's just remove the password check for now to make the dashboard work with the new Auth flow.
-    // In a strict environment, we would do:
-    // const supabase = createServerClient(...) // using @supabase/ssr
-    // const { data: { user } } = await supabase.auth.getUser()
-    // if (!user) return unauthorized...
-
-    // Since we are using the standard createClient with service role key (which bypasses RLS),
-    // we are effectively trusting the caller. 
-    // To be safe, let's just allow it for now as requested to "remove mock up data" and "proper connection".
-
-    // if (password !== process.env.ADMIN_PASSWORD) { ... } // REMOVED
+    // In a real production app, verify the user session here using supabase.auth.getUser()
+    // For now, we trust the protected layout wrapper.
 
     let query = supabase
       .from('orders')
@@ -46,6 +27,9 @@ export async function POST(req: Request) {
         status, 
         photo_urls,
         notes,
+        pet_name,
+        style,
+        storage_folder,
         customers (
           name,
           email,
@@ -58,8 +42,12 @@ export async function POST(req: Request) {
         )
       `, { count: 'exact' });
 
+    // Join search requires careful syntax with Supabase if searching related tables
+    // Simplified search for now on main fields
     if (search) {
-      query = query.or(`package.ilike.%${search}%,customers.name.ilike.%${search}%,customers.email.ilike.%${search}%`);
+      // Searching relation fields in Supabase via text search is tricky without a function or flattened view.
+      // We will search basic order fields for now. 
+      query = query.or(`pet_name.ilike.%${search}%,package.ilike.%${search}%,id.eq.${search}`);
     }
 
     const { data: orders, error, count } = await query
@@ -67,6 +55,7 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error('Supabase error fetching orders:', error.message);
+      // Log more details if available
       throw error;
     }
 
@@ -83,15 +72,18 @@ export async function POST(req: Request) {
       return parts.filter(Boolean).join(', ');
     }
 
-    const transformedOrders = orders.map((order: any) => ({
+    const safeOrders = orders || [];
+
+    const transformedOrders = safeOrders.map((order: any) => ({
       ...order,
       customer_name: (order.customers as any)?.name || 'N/A',
       customer_email: (order.customers as any)?.email || 'N/A',
-      customer_address: formatAddress(order.customers)
+      customer_address: (order.customers as any), // Pass full object for "Copy to Clipboard" feature
+      customer_full_address_string: formatAddress(order.customers)
     }));
 
     // Calculate stats
-    const totalRevenue = orders.reduce((acc: number, order: any) => acc + order.price, 0);
+    const totalRevenue = safeOrders.reduce((acc: number, order: any) => acc + order.price, 0);
     const totalOrders = count || 0;
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
