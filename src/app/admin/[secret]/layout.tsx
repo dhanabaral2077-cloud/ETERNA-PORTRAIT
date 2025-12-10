@@ -4,16 +4,18 @@ import { ReactNode } from 'react';
 
 type AdminLayoutProps = {
   children: ReactNode;
-  params: {
+  params: Promise<{
     secret: string;
-  };
+  }>;
 };
 
-export default function AdminLayout({ children, params }: AdminLayoutProps) {
+export default async function AdminLayout({ children, params }: AdminLayoutProps) {
   // This is a server-side guard.
   // It checks if the secret in the URL matches the one in the .env file.
   // If they don't match, it renders a 404 page.
-  if (params.secret !== process.env.ADMIN_SECRET) {
+  const { secret } = await params;
+
+  if (secret !== process.env.ADMIN_SECRET) {
     notFound();
   }
 
