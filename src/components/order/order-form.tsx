@@ -254,7 +254,7 @@ export function OrderForm() {
         let isValid = true;
         Object.keys(formData).forEach(key => {
             if (['name', 'email', 'addressLine1', 'city', 'postalCode', 'country'].includes(key)) {
-                validateField(key, formData[key as keyof typeof formData]);
+                validateField(key, formData[key as keyof typeof formData] as string);
                 if (errors[key]) isValid = false;
             }
         });
