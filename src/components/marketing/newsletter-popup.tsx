@@ -1,19 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Sparkles } from 'lucide-react';
+import { X, Mail, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 export function NewsletterPopup() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
+
+
     useEffect(() => {
+        // Don't show on admin pages
+        if (pathname?.startsWith('/admin')) return;
+
         // Check if user has already subscribed or dismissed
         const hasSeen = localStorage.getItem('eterna_newsletter_seen');
         if (hasSeen) return;
@@ -60,7 +67,7 @@ export function NewsletterPopup() {
 
             toast({
                 title: "Welcome to the Family! 🎨",
-                description: "Your 10% discount code: WELCOME10",
+                description: "Your 15% discount code: HOLIDAY15",
             });
 
             localStorage.setItem('eterna_newsletter_subscribed', 'true');
@@ -100,12 +107,12 @@ export function NewsletterPopup() {
 
                         <div className="p-8 pt-10 text-center relative z-0">
                             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
-                                <Sparkles size={32} />
+                                <Palette size={32} />
                             </div>
 
-                            <h2 className="font-headline text-3xl mb-3">Join the Eterna Club</h2>
+                            <h2 className="font-headline text-3xl mb-3">The Season of Giving 🎁</h2>
                             <p className="text-secondary mb-8 leading-relaxed">
-                                Get <span className="font-bold text-primary">10% OFF</span> your first custom portrait and receive exclusive art tips.
+                                Get <span className="font-bold text-primary">15% OFF</span> + Priority Shipping when you order in time for Christmas.
                             </p>
 
                             <form onSubmit={handleSubscribe} className="space-y-4">
@@ -122,7 +129,7 @@ export function NewsletterPopup() {
                                     className="w-full h-12 rounded-xl text-lg font-medium shadow-lg hover:shadow-primary/25 transition-all"
                                     disabled={isLoading}
                                 >
-                                    {isLoading ? 'Unlocking...' : 'Unlock My 10% Off'}
+                                    {isLoading ? 'Unlocking...' : 'Unlock My 15% Off'}
                                 </Button>
                             </form>
 

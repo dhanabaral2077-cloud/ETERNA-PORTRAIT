@@ -54,7 +54,7 @@ export function AnnouncementBar() {
                 >
                     <div className="bg-primary px-4 py-3 text-white">
                         <p className="text-center text-xs font-medium md:text-sm">
-                            🎁 <Link href="/blog/gift-guide" className="hover:underline">Looking for the perfect gift? Read our Ultimate Guide</Link> — Free Shipping on orders over $150
+                            🎄 <strong>Under the Tree Guarantee:</strong> Order by Dec 15 for Christmas Delivery! <Link href="/order" className="underline hover:text-white/90 ml-2">Order Now</Link>
                         </p>
                     </div>
                 </motion.div>

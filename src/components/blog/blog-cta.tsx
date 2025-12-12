@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Brush } from "lucide-react";
 
 import { useState, useEffect } from "react";
 
@@ -53,7 +53,7 @@ export function BlogCTA() {
                 {/* Text Content */}
                 <div className="flex-1 text-center md:text-left">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 backdrop-blur-sm border border-primary/20 text-xs font-semibold text-primary mb-4">
-                        <Sparkles size={14} />
+                        <Brush size={14} />
                         <span>Turn this photo into art</span>
                     </div>
 

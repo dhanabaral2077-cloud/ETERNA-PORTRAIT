@@ -101,10 +101,10 @@ export default function PhotoGuidePage() {
                                 <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-red-500/20">
                                     <div className="w-full h-full bg-gray-800 relative opacity-70">
                                         <Image
-                                            src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?q=80&w=2072&auto=format&fit=crop"
-                                            alt="Bad example: blurry or dark"
+                                            src="https://images.unsplash.com/photo-1517423568366-8b83523034fd?q=80&w=2069&auto=format&fit=crop"
+                                            alt="Bad example: Backlit silhouette, hard to see details"
                                             fill
-                                            className="object-cover blur-sm brightness-50"
+                                            className="object-cover blur-[2px] brightness-75"
                                         />
                                         <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-xl">Too Dark / Blurry</div>
                                     </div>

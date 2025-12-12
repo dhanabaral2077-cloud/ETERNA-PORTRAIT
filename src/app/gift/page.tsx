@@ -84,8 +84,8 @@ export default function GiftPage() {
                                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full animate-pulse blur-3xl opacity-50" />
                                 <div className="relative h-full w-full rounded-3xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 border-4 border-white">
                                     <Image
-                                        src="https://i.pinimg.com/736x/8d/3f/8a/8d3f8a004414ac890458623631742416.jpg" // High converting cute example
-                                        alt="Happy person holding a pet portrait gift"
+                                        src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=2070&auto=format&fit=crop"
+                                        alt="Woman joyfully hugging her dog"
                                         fill
                                         className="object-cover"
                                     />
