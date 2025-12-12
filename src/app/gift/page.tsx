@@ -84,7 +84,7 @@ export default function GiftPage() {
                                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full animate-pulse blur-3xl opacity-50" />
                                 <div className="relative h-full w-full rounded-3xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 border-4 border-white">
                                     <Image
-                                        src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=2070&auto=format&fit=crop"
+                                        src="/portfolio/emotional_reaction.png"
                                         alt="Woman joyfully hugging her dog"
                                         fill
                                         className="object-cover"

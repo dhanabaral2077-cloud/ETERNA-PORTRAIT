@@ -78,7 +78,7 @@ export default function PhotoGuidePage() {
                                     {/* Placeholder for Good Photo - Using a reliable external placeholder if local not avail, or colored div */}
                                     <div className="w-full h-full bg-gray-200 relative">
                                         <Image
-                                            src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=2069&auto=format&fit=crop"
+                                            src="/portfolio/good_example.png"
                                             alt="Good example: Clear dog face in natural light"
                                             fill
                                             className="object-cover"
@@ -101,7 +101,7 @@ export default function PhotoGuidePage() {
                                 <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-red-500/20">
                                     <div className="w-full h-full bg-gray-800 relative opacity-70">
                                         <Image
-                                            src="https://images.unsplash.com/photo-1517423568366-8b83523034fd?q=80&w=2069&auto=format&fit=crop"
+                                            src="/portfolio/bad_example.png"
                                             alt="Bad example: Backlit silhouette, hard to see details"
                                             fill
                                             className="object-cover blur-[2px] brightness-75"
