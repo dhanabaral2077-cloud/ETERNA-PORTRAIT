@@ -52,14 +52,10 @@ export function AnnouncementBar() {
                     exit={{ height: 0, opacity: 0 }}
                     className="bg-primary text-primary-foreground relative z-50"
                 >
-                    <div className="container mx-auto px-4 py-2 text-center">
-                        {campaign.top_bar_link ? (
-                            <Link href={campaign.top_bar_link} className="hover:underline underline-offset-4">
-                                <Content />
-                            </Link>
-                        ) : (
-                            <Content />
-                        )}
+                    <div className="bg-primary px-4 py-3 text-white">
+                        <p className="text-center text-xs font-medium md:text-sm">
+                            🎁 <Link href="/blog/gift-guide" className="hover:underline">Looking for the perfect gift? Read our Ultimate Guide</Link> — Free Shipping on orders over $150
+                        </p>
                     </div>
                 </motion.div>
             )}

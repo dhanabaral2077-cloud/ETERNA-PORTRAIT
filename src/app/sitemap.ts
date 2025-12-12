@@ -57,6 +57,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'monthly',
             priority: 0.9,
         },
+        {
+            url: 'https://eternaportrait.com/materials',
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: 'https://eternaportrait.com/gift',
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.9,
+        },
     ];
 
     return [...staticPages, ...blogEntries];

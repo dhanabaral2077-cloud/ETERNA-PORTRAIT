@@ -5,7 +5,7 @@ import './globals.css';
 import Script from 'next/script';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
-import { MarketingPopup } from '@/components/marketing-popup';
+import { NewsletterPopup } from '@/components/marketing/newsletter-popup';
 import { AnnouncementBar } from '@/components/announcement-bar';
 import { StickyCTA } from '@/components/layout/sticky-cta';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -82,7 +82,7 @@ export default function RootLayout({
         <AnnouncementBar />
         {children}
         <StickyCTA />
-        <MarketingPopup />
+        <NewsletterPopup />
         <Toaster />
         <SpeedInsights />
         <Analytics />

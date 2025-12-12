@@ -1,35 +1,33 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { sendWelcomeEmail } from '@/lib/email';
 
-export async function POST(req: Request) {
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!
-    );
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
+export async function POST(request: Request) {
     try {
-        const { email } = await req.json();
+        const { email } = await request.json();
 
         if (!email || !email.includes('@')) {
             return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
         }
 
-        // Try to insert into 'newsletter_subscribers' table
-        // If table doesn't exist, this will fail, but we'll handle it gracefully
+        // Insert into Supabase
         const { error } = await supabase
             .from('newsletter_subscribers')
-            .insert([{ email, created_at: new Date().toISOString() }]);
+            .upsert({ email }, { onConflict: 'email' });
 
-        if (error) {
-            console.error("Supabase error:", error);
-            // Fallback: Just log it (or return success if table missing to not break UI)
-            // In a real app, we'd ensure table exists. 
-            // We return success to the user so they see the discount code.
-        }
+        if (error) throw error;
+
+        // Send Welcome Email (Fire and forget, don't block response)
+        sendWelcomeEmail(email, 'WELCOME10').catch(e => console.error("Email send failed", e));
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("Newsletter API error:", error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Newsletter Error:', error);
+        return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
     }
 }

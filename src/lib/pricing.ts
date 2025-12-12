@@ -39,6 +39,13 @@ export const PRODUCT_PRICES = {
         name: 'Acrylic Print',
         plan: 'masterpiece',
     },
+
+    // Gift Plan
+    gift_card: {
+        basePrice: 1, // Multiplier for denomination
+        name: 'Eterna Gift Card',
+        plan: 'gift',
+    },
 } as const;
 
 export const SIZE_MODIFIERS = {
@@ -57,6 +64,23 @@ export const SIZE_MODIFIERS = {
     '24x36': {
         name: '60x90 cm / 24x36"',
         modifier: 2.2,
+    },
+    // Gift Denominations
+    'gift_50': {
+        name: '$50 Gift Card',
+        modifier: 50,
+    },
+    'gift_100': {
+        name: '$100 Gift Card',
+        modifier: 100,
+    },
+    'gift_150': {
+        name: '$150 Gift Card',
+        modifier: 150,
+    },
+    'gift_200': {
+        name: '$200 Gift Card',
+        modifier: 200,
     },
 } as const;
 

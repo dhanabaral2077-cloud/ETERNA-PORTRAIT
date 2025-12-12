@@ -155,6 +155,78 @@ export default function MarketingAdminPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Subscribers List */}
+            <SubscribersList />
         </div>
+    );
+}
+
+function SubscribersList() {
+    const [subscribers, setSubscribers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchSubs = async () => {
+            const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { data } = await supabase.from('newsletter_subscribers').select('*').order('created_at', { ascending: false });
+            if (data) setSubscribers(data);
+            setLoading(false);
+        };
+        fetchSubs();
+    }, []);
+
+    const copyEmails = () => {
+        const emails = subscribers.map(s => s.email).join(', ');
+        navigator.clipboard.writeText(emails);
+        alert('Emails copied to clipboard!');
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <CardTitle>Newsletter Subscribers ({subscribers.length})</CardTitle>
+                        <CardDescription>Export this list to your email marketing tool.</CardDescription>
+                    </div>
+                    <Button variant="outline" onClick={copyEmails} disabled={loading}>
+                        Copy All Emails
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="rounded-md border max-h-96 overflow-y-auto">
+                    {loading ? (
+                        <div className="p-4 text-center">Loading...</div>
+                    ) : (
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-muted/50">
+                                <tr>
+                                    <th className="p-3 font-medium">Email</th>
+                                    <th className="p-3 font-medium">Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {subscribers.map((sub) => (
+                                    <tr key={sub.id} className="border-t">
+                                        <td className="p-3">{sub.email}</td>
+                                        <td className="p-3 text-muted-foreground">{new Date(sub.created_at).toLocaleDateString()}</td>
+                                    </tr>
+                                ))}
+                                {subscribers.length === 0 && (
+                                    <tr>
+                                        <td colSpan={2} className="p-6 text-center text-muted-foreground">No subscribers yet.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
     );
 }

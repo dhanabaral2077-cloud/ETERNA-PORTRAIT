@@ -39,7 +39,31 @@ function SuccessContent() {
                     #{orderId ? orderId.slice(0, 8) : Date.now().toString().slice(-8)}
                 </p>
             </div>
-            <Button asChild className="mt-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg">
+
+            {/* Referral Section - Viral Loop */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full text-left">
+                <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                    <h3 className="font-headline text-xl mb-2">🎁 Give $10, Get $10</h3>
+                    <p className="text-sm text-secondary mb-4">
+                        Share your love for Eterna! Refer a friend and you both get $10 off your next masterpiece.
+                    </p>
+                    <Button variant="outline" className="w-full bg-white/50 border-primary/20 text-primary hover:bg-primary hover:text-white transition-colors" onClick={() => navigator.clipboard.writeText('ETERNA-FRIEND-10')}>
+                        Copy Code: ETERNA-FRIEND-10
+                    </Button>
+                </div>
+
+                <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
+                    <h3 className="font-headline text-xl mb-2 text-orange-800">📸 Join the Gallery</h3>
+                    <p className="text-sm text-orange-700/80 mb-4">
+                        We feature our favorite portraits on Instagram. Tag us to be featured!
+                    </p>
+                    <Button variant="outline" asChild className="w-full bg-white/50 border-orange-200 text-orange-700 hover:bg-orange-500 hover:text-white transition-colors">
+                        <Link href="https://instagram.com/eter.naportrait" target="_blank">@eter.naportrait</Link>
+                    </Button>
+                </div>
+            </div>
+
+            <Button asChild className="mt-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg shadow-lg shadow-primary/20">
                 <Link href="/">Return to Gallery</Link>
             </Button>
         </motion.div>

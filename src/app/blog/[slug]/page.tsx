@@ -12,6 +12,7 @@ import { ShareButtons } from '@/components/blog/share-buttons';
 import { BackToTop } from '@/components/blog/back-to-top';
 import { Badge } from '@/components/ui/badge';
 import { BlogCTA } from '@/components/blog/blog-cta';
+import { BlogSidebar } from '@/components/blog/blog-sidebar';
 
 interface Props {
     params: Promise<{ slug: string }>;
@@ -116,63 +117,73 @@ export default async function BlogPostPage({ params }: Props) {
             />
             <Header />
             <main className="flex-1 bg-background py-24 px-6 md:px-16">
-                <article className="max-w-3xl mx-auto">
-                    <div className="mb-8 text-center">
-                        <div className="flex items-center justify-center text-sm text-muted-foreground mb-4 space-x-2">
-                            <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
-                            <span>•</span>
-                            <span>{Math.ceil(post.content?.split(' ').length / 200) || 5} min read</span>
-                        </div>
-                        <h1 className="font-headline text-4xl md:text-5xl text-foreground mb-6 leading-tight">
-                            {post.title}
-                        </h1>
-                        <div className="flex items-center justify-center space-x-2">
-                            <span className="text-sm font-medium text-foreground">By {post.author}</span>
-                        </div>
-                    </div>
+                <div className="container mx-auto">
+                    <div className="flex flex-col lg:flex-row gap-12 relative">
+                        {/* Main Content Column */}
+                        <article className="lg:w-2/3 max-w-3xl">
+                            <div className="mb-8 text-center lg:text-left">
+                                <div className="flex items-center justify-center lg:justify-start text-sm text-muted-foreground mb-4 space-x-2">
+                                    <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
+                                    <span>•</span>
+                                    <span>{Math.ceil(post.content?.split(' ').length / 200) || 5} min read</span>
+                                </div>
+                                <h1 className="font-headline text-4xl md:text-5xl text-foreground mb-6 leading-tight">
+                                    {post.title}
+                                </h1>
+                                <div className="flex items-center justify-center lg:justify-start space-x-2">
+                                    <span className="text-sm font-medium text-foreground">By {post.author}</span>
+                                </div>
+                            </div>
 
-                    {post.image && (
-                        <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 shadow-lg">
-                            <Image
-                                src={post.image}
-                                alt={post.image_alt || post.title}
-                                fill
-                                className="object-cover"
-                                priority
+                            {post.image && (
+                                <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 shadow-lg">
+                                    <Image
+                                        src={post.image}
+                                        alt={post.image_alt || post.title}
+                                        fill
+                                        className="object-cover"
+                                        priority
+                                    />
+                                </div>
+                            )}
+
+                            <div
+                                className="prose prose-lg prose-stone dark:prose-invert mb-12 max-w-none"
+                                dangerouslySetInnerHTML={{ __html: post.content }}
                             />
-                        </div>
-                    )}
 
-                    <div
-                        className="prose prose-lg prose-stone mx-auto dark:prose-invert mb-12"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                    />
+                            <BlogCTA />
 
-                    <BlogCTA />
+                            {/* Tags */}
+                            {post.tags && post.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-12">
+                                    {post.tags.map((tag: string) => (
+                                        <Badge key={tag} variant="secondary" className="text-sm px-3 py-1">
+                                            #{tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
 
-                    {/* Tags */}
-                    {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-12">
-                            {post.tags.map((tag: string) => (
-                                <Badge key={tag} variant="secondary" className="text-sm px-3 py-1">
-                                    #{tag}
-                                </Badge>
-                            ))}
-                        </div>
-                    )}
+                            {/* Share Buttons */}
+                            <ShareButtons title={post.title} slug={post.slug} />
 
-                    {/* Share Buttons */}
-                    <ShareButtons title={post.title} slug={post.slug} />
+                            {/* Reactions */}
+                            <Reactions postId={post.id} />
 
-                    {/* Reactions */}
-                    <Reactions postId={post.id} />
+                            {/* Related Posts */}
+                            <RelatedPosts currentSlug={post.slug} tags={post.tags} />
 
-                    {/* Related Posts */}
-                    <RelatedPosts currentSlug={post.slug} tags={post.tags} />
+                            {/* Comments */}
+                            <Comments postId={post.id} />
+                        </article>
 
-                    {/* Comments */}
-                    <Comments postId={post.id} />
-                </article>
+                        {/* Sidebar Column (Desktop Only) */}
+                        <aside className="hidden lg:block lg:w-1/3 relative">
+                            <BlogSidebar />
+                        </aside>
+                    </div>
+                </div>
             </main>
             <BackToTop />
             <Footer />

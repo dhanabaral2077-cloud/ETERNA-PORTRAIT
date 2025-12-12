@@ -42,6 +42,22 @@ export function Hero() {
               Transform Your Pet’s Photo Into <span className="italic text-primary">Timeless Art.</span>
             </motion.h1>
 
+            {/* Trust Badge Social Proof */}
+            <motion.div
+              className="flex items-center justify-center md:justify-start gap-2 mt-6"
+              style={{ y: textY }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.1 }}
+            >
+              <div className="flex -space-x-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center text-[10px] text-yellow-900 font-bold">★</div>
+                ))}
+              </div>
+              <span className="text-sm font-medium text-foreground/80">Trusted by 10,000+ Happy Pet Parents</span>
+            </motion.div>
+
             <motion.p
               className="mt-4 md:mt-8 text-base md:text-xl 2xl:text-2xl text-secondary font-light leading-relaxed max-w-lg text-center md:text-left mx-auto md:mx-0"
               style={{ y: textY }}
@@ -131,6 +147,28 @@ export function Hero() {
           Scroll to Explore
         </motion.div>
       </div>
+
+      {/* Schema for LocalBusiness/Organization Validation */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Eterna Portrait",
+            "url": "https://eternaportrait.com",
+            "logo": "https://eternaportrait.com/logo.png",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "reviewCount": "10432"
+            },
+            "sameAs": [
+              "https://instagram.com/eter.naportrait"
+            ]
+          })
+        }}
+      />
     </section>
   );
 }

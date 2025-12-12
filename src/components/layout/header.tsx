@@ -43,6 +43,7 @@ export function Header() {
     { href: '/#gallery', label: 'Gallery' },
     { href: '/#how-it-works', label: 'How It Works' },
     { href: '/#testimonials', label: 'Testimonials' },
+    { href: '/gift', label: 'Gift' },
     { href: '/blog', label: 'Blog' },
     { href: '/#pricing', label: 'Pricing' },
   ];

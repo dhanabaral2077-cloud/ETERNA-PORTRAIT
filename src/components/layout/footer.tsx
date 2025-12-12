@@ -65,21 +65,34 @@ export function Footer() {
           </div>
 
           {/* Navigation Links */}
-          <div className="flex items-center space-x-6 font-headline text-sm uppercase tracking-widest">
+          {/* Navigation Links */}
+          <div className="flex flex-wrap justify-center items-center gap-6 font-headline text-sm uppercase tracking-widest">
+            <Link href="/contact" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Contact</span>
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            </Link>
             <Link href="/shipping" className="relative text-muted-foreground transition-colors hover:text-primary group">
               <span>Shipping</span>
               <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
             </Link>
-            <Link href="/privacy" className="relative text-muted-foreground transition-colors hover:text-primary group">
-              <span>Privacy</span>
+            <Link href="/guide/photos" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Photo Guide</span>
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            </Link>
+            <Link href="/guide/styles" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Art Styles</span>
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
+            </Link>
+            <Link href="/materials" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Our Materials</span>
               <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
             </Link>
             <Link href="/refunds" className="relative text-muted-foreground transition-colors hover:text-primary group">
               <span>Refunds</span>
               <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
             </Link>
-            <Link href="/contact" className="relative text-muted-foreground transition-colors hover:text-primary group">
-              <span>Contact</span>
+            <Link href="/reviews" className="relative text-muted-foreground transition-colors hover:text-primary group">
+              <span>Reviews</span>
               <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 ease-out group-hover:w-full"></span>
             </Link>
           </div>
