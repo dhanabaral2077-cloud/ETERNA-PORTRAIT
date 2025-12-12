@@ -27,13 +27,15 @@ export function NewsletterPopup() {
 
         // Timer: Show after 15 seconds
         const timer = setTimeout(() => {
-            setIsOpen(true);
+            const hasSeen = localStorage.getItem('eterna_newsletter_seen');
+            if (!hasSeen) setIsOpen(true);
         }, 15000);
 
         // Exit Intent: Show if mouse leaves window (Desktop only)
         const handleMouseLeave = (e: MouseEvent) => {
             if (e.clientY <= 0) {
-                setIsOpen(true);
+                const hasSeen = localStorage.getItem('eterna_newsletter_seen');
+                if (!hasSeen) setIsOpen(true);
             }
         };
 
