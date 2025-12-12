@@ -60,6 +60,25 @@ export function MarketingPopup() {
         checkCampaign();
     }, []);
 
+    useEffect(() => {
+        // Exit Intent: Show if mouse leaves window (Desktop only)
+        const handleMouseLeave = (e: MouseEvent) => {
+            if (e.clientY <= 0 && campaign && campaign.is_active && !isOpen) {
+                // Check dismissal again to be safe
+                const dismissedAt = localStorage.getItem('marketing_popup_dismissed');
+                if (dismissedAt) {
+                    const dismissedTime = new Date(dismissedAt).getTime();
+                    const now = new Date().getTime();
+                    if ((now - dismissedTime) / (1000 * 60 * 60) < 24) return;
+                }
+                setIsOpen(true);
+            }
+        };
+
+        document.addEventListener('mouseleave', handleMouseLeave);
+        return () => document.removeEventListener('mouseleave', handleMouseLeave);
+    }, [campaign, isOpen]);
+
     const handleDismiss = () => {
         setIsOpen(false);
         localStorage.setItem('marketing_popup_dismissed', new Date().toISOString());
@@ -93,8 +112,8 @@ export function MarketingPopup() {
         navigator.clipboard.writeText(campaign.discount_code);
         setCopied(true);
         toast({
-            title: "Code Copied!",
-            description: "Use it at checkout for your discount.",
+            title: "Code Copied! 📋",
+            description: "We also emailed this to you! Keep an eye on your inbox for future VIP gifts. 🎁",
         });
         setTimeout(() => setCopied(false), 2000);
     };
@@ -222,6 +241,10 @@ export function MarketingPopup() {
                                                 >
                                                     Start Shopping
                                                 </Button>
+
+                                                <p className="text-xs text-center text-muted-foreground">
+                                                    We've also sent this code to <span className="font-medium text-foreground">{email}</span> so you don't lose it!
+                                                </p>
                                             </div>
                                         )}
                                     </motion.div>

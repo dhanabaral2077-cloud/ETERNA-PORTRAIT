@@ -19,9 +19,14 @@ export default function MaterialsPage() {
                 {/* Hero Section */}
                 <section className="relative py-20 md:py-32 overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        {/* Abstract Background */}
-                        <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10" />
-                        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent" />
+                        <Image
+                            src="/portfolio/The_Craftsman_Hero.png"
+                            alt="Artisan framing a portrait"
+                            fill
+                            className="object-cover opacity-20"
+                            priority
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
                     </div>
 
                     <div className="container relative z-10 mx-auto px-4 md:px-6">
@@ -45,7 +50,7 @@ export default function MaterialsPage() {
                                 <div className="absolute inset-0 bg-stone-200 dark:bg-stone-800 flex items-center justify-center text-muted-foreground">
                                     <span className="sr-only">Canvas Texture Detail</span>
                                     <Image
-                                        src="/portfolio/Detailed_Oil_Paint_Texture.jpg" // Assuming this exists or using a generic filler
+                                        src="/portfolio/Detailed_Oil_Paint_Texture.png"
                                         alt="Museum Quality Canvas Texture Detail"
                                         fill
                                         className="object-cover hover:scale-105 transition-transform duration-700"
@@ -89,7 +94,7 @@ export default function MaterialsPage() {
                                 <div className="absolute inset-0 bg-stone-100 dark:bg-stone-900 flex items-center justify-center text-muted-foreground">
                                     <span className="sr-only">Fine Art Paper Detail</span>
                                     <Image
-                                        src="/portfolio/Watercolor_Paper_Texture.jpg"
+                                        src="/portfolio/Watercolor_Paper_Texture.png"
                                         alt="Fine Art Matte Paper Texture Detail"
                                         fill
                                         className="object-cover hover:scale-105 transition-transform duration-700"
