@@ -118,9 +118,9 @@ export default async function BlogPostPage({ params }: Props) {
             <Header />
             <main className="flex-1 bg-background py-24 px-6 md:px-16">
                 <div className="container mx-auto">
-                    <div className="flex flex-col lg:flex-row gap-12 relative">
+                    <div className="flex flex-col lg:flex-row gap-12 relative justify-center">
                         {/* Main Content Column */}
-                        <article className="lg:w-2/3 max-w-3xl">
+                        <article className="flex-1 max-w-3xl">
                             <div className="mb-8 text-center lg:text-left">
                                 <div className="flex items-center justify-center lg:justify-start text-sm text-muted-foreground mb-4 space-x-2">
                                     <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: Props) {
                         </article>
 
                         {/* Sidebar Column (Desktop Only) */}
-                        <aside className="hidden lg:block lg:w-1/3 relative">
+                        <aside className="hidden lg:block w-80 relative shrink-0">
                             <BlogSidebar />
                         </aside>
                     </div>
