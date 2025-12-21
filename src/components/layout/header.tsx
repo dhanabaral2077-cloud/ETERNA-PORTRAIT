@@ -65,7 +65,7 @@ export function Header() {
         <div className="flex md:hidden justify-center flex-1">
           <Link href="/" className="relative block h-20 w-64">
             <Image
-              src="/portfolio/Eterna_Portrait_Logo_Christmas.png"
+              src="/portfolio/eterna_logo_santa_hat.png"
               alt="Eterna Portrait Logo"
               fill
               className="object-contain"
@@ -78,7 +78,7 @@ export function Header() {
         <div className="hidden md:flex items-center">
           <Link href="/" className="relative block h-20 w-64">
             <Image
-              src="/portfolio/Eterna_Portrait_Logo_Christmas.png"
+              src="/portfolio/eterna_logo_santa_hat.png"
               alt="Eterna Portrait Logo"
               fill
               className="object-contain"

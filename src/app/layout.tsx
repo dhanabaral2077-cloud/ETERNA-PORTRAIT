@@ -53,6 +53,9 @@ export const metadata: Metadata = {
     description: 'Transform your pet\'s photo into a timeless masterpiece.',
     images: ['/og-image.jpg'],
   },
+  icons: {
+    icon: '/portfolio/eterna_logo_santa_hat.png',
+  },
 };
 
 export default function RootLayout({
