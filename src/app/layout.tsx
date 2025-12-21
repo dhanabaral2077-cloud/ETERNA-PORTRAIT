@@ -9,6 +9,7 @@ import { MarketingPopup } from '@/components/marketing-popup';
 import { AnnouncementBar } from '@/components/announcement-bar';
 import { StickyCTA } from '@/components/layout/sticky-cta';
 import { JsonLd } from '@/components/seo/json-ld';
+import { Snowfall } from '@/components/effects/snowfall';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -83,6 +84,7 @@ export default function RootLayout({
         {children}
         <StickyCTA />
         <MarketingPopup />
+        <Snowfall />
         <Toaster />
         <SpeedInsights />
         <Analytics />
