@@ -18,7 +18,7 @@ export function AnnouncementBar() {
     useEffect(() => {
         const fetchCampaign = async () => {
             try {
-                const res = await fetch('/api/marketing/campaign');
+                const res = await fetch('/api/marketing/campaign', { cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.top_bar_active) {
@@ -54,7 +54,12 @@ export function AnnouncementBar() {
                 >
                     <div className="bg-primary px-4 py-3 text-white">
                         <p className="text-center text-xs font-medium md:text-sm">
-                            🎄 <strong>Under the Tree Guarantee:</strong> Order by Dec 15 for Christmas Delivery! <Link href="/order" className="underline hover:text-white/90 ml-2">Order Now</Link>
+                            {campaign.top_bar_text}
+                            {campaign.top_bar_link && (
+                                <Link href={campaign.top_bar_link} className="underline hover:text-white/90 ml-2">
+                                    Get It Now
+                                </Link>
+                            )}
                         </p>
                     </div>
                 </motion.div>

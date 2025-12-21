@@ -41,7 +41,7 @@ export function MarketingPopup() {
                 }
 
                 // 2. Fetch active campaign
-                const res = await fetch('/api/marketing/campaign');
+                const res = await fetch('/api/marketing/campaign', { cache: 'no-store' });
                 if (!res.ok) return;
 
                 const data = await res.json();
