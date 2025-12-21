@@ -63,7 +63,7 @@ export function Header() {
       >
         {/* Mobile Logo (Centered) */}
         <div className="flex md:hidden justify-center flex-1">
-          <Link href="/" className="relative block h-20 w-64">
+          <Link href="/" className="relative block h-28 w-72">
             <Image
               src="/portfolio/eterna_logo_santa_hat.png"
               alt="Eterna Portrait Logo"
@@ -76,7 +76,7 @@ export function Header() {
 
         {/* Desktop Logo (Left-Aligned) */}
         <div className="hidden md:flex items-center">
-          <Link href="/" className="relative block h-20 w-64">
+          <Link href="/" className="relative block h-32 w-80">
             <Image
               src="/portfolio/eterna_logo_santa_hat.png"
               alt="Eterna Portrait Logo"
