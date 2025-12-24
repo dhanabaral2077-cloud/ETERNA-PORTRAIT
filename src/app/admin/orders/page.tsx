@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { Loader2, Settings2 } from "lucide-react";
 import { OrderDetailsModal } from "@/components/admin/order-details-modal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase-client";
 
 interface Order {
     id: string;
@@ -174,10 +174,6 @@ function DraftsTable() {
 
     useEffect(() => {
         const fetchDrafts = async () => {
-            const supabase = createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-            );
             const { data } = await supabase.from('order_drafts').select('*').order('updated_at', { ascending: false });
             if (data) setDrafts(data);
             setLoading(false);
