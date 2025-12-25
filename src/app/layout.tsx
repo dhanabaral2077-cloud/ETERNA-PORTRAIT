@@ -57,6 +57,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/portfolio/eterna_logo_santa_hat.png',
   },
+  verification: {
+    google: "-M4nH-Q-PKVfeUSLlWY9tbbNWv7M9JysEUWL0-jzVSw",
+  },
 };
 
 export default function RootLayout({
