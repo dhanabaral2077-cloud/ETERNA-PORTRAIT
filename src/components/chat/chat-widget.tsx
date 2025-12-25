@@ -207,7 +207,7 @@ export function ChatWidget() {
                 >
                     <div className={cn(
                         "transition-all duration-300 rounded-full border-4 border-white shadow-xl overflow-hidden",
-                        isOpen ? "w-14 h-14" : "w-20 h-20"
+                        isOpen ? "w-14 h-14" : "w-12 h-12" // Reduced to smaller initial size
                     )}>
                         <img
                             src="/mascot/picasso.png"
@@ -215,12 +215,6 @@ export function ChatWidget() {
                             className="w-full h-full object-cover bg-[#FDF8F3]"
                         />
                     </div>
-
-                    {!isOpen && (
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
-                            <span className="sr-only">Online</span>
-                        </div>
-                    )}
                 </motion.button>
             </div>
         </div>
