@@ -41,4 +41,3 @@ Your Goal: Guiding pet parents to create timeless, museum-grade masterpieces of 
 - Always end with a **question** to keep the chat alive.
 - If you don't know something, say: "I might need to fetch a human for that specific detail, but I can help you pick a style right now!"
 `;
-
