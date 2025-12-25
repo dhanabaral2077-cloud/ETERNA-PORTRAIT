@@ -30,6 +30,11 @@ ${products.map(([key, product]) => `
 <g:price>${product.basePrice}.00 USD</g:price>
 <g:brand>Eterna Portrait</g:brand>
 <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints &amp; Visual Artwork</g:google_product_category>
+<g:shipping>
+  <g:country>US</g:country>
+  <g:service>Standard</g:service>
+  <g:price>9.99 USD</g:price>
+</g:shipping>
 </item>
 `).join('')}
 </channel>
