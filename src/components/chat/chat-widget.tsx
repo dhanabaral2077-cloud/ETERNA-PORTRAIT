@@ -83,7 +83,7 @@ export function ChatWidget() {
             setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
         } catch (error) {
             console.error(error);
-            setMessages((prev) => [...prev, { role: "assistant", content: "Woof! I'm having trouble fetching that bond. Please try again! 🐾" }]);
+            setMessages((prev) => [...prev, { role: "assistant", content: "Woof! I'm having trouble fetching that bone. Please try again! 🐾" }]);
         } finally {
             setIsLoading(false);
         }
