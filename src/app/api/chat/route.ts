@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         const latestMessage = messages[messages.length - 1].content;
 
         // Construct the model and chat
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         // History: Map previous messages to Gemini format (limiting context window for efficiency)
         const history = messages.slice(0, -1).map((msg: any) => ({
@@ -59,10 +59,14 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ role: "assistant", content: text });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Gemini Chat Error:", error);
         return NextResponse.json(
-            { error: "Failed to generate response." },
+            {
+                error: "Failed to generate response.",
+                details: error instanceof Error ? error.message : "Unknown error",
+                env_check: process.env.GOOGLE_GEMINI_API_KEY ? "Key Present" : "Key Missing"
+            },
             { status: 500 }
         );
     }
