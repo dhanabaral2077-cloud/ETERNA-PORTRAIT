@@ -26,9 +26,6 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://eternaportrait.com'),
-  alternates: {
-    canonical: '/',
-  },
   title: 'Custom Pet Portraits | Handcrafted Dog & Cat Art | Eterna Portrait',
   description: 'Transform your pet\'s photo into a timeless masterpiece. Commission handcrafted digital art and museum-quality prints that celebrate your companion for a lifetime.',
   keywords: ['pet portrait', 'dog portrait', 'cat portrait', 'custom pet art', 'digital oil painting', 'pet memorial', 'gift for pet lovers'],

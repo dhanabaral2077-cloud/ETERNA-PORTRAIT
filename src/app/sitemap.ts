@@ -34,13 +34,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.8,
         },
         {
-            url: 'https://eternaportrait.com/how-it-works',
+            url: 'https://eternaportrait.com/guide/photos',
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.8,
         },
         {
-            url: 'https://eternaportrait.com/testimonials',
+            url: 'https://eternaportrait.com/reviews',
             lastModified: new Date(),
             changeFrequency: 'weekly',
             priority: 0.8,
@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.9,
         },
         {
-            url: 'https://eternaportrait.com/pricing',
+            url: 'https://eternaportrait.com/shop/digital',
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.9,

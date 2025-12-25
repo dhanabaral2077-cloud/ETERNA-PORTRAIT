@@ -66,6 +66,30 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/gallery',
+        destination: '/shop/digital',
+        permanent: true,
+      },
+      {
+        source: '/testimonials',
+        destination: '/reviews',
+        permanent: true,
+      },
+      {
+        source: '/how-it-works',
+        destination: '/guide/photos',
+        permanent: true,
+      },
+      {
+        source: '/pricing',
+        destination: '/shop/digital',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

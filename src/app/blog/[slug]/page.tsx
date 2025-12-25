@@ -56,6 +56,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             images: post.image ? [post.image] : [],
             type: 'article',
         },
+        alternates: {
+            canonical: `/blog/${post.slug}`,
+        },
     };
 }
 
