@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         const latestMessage = messages[messages.length - 1].content;
 
         // Construct the model and chat
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // History: Map previous messages to Gemini format (limiting context window for efficiency)
         const history = messages.slice(0, -1).map((msg: any) => ({
