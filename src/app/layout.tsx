@@ -10,6 +10,7 @@ import { AnnouncementBar } from '@/components/announcement-bar';
 import { StickyCTA } from '@/components/layout/sticky-cta';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Snowfall } from '@/components/effects/snowfall';
+import { ChatWidget } from '@/components/chat/chat-widget';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -88,6 +89,7 @@ export default function RootLayout({
         <StickyCTA />
         <MarketingPopup />
         <Snowfall />
+        <ChatWidget />
         <Toaster />
         <SpeedInsights />
         <Analytics />
