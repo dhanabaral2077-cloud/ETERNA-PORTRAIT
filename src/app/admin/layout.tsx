@@ -12,6 +12,7 @@ import {
     LogOut,
     Menu,
     X,
+    Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ export default function AdminLayout({
     const navItems = [
         { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+        { href: "/admin/marketing", label: "Marketing", icon: Megaphone },
         { href: "/admin/blog", label: "Blog Posts", icon: FileText },
         { href: "/admin/settings", label: "Settings", icon: Settings },
     ];
