@@ -286,16 +286,20 @@ export function OrderForm() {
         if (!discountCode) return;
         setVerifyingDiscount(true);
         try {
-            const res = await fetch('/api/marketing/campaign');
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.is_active && data.discount_code === discountCode) {
-                    setAppliedDiscount({ code: data.discount_code, percent: data.discount_percent });
-                    toast({ title: "Discount Applied!", description: `You saved ${data.discount_percent}%!` });
-                } else {
-                    toast({ variant: "destructive", title: "Invalid Code", description: "This code is invalid or expired." });
-                    setAppliedDiscount(null);
-                }
+            const res = await fetch('/api/discounts/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: discountCode })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.valid) {
+                setAppliedDiscount({ code: data.code, percent: data.percent });
+                toast({ title: "Discount Applied!", description: `You saved ${data.percent}%!` });
+            } else {
+                toast({ variant: "destructive", title: "Invalid Code", description: data.error || "This code is invalid or expired." });
+                setAppliedDiscount(null);
             }
         } catch (error) {
             toast({ variant: "destructive", title: "Error", description: "Could not verify discount code." });

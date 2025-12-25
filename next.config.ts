@@ -53,6 +53,19 @@ const nextConfig: NextConfig = {
     GELATO_API_KEY: process.env.GELATO_API_KEY,
     ADMIN_SECRET: process.env.ADMIN_SECRET,
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https: http:; style-src 'self' 'unsafe-inline' https: http:; img-src 'self' data: https: http:; font-src 'self' data: https: http:; connect-src 'self' https: http:; frame-src 'self' https: http:;",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Trash2 } from "lucide-react";
 
 // Types
 interface Campaign {
@@ -20,6 +20,16 @@ interface Campaign {
     discount_percent: number;
     is_active: boolean;
     delay_seconds: number;
+}
+
+interface DiscountCode {
+    id: string;
+    created_at: string;
+    code: string;
+    discount_percent: number;
+    description: string;
+    is_active: boolean;
+    usage_count: number;
 }
 
 export default function MarketingAdminPage() {
@@ -156,9 +166,153 @@ export default function MarketingAdminPage() {
                 </CardContent>
             </Card>
 
+            {/* Promo Code Manager */}
+            <PromoCodeManager />
+
             {/* Subscribers List */}
             <SubscribersList />
         </div>
+    );
+}
+
+function PromoCodeManager() {
+    const [codes, setCodes] = useState<DiscountCode[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [newCode, setNewCode] = useState({ code: '', percent: 10, description: '' });
+    const { toast } = useToast();
+
+    const fetchCodes = async () => {
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { data } = await supabase.from('discount_codes').select('*').order('created_at', { ascending: false });
+        if (data) setCodes(data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchCodes();
+    }, []);
+
+    const toggleActive = async (id: string, currentState: boolean) => {
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.from('discount_codes').update({ is_active: !currentState }).eq('id', id);
+        if (error) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Failed to update code status.' });
+        } else {
+            fetchCodes();
+        }
+    };
+
+    const addCode = async () => {
+        if (!newCode.code || !newCode.percent) return;
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.from('discount_codes').insert({
+            code: newCode.code.toUpperCase(),
+            discount_percent: newCode.percent,
+            description: newCode.description
+        });
+
+        if (error) {
+            toast({ variant: 'destructive', title: 'Error', description: error.message });
+        } else {
+            toast({ title: 'Success', description: 'Discount code created!' });
+            setNewCode({ code: '', percent: 10, description: '' });
+            fetchCodes();
+        }
+    };
+
+    const deleteCode = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this code?')) return;
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.from('discount_codes').delete().eq('id', id);
+        if (error) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete code.' });
+        } else {
+            fetchCodes();
+        }
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Promo Code Manager</CardTitle>
+                <CardDescription>Create and manage standalone discount codes.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex gap-4 items-end bg-muted/30 p-4 rounded-lg">
+                    <div className="space-y-2 flex-1">
+                        <Label>Code</Label>
+                        <Input
+                            value={newCode.code}
+                            onChange={(e) => setNewCode({ ...newCode, code: e.target.value.toUpperCase() })}
+                            placeholder="e.g. VIP20"
+                        />
+                    </div>
+                    <div className="space-y-2 w-24">
+                        <Label>% Off</Label>
+                        <Input
+                            type="number"
+                            value={newCode.percent}
+                            onChange={(e) => setNewCode({ ...newCode, percent: parseInt(e.target.value) })}
+                        />
+                    </div>
+                    <div className="space-y-2 flex-1">
+                        <Label>Description</Label>
+                        <Input
+                            value={newCode.description}
+                            onChange={(e) => setNewCode({ ...newCode, description: e.target.value })}
+                            placeholder="Internal note"
+                        />
+                    </div>
+                    <Button onClick={addCode}><Save className="w-4 h-4 mr-2" /> Add Code</Button>
+                </div>
+
+                <div className="rounded-md border">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-muted/50">
+                            <tr>
+                                <th className="p-3 font-medium">Code</th>
+                                <th className="p-3 font-medium">Discount</th>
+                                <th className="p-3 font-medium">Active</th>
+                                <th className="p-3 font-medium">Usage</th>
+                                <th className="p-3 font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {codes.map((code) => (
+                                <tr key={code.id} className="border-t">
+                                    <td className="p-3 font-bold">{code.code}</td>
+                                    <td className="p-3">{code.discount_percent}%</td>
+                                    <td className="p-3">
+                                        <Switch checked={code.is_active} onCheckedChange={() => toggleActive(code.id, code.is_active)} />
+                                    </td>
+                                    <td className="p-3 text-muted-foreground">{code.usage_count || 0}</td>
+                                    <td className="p-3">
+                                        <Button variant="ghost" size="sm" onClick={() => deleteCode(code.id)} className="text-destructive h-8 w-8 p-0">
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {codes.length === 0 && !loading && (
+                                <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No active codes.</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
