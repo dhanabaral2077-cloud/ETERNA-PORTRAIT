@@ -59,14 +59,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ role: "assistant", content: text });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Gemini Chat Error:", error);
         return NextResponse.json(
-            {
-                error: "Failed to generate response.",
-                details: error instanceof Error ? error.message : "Unknown error",
-                env_check: process.env.GOOGLE_GEMINI_API_KEY ? "Key Present" : "Key Missing"
-            },
+            { error: "Failed to generate response." },
             { status: 500 }
         );
     }

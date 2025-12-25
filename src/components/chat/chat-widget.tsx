@@ -77,11 +77,7 @@ export function ChatWidget() {
                 body: JSON.stringify({ messages: [...messages, { role: "user", content: userMessage }] }),
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Chat API Error Details:", errorData);
-                throw new Error(errorData.error || "Failed to get response");
-            }
+            if (!response.ok) throw new Error("Failed to get response");
 
             const data = await response.json();
             setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
