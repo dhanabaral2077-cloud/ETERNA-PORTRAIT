@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         const latestMessage = messages[messages.length - 1].content;
 
         // Construct the model and chat
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         // History: Map previous messages to Gemini format (limiting context window for efficiency)
         const history = messages.slice(0, -1).map((msg: any) => ({
@@ -59,28 +59,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ role: "assistant", content: text });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Gemini Chat Error:", error);
-
-        // Attempt to fetch available models to debug 404
-        let availableModels = "Could not fetch models";
-        try {
-            const modelsReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_GEMINI_API_KEY}`);
-            const modelsData = await modelsReq.json();
-            if (modelsData.models) {
-                availableModels = modelsData.models.map((m: any) => m.name).join(", ");
-            }
-        } catch (e) {
-            console.error("Failed to list models", e);
-        }
-
         return NextResponse.json(
-            {
-                error: "Failed to generate response.",
-                details: error instanceof Error ? error.message : "Unknown error",
-                env_check: process.env.GOOGLE_GEMINI_API_KEY ? "Key Present" : "Key Missing",
-                available_models: availableModels
-            },
+            { error: "Failed to generate response." },
             { status: 500 }
         );
     }
