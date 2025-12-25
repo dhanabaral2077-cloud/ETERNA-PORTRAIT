@@ -61,11 +61,25 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error("Gemini Chat Error:", error);
+
+        // Attempt to fetch available models to debug 404
+        let availableModels = "Could not fetch models";
+        try {
+            const modelsReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_GEMINI_API_KEY}`);
+            const modelsData = await modelsReq.json();
+            if (modelsData.models) {
+                availableModels = modelsData.models.map((m: any) => m.name).join(", ");
+            }
+        } catch (e) {
+            console.error("Failed to list models", e);
+        }
+
         return NextResponse.json(
             {
                 error: "Failed to generate response.",
                 details: error instanceof Error ? error.message : "Unknown error",
-                env_check: process.env.GOOGLE_GEMINI_API_KEY ? "Key Present" : "Key Missing"
+                env_check: process.env.GOOGLE_GEMINI_API_KEY ? "Key Present" : "Key Missing",
+                available_models: availableModels
             },
             { status: 500 }
         );
