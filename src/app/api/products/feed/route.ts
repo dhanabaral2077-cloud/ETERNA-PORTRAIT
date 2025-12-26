@@ -18,13 +18,19 @@ export async function GET() {
 <title>Eterna Portrait Products</title>
 <link>${BASE_URL}</link>
 <description>Handcrafted Custom Pet Portraits</description>
-${products.map(([key, product]) => `
+${products.map(([key, product]) => {
+        // Use the specific image from pricing.ts if available, otherwise fallback
+        const imageUrl = (product as any).image
+            ? `${BASE_URL}${(product as any).image}`
+            : getProductImage(key);
+
+        return `
 <item>
 <g:id>${key}</g:id>
 <g:title>${product.name}</g:title>
 <g:description>Turn your pet into a masterpiece with our ${product.name}. Handcrafted digital art available in Poster, Canvas, or Framed options. 100% Satisfaction Guarantee.</g:description>
-<g:link>${BASE_URL}/order</g:link>
-<g:image_link>${getProductImage(key)}</g:image_link>
+<g:link>${BASE_URL}/order?plan=${product.plan}&amp;mode=gmc</g:link>
+<g:image_link>${imageUrl}</g:image_link>
 <g:condition>new</g:condition>
 <g:availability>in_stock</g:availability>
 <g:price>${product.basePrice}.00 USD</g:price>
@@ -33,10 +39,26 @@ ${products.map(([key, product]) => `
 <g:shipping>
   <g:country>US</g:country>
   <g:service>Standard</g:service>
-  <g:price>9.99 USD</g:price>
+  <g:price>0.00 USD</g:price>
+</g:shipping>
+<g:shipping>
+  <g:country>GB</g:country>
+  <g:service>International</g:service>
+  <g:price>14.99 USD</g:price>
+</g:shipping>
+<g:shipping>
+  <g:country>CA</g:country>
+  <g:service>International</g:service>
+  <g:price>14.99 USD</g:price>
+</g:shipping>
+<g:shipping>
+  <g:country>AU</g:country>
+  <g:service>International</g:service>
+  <g:price>19.99 USD</g:price>
 </g:shipping>
 </item>
-`).join('')}
+`;
+    }).join('')}
 </channel>
 </rss>`;
 

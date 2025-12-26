@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UploadCloud, CheckCircle, Loader2, Package, Trash2, ShieldCheck, HeartHandshake, Palette, Gift, Zap, FileCheck } from "lucide-react";
+import { UploadCloud, CheckCircle, Loader2, Package, Trash2, ShieldCheck, HeartHandshake, Palette, Gift, Zap, FileCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import PayPalButton from "@/components/paypal-button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -30,48 +30,104 @@ interface VisualOptionProps {
     onClick: () => void;
     icon?: React.ReactNode;
     image?: string;
+    gallery?: string[];
 }
 
-const VisualOption = ({ id, title, description, price, selected, onClick, icon, image }: VisualOptionProps) => (
-    <div
-        onClick={onClick}
-        className={`
-            relative flex flex-col rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden group
-            ${selected
-                ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
-                : 'border-muted/40 hover:border-primary/50 hover:bg-white/40 bg-white/20'}
-        `}
-    >
-        {image ? (
-            <div className="relative w-full h-32 md:h-40 overflow-hidden bg-muted/10">
-                <Image
-                    src={image}
-                    alt={title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+const VisualOption = ({ id, title, description, price, selected, onClick, icon, image, gallery }: VisualOptionProps) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
 
-                {/* Overlay Checkmark */}
-                <div className={`absolute top-3 right-3 rounded-full p-1.5 shadow-sm transition-all duration-300 ${selected ? 'bg-primary text-white scale-100' : 'bg-black/30 text-transparent scale-90 opacity-0'}`}>
-                    <CheckCircle className="w-4 h-4" />
-                </div>
-            </div>
-        ) : (
-            <div className="flex justify-between items-start mb-2 p-4 pb-0">
-                <div className={`p-2 rounded-full ${selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                    {icon || <Package size={20} />}
-                </div>
-                {selected && <CheckCircle className="text-primary w-5 h-5" />}
-            </div>
-        )}
+    // Determine which images to use: gallery first, then single image, then empty array
+    const images = gallery && gallery.length > 0 ? gallery : (image ? [image] : []);
 
-        <div className="p-4">
-            <h3 className="font-headline text-lg font-medium leading-tight">{title}</h3>
-            {description && <p className="text-sm text-secondary mt-1 line-clamp-2">{description}</p>}
-            {price && <p className="text-sm font-semibold mt-2 text-primary">{price}</p>}
+    // Handle image navigation
+    const nextImage = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent selecting the option when clicking arrow
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    // Reset index if id changes (although usually component is remounted or key changes)
+    useEffect(() => {
+        setCurrentImageIndex(0);
+    }, [id]);
+
+    return (
+        <div
+            onClick={onClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className={`
+                relative flex flex-col rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden group
+                ${selected
+                    ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
+                    : 'border-muted/40 hover:border-primary/50 hover:bg-white/40 bg-white/20'}
+            `}
+        >
+            {images.length > 0 ? (
+                <div className="relative w-full h-32 md:h-40 overflow-hidden bg-muted/10">
+                    <Image
+                        src={images[currentImageIndex]}
+                        alt={`${title} - View ${currentImageIndex + 1}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    {/* Carousel Controls - Only show if multiple images and hovered/selected */}
+                    {images.length > 1 && (isHovered || selected) && (
+                        <>
+                            <button
+                                onClick={prevImage}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm z-10"
+                                aria-label="Previous image"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <button
+                                onClick={nextImage}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm z-10"
+                                aria-label="Next image"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                            {/* Dots indicator */}
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                                {images.map((_, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`w-1.5 h-1.5 rounded-full shadow-sm transition-all ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {/* Overlay Checkmark */}
+                    <div className={`absolute top-3 right-3 rounded-full p-1.5 shadow-sm transition-all duration-300 z-20 ${selected ? 'bg-primary text-white scale-100' : 'bg-black/30 text-transparent scale-90 opacity-0'}`}>
+                        <CheckCircle className="w-4 h-4" />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex justify-between items-start mb-2 p-4 pb-0">
+                    <div className={`p-2 rounded-full ${selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                        {icon || <Package size={20} />}
+                    </div>
+                    {selected && <CheckCircle className="text-primary w-5 h-5" />}
+                </div>
+            )}
+
+            <div className="p-4">
+                <h3 className="font-headline text-lg font-medium leading-tight">{title}</h3>
+                {description && <p className="text-sm text-secondary mt-1 line-clamp-2">{description}</p>}
+                {price && <p className="text-sm font-semibold mt-2 text-primary">{price}</p>}
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export function OrderForm() {
     const searchParams = useSearchParams();
@@ -509,7 +565,8 @@ export function OrderForm() {
                                         selected={formData.printType === type.id}
                                         onClick={() => handleChange('printType', type.id)}
                                         icon={isGift ? <Gift size={20} /> : <Palette size={20} />}
-                                        image={(type as any).image} // Ensure image is passed if available
+                                        image={(type as any).image}
+                                        gallery={(type as any).gallery} // Pass gallery if available
                                     />
                                 ))}
                             </div>

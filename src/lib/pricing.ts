@@ -5,18 +5,35 @@ export const PRODUCT_PRICES = {
         name: 'Fine Art Poster',
         plan: 'classic',
         image: '/products/Fine art/fine art poster/Gemini_Generated_Image_l3jkakl3jkakl3jk.png',
+        gallery: [
+            '/products/Fine art/fine art poster/Gemini_Generated_Image_l3jkakl3jkakl3jk.png',
+            '/products/Fine art/fine art poster/Gemini_Generated_Image_5q3khw5q3khw5q3k.png',
+            '/products/Fine art/fine art poster/Gemini_Generated_Image_ifzunfifzunfifzu.png',
+            '/products/Fine art/fine art poster/Gemini_Generated_Image_x58a71x58a71x58a.png',
+        ]
     },
     framed_poster_wood: {
         basePrice: 119,
         name: 'Wooden Framed Poster',
         plan: 'classic',
-        image: '/products/Fine art/wooden Framed/Gemini_Generated_Image_grgbk0grgbk0grgb.png',
+        image: '/products/Fine art/wooden Framed/Gemini_Generated_Image_x4nystx4nystx4ny.png',
+        gallery: [
+            '/products/Fine art/wooden Framed/Gemini_Generated_Image_x4nystx4nystx4ny.png',
+            '/products/Fine art/wooden Framed/Gemini_Generated_Image_grgbk0grgbk0grgb.png',
+            '/products/Fine art/wooden Framed/Gemini_Generated_Image_hlxr98hlxr98hlxr.png',
+        ]
     },
     framed_poster_metal: {
         basePrice: 129,
         name: 'Metal Framed Poster',
         plan: 'classic',
-        image: '/products/Fine art/Metal Framed/Gemini_Generated_Image_b4dqywb4dqywb4dq.png',
+        image: '/products/Fine art/Metal Framed/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
+        gallery: [
+            '/products/Fine art/Metal Framed/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
+            '/products/Fine art/Metal Framed/Gemini_Generated_Image_b4dqywb4dqywb4dq.png',
+            '/products/Fine art/Metal Framed/Gemini_Generated_Image_b4ufib4ufib4ufib.png',
+            '/products/Fine art/Metal Framed/Gemini_Generated_Image_c4178hc4178hc417.png',
+        ]
     },
 
     // Signature Plan
@@ -24,13 +41,23 @@ export const PRODUCT_PRICES = {
         basePrice: 129,
         name: 'Canvas',
         plan: 'signature',
-        image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
+        image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
+        gallery: [
+            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
+            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_kfntyjkfntyjkfnt.png',
+        ]
     },
     framed_canvas: {
         basePrice: 199,
         name: 'Framed Canvas',
         plan: 'signature',
         image: '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
+        gallery: [
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_a19y0va19y0va19y.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_bskpjpbskpjpbskp.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_w6a8s7w6a8s7w6a8.png',
+        ]
     },
 
     // Masterpiece Plan
@@ -39,12 +66,20 @@ export const PRODUCT_PRICES = {
         name: 'Aluminum Print',
         plan: 'masterpiece',
         image: '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
+        gallery: [
+            '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
+            '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_tsomwttsomwttsom.png',
+        ]
     },
     acrylic_print: {
         basePrice: 229,
         name: 'Acrylic Print',
         plan: 'masterpiece',
         image: '/products/Luxury Print/Acrylic Print/AcrylicPrint.png',
+        gallery: [
+            '/products/Luxury Print/Acrylic Print/AcrylicPrint.png',
+            '/products/Luxury Print/Acrylic Print/AcrylicPrint (4).png',
+        ]
     },
 
     // Gift Plan
