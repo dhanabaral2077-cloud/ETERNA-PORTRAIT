@@ -4,27 +4,27 @@ import { PRODUCT_PRICES } from '@/lib/pricing';
 const BASE_URL = 'https://eternaportrait.com';
 
 function getProductImage(key: string) {
-    if (key.includes('canvas')) return `${BASE_URL}/portfolio/The_Craftsman_Hero.png`;
-    if (key.includes('framed')) return `${BASE_URL}/portfolio/collector1.png`;
-    return `${BASE_URL}/portfolio/Brenden Dog1.jpg`;
+  if (key.includes('canvas')) return `${BASE_URL}/portfolio/The_Craftsman_Hero.png`;
+  if (key.includes('framed')) return `${BASE_URL}/portfolio/collector1.png`;
+  return `${BASE_URL}/portfolio/Brenden Dog1.jpg`;
 }
 
 export async function GET() {
-    const products = Object.entries(PRODUCT_PRICES).filter(([key, product]) => product.plan !== 'gift');
+  const products = Object.entries(PRODUCT_PRICES).filter(([key, product]) => product.plan !== 'gift');
 
-    const xml = `<?xml version="1.0"?>
+  const xml = `<?xml version="1.0"?>
 <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
 <channel>
 <title>Eterna Portrait Products</title>
 <link>${BASE_URL}</link>
 <description>Handcrafted Custom Pet Portraits</description>
 ${products.map(([key, product]) => {
-        // Use the specific image from pricing.ts if available, otherwise fallback
-        const imageUrl = (product as any).image
-            ? `${BASE_URL}${(product as any).image}`
-            : getProductImage(key);
+    // Use the specific image from pricing.ts if available, otherwise fallback
+    const imageUrl = (product as any).image
+      ? `${BASE_URL}${(product as any).image}`
+      : getProductImage(key);
 
-        return `
+    return `
 <item>
 <g:id>${key}</g:id>
 <g:title>${product.name}</g:title>
@@ -41,31 +41,22 @@ ${products.map(([key, product]) => {
   <g:service>Standard</g:service>
   <g:price>0.00 USD</g:price>
 </g:shipping>
+${['GB', 'CA', 'AU', 'NZ', 'DE', 'FR', 'IT', 'ES', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'CH', 'BE', 'AT'].map(country => `
 <g:shipping>
-  <g:country>GB</g:country>
+  <g:country>${country}</g:country>
   <g:service>International</g:service>
   <g:price>14.99 USD</g:price>
-</g:shipping>
-<g:shipping>
-  <g:country>CA</g:country>
-  <g:service>International</g:service>
-  <g:price>14.99 USD</g:price>
-</g:shipping>
-<g:shipping>
-  <g:country>AU</g:country>
-  <g:service>International</g:service>
-  <g:price>19.99 USD</g:price>
-</g:shipping>
+</g:shipping>`).join('')}
 </item>
 `;
-    }).join('')}
+  }).join('')}
 </channel>
 </rss>`;
 
-    return new NextResponse(xml, {
-        headers: {
-            'Content-Type': 'text/xml',
-            'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-        },
-    });
+  return new NextResponse(xml, {
+    headers: {
+      'Content-Type': 'text/xml',
+      'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+    },
+  });
 }
