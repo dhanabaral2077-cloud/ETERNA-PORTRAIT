@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabase-client';
 import { trackEvent } from "@/lib/analytics";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PRODUCT_PRICES, SIZE_MODIFIERS, calculatePrice, ProductType, SizeType } from "@/lib/pricing";
+import { PRODUCT_PRICES, ART_STYLES, SIZE_MODIFIERS, calculatePrice, ProductType, SizeType } from "@/lib/pricing";
 
 type StyleOption = "artist" | "renaissance" | "classic_oil" | "watercolor" | "modern_minimalist";
 
@@ -29,27 +29,47 @@ interface VisualOptionProps {
     selected: boolean;
     onClick: () => void;
     icon?: React.ReactNode;
+    image?: string;
 }
 
-const VisualOption = ({ id, title, description, price, selected, onClick, icon }: VisualOptionProps) => (
+const VisualOption = ({ id, title, description, price, selected, onClick, icon, image }: VisualOptionProps) => (
     <div
         onClick={onClick}
         className={`
-            relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
+            relative flex flex-col rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden group
             ${selected
-                ? 'border-primary bg-primary/5 shadow-md scale-[1.02]'
+                ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
                 : 'border-muted/40 hover:border-primary/50 hover:bg-white/40 bg-white/20'}
         `}
     >
-        <div className="flex justify-between items-start mb-2">
-            <div className={`p-2 rounded-full ${selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                {icon || <Package size={20} />}
+        {image ? (
+            <div className="relative w-full h-32 md:h-40 overflow-hidden bg-muted/10">
+                <Image
+                    src={image}
+                    alt={title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
+                {/* Overlay Checkmark */}
+                <div className={`absolute top-3 right-3 rounded-full p-1.5 shadow-sm transition-all duration-300 ${selected ? 'bg-primary text-white scale-100' : 'bg-black/30 text-transparent scale-90 opacity-0'}`}>
+                    <CheckCircle className="w-4 h-4" />
+                </div>
             </div>
-            {selected && <CheckCircle className="text-primary w-5 h-5" />}
+        ) : (
+            <div className="flex justify-between items-start mb-2 p-4 pb-0">
+                <div className={`p-2 rounded-full ${selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                    {icon || <Package size={20} />}
+                </div>
+                {selected && <CheckCircle className="text-primary w-5 h-5" />}
+            </div>
+        )}
+
+        <div className="p-4">
+            <h3 className="font-headline text-lg font-medium leading-tight">{title}</h3>
+            {description && <p className="text-sm text-secondary mt-1 line-clamp-2">{description}</p>}
+            {price && <p className="text-sm font-semibold mt-2 text-primary">{price}</p>}
         </div>
-        <h3 className="font-headline text-lg font-medium">{title}</h3>
-        {description && <p className="text-sm text-secondary mt-1 line-clamp-2">{description}</p>}
-        {price && <p className="text-sm font-semibold mt-2 text-primary">{price}</p>}
     </div>
 );
 
@@ -489,6 +509,7 @@ export function OrderForm() {
                                         selected={formData.printType === type.id}
                                         onClick={() => handleChange('printType', type.id)}
                                         icon={isGift ? <Gift size={20} /> : <Palette size={20} />}
+                                        image={(type as any).image} // Ensure image is passed if available
                                     />
                                 ))}
                             </div>
@@ -594,21 +615,16 @@ export function OrderForm() {
                             <div className="space-y-4">
                                 <Label className="text-lg font-serif text-foreground">Choose a Style</Label>
                                 <div className="grid grid-cols-2 gap-4">
-                                    {[
-                                        { id: 'artist', title: 'Artist Choice', desc: 'Our most popular, balanced style.' },
-                                        { id: 'renaissance', title: 'Renaissance', desc: 'Classic, royal, and timeless.' },
-                                        { id: 'classic_oil', title: 'Classic Oil', desc: 'Rich textures and deep tones.' },
-                                        { id: 'watercolor', title: 'Watercolor', desc: 'Soft, dreamy, and artistic.' },
-                                        { id: 'modern_minimalist', title: 'Modern', desc: 'Clean lines and bold colors.' }
-                                    ].map(style => (
+                                    {Object.values(ART_STYLES).map(style => (
                                         <VisualOption
                                             key={style.id}
                                             id={style.id}
                                             title={style.title}
-                                            description={style.desc}
+                                            description={style.description}
                                             selected={formData.style === style.id}
                                             onClick={() => handleChange('style', style.id as StyleOption)}
                                             icon={<Palette size={18} />}
+                                            image={style.image}
                                         />
                                     ))}
                                 </div>

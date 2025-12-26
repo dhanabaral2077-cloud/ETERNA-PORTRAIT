@@ -4,16 +4,19 @@ export const PRODUCT_PRICES = {
         basePrice: 59, // 12x16 base
         name: 'Fine Art Poster',
         plan: 'classic',
+        image: '/products/Fine art/fine art poster/Gemini_Generated_Image_l3jkakl3jkakl3jk.png',
     },
     framed_poster_wood: {
         basePrice: 119,
         name: 'Wooden Framed Poster',
         plan: 'classic',
+        image: '/products/Fine art/wooden Framed/Gemini_Generated_Image_grgbk0grgbk0grgb.png',
     },
     framed_poster_metal: {
         basePrice: 129,
         name: 'Metal Framed Poster',
         plan: 'classic',
+        image: '/products/Fine art/Metal Framed/Gemini_Generated_Image_b4dqywb4dqywb4dq.png',
     },
 
     // Signature Plan
@@ -21,11 +24,13 @@ export const PRODUCT_PRICES = {
         basePrice: 129,
         name: 'Canvas',
         plan: 'signature',
+        image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
     },
     framed_canvas: {
         basePrice: 199,
         name: 'Framed Canvas',
         plan: 'signature',
+        image: '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
     },
 
     // Masterpiece Plan
@@ -33,11 +38,13 @@ export const PRODUCT_PRICES = {
         basePrice: 189,
         name: 'Aluminum Print',
         plan: 'masterpiece',
+        image: '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
     },
     acrylic_print: {
         basePrice: 229,
         name: 'Acrylic Print',
         plan: 'masterpiece',
+        image: '/products/Luxury Print/Acrylic Print/AcrylicPrint.png',
     },
 
     // Gift Plan
@@ -45,6 +52,40 @@ export const PRODUCT_PRICES = {
         basePrice: 1, // Multiplier for denomination
         name: 'Eterna Gift Card',
         plan: 'gift',
+        image: '/portfolio/eterna_logo_santa_hat.png', // Fallback or specific gift card image
+    },
+} as const;
+
+export const ART_STYLES = {
+    artist: {
+        id: 'artist',
+        title: 'Artist Choice',
+        description: 'Our most popular, balanced style.',
+        image: '/Art Styles/Artist Choice.png',
+    },
+    renaissance: {
+        id: 'renaissance',
+        title: 'Renaissance',
+        description: 'Classic, royal, and timeless.',
+        image: '/Art Styles/Renaissance.png',
+    },
+    classic_oil: {
+        id: 'classic_oil',
+        title: 'Classic Oil',
+        description: 'Rich textures and deep tones.',
+        image: '/Art Styles/Classic Oil.png',
+    },
+    watercolor: {
+        id: 'watercolor',
+        title: 'Watercolor',
+        description: 'Soft, dreamy, and artistic.',
+        image: '/Art Styles/Watercolor.png',
+    },
+    modern_minimalist: {
+        id: 'modern_minimalist',
+        title: 'Modern',
+        description: 'Clean lines and bold colors.',
+        image: '/Art Styles/Modern.png',
     },
 } as const;
 
