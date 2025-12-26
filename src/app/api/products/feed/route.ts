@@ -41,7 +41,7 @@ ${products.map(([key, product]) => {
   <g:service>Standard</g:service>
   <g:price>0.00 USD</g:price>
 </g:shipping>
-${['GB', 'CA', 'AU', 'NZ', 'DE', 'FR', 'IT', 'ES', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'CH', 'BE', 'AT', 'JP', 'SG', 'HK', 'KR', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'ZA', 'AE', 'SA', 'TR', 'PL', 'CZ', 'HU', 'RO', 'GR', 'PT', 'IL', 'MY', 'TH', 'VN', 'PH', 'ID', 'IN', 'TW'].map(country => `
+${['GB', 'CA', 'AU', 'NZ', 'DE', 'FR', 'IT', 'ES', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'CH', 'BE', 'AT', 'JP', 'SG', 'HK', 'KR', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'ZA', 'AE', 'SA', 'TR', 'PL', 'CZ', 'HU', 'RO', 'GR', 'PT', 'IL', 'MY', 'TH', 'VN', 'PH', 'ID', 'IN', 'TW', 'DZ', 'AO', 'BH', 'BD', 'BY', 'RU', 'SK', 'ZW'].map(country => `
 <g:shipping>
   <g:country>${country}</g:country>
   <g:service>International</g:service>
