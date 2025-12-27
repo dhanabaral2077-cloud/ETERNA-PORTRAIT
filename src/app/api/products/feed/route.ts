@@ -40,6 +40,8 @@ ${products.map((product) => {
 <g:description>Turn your pet into a masterpiece with our ${product.name}. Handcrafted digital art available in Poster, Canvas, or Framed options. 100% Satisfaction Guarantee.</g:description>
 <g:link>${BASE_URL}/order?plan=${product.plan}&amp;mode=gmc</g:link>
 <g:image_link>${imageUrl}</g:image_link>
+${product.gallery && Array.isArray(product.gallery) ? product.gallery.map((img: string) => `
+<g:additional_image_link>${img.startsWith('http') ? img : `${BASE_URL}${img}`}</g:additional_image_link>`).join('') : ''}
 <g:condition>new</g:condition>
 <g:availability>in_stock</g:availability>
 <g:price>${product.base_price}.00 USD</g:price>
