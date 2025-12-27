@@ -15,7 +15,8 @@ import { supabase } from '@/lib/supabase-client';
 import { trackEvent } from "@/lib/analytics";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PRODUCT_PRICES, ART_STYLES, SIZE_MODIFIERS, calculatePrice, ProductType, SizeType } from "@/lib/pricing";
+import { ART_STYLES, SIZE_MODIFIERS, calculatePrice, ProductType, SizeType } from "@/lib/pricing";
+import { useProducts } from "@/hooks/use-products";
 
 type StyleOption = "artist" | "renaissance" | "classic_oil" | "watercolor" | "modern_minimalist";
 
@@ -130,11 +131,16 @@ const VisualOption = ({ id, title, description, price, selected, onClick, icon, 
 };
 
 export function OrderForm() {
+    const { products: PRODUCT_PRICES, loading: productsLoading } = useProducts();
     const searchParams = useSearchParams();
     const { toast } = useToast();
     const router = useRouter();
 
     const [step, setStep] = useState(0); // 0: Form, 1: Success
+
+    if (productsLoading) {
+        return <div className="flex justify-center items-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
 
     const selectedPlan = searchParams.get('plan') || 'signature';
 
@@ -144,7 +150,7 @@ export function OrderForm() {
             id: id as ProductType,
             ...details
         }));
-    }, []);
+    }, [PRODUCT_PRICES]);
 
     const availableProductTypes = useMemo(() => {
         return productTypes.filter(type => type.plan === selectedPlan);

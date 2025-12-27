@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, GripVertical, Trash2, Save, Image as ImageIcon } from "lucide-react";
+import { Reorder } from "framer-motion";
+import { Loader2, Plus, Trash2, Save, Image as ImageIcon, GripVertical } from "lucide-react";
 import Image from "next/image";
 
 // Initialize Supabase Client (Public)
@@ -236,20 +237,27 @@ export default function AdminProductsPage() {
                                                         </Label>
                                                     </div>
 
-                                                    <div className="grid grid-cols-3 gap-4">
+                                                    <Reorder.Group
+                                                        axis="y"
+                                                        values={editingProduct.gallery}
+                                                        onReorder={(newOrder) => setEditingProduct({ ...editingProduct, gallery: newOrder })}
+                                                        className="grid grid-cols-3 gap-4"
+                                                    >
                                                         {editingProduct.gallery.map((img, idx) => (
-                                                            <div key={idx} className="relative group aspect-square border rounded-md overflow-hidden bg-muted">
-                                                                <Image src={img} alt={`Gallery ${idx}`} fill className="object-cover" />
+                                                            <Reorder.Item key={img} value={img} className="relative group aspect-square border rounded-md overflow-hidden bg-muted cursor-grab active:cursor-grabbing">
+                                                                <Image src={img} alt={`Gallery ${idx}`} fill className="object-cover pointer-events-none" />
                                                                 <button
-                                                                    onClick={() => removeGalleryImage(idx)}
-                                                                    className="absolute top-1 right-1 bg-destructive/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    onClick={(e) => { e.stopPropagation(); removeGalleryImage(idx); }}
+                                                                    className="absolute top-1 right-1 bg-destructive/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                                                                 >
                                                                     <Trash2 size={14} />
                                                                 </button>
-                                                                {/* Reorder handles could go here */}
-                                                            </div>
+                                                                <div className="absolute bottom-1 left-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <GripVertical size={14} />
+                                                                </div>
+                                                            </Reorder.Item>
                                                         ))}
-                                                    </div>
+                                                    </Reorder.Group>
                                                 </div>
                                             </div>
 
