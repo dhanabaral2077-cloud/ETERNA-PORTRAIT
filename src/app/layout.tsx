@@ -87,8 +87,9 @@ export default function RootLayout({
         <AnnouncementBar />
         {children}
         <StickyCTA />
-        <MarketingPopup />
-        <Snowfall />
+        <StickyCTA />
+        {/* <MarketingPopup />
+        <Snowfall /> */}
         <ChatWidget />
         <Toaster />
         <SpeedInsights />

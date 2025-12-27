@@ -7,35 +7,35 @@ import Link from "next/link";
 
 export function Gallery() {
   const portraits = [
-    { 
-      src: "https://i.pinimg.com/736x/f2/c5/e7/f2c5e7faef71372a364cec114b950d49.jpg", 
-      title: "Bella in Renaissance Style", 
-      aiHint: "dog renaissance" 
+    {
+      src: "https://i.pinimg.com/736x/f2/c5/e7/f2c5e7faef71372a364cec114b950d49.jpg",
+      title: "Bella in Renaissance Style",
+      aiHint: "dog renaissance"
     },
-    { 
-      src: "https://i.pinimg.com/736x/9f/23/cb/9f23cb991c51c130f83ad8169a75388b.jpg", 
-      title: "Max in Classic Oil", 
-      aiHint: "cat oil" 
+    {
+      src: "https://i.pinimg.com/736x/9f/23/cb/9f23cb991c51c130f83ad8169a75388b.jpg",
+      title: "Max in Classic Oil",
+      aiHint: "cat oil"
     },
-    { 
-      src: "https://i.pinimg.com/1200x/cd/5a/ca/cd5acac70dd4da1454ef66b95543676b.jpg", 
-      title: "Luna in Modern Minimalist", 
-      aiHint: "pet minimalist" 
+    {
+      src: "https://i.pinimg.com/1200x/cd/5a/ca/cd5acac70dd4da1454ef66b95543676b.jpg",
+      title: "Luna in Modern Minimalist",
+      aiHint: "pet minimalist"
     },
-    { 
-      src: "https://i.pinimg.com/1200x/1f/38/b7/1f38b71214e5233cd9ad8c4fb9d1d947.jpg", 
-      title: "Charlie in Regal Style", 
-      aiHint: "dog regal" 
+    {
+      src: "https://i.pinimg.com/1200x/1f/38/b7/1f38b71214e5233cd9ad8c4fb9d1d947.jpg",
+      title: "Charlie in Regal Style",
+      aiHint: "dog regal"
     },
-    { 
-      src: "https://i.pinimg.com/1200x/33/63/2d/33632d69759732a62a1204666c250b0e.jpg", 
-      title: "Daisy in Soft Pastel", 
-      aiHint: "pet pastel" 
+    {
+      src: "https://i.pinimg.com/1200x/33/63/2d/33632d69759732a62a1204666c250b0e.jpg",
+      title: "Daisy in Soft Pastel",
+      aiHint: "pet pastel"
     },
-    { 
-      src: "https://i.pinimg.com/1200x/53/b9/73/53b973489c2b94f4cadcc19c6bc49aca.jpg", 
-      title: "Rocky in Contemporary Ink", 
-      aiHint: "pet ink" 
+    {
+      src: "https://i.pinimg.com/1200x/53/b9/73/53b973489c2b94f4cadcc19c6bc49aca.jpg",
+      title: "Rocky in Contemporary Ink",
+      aiHint: "pet ink"
     },
   ];
 
@@ -127,6 +127,36 @@ export function Gallery() {
             >
               <p className="font-headline italic text-lg text-white drop-shadow-md">{portrait.title}</p>
             </motion.div>
+
+            {/* Pinterest Share Button */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }} // Visible by default on touch, handled by group-hover for desktop via CSS if needed, but framer motion whileHover on parent is easier. Actually using group-hover class is safer for mobile.
+              className="absolute top-4 right-4 p-2.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#E60023] hover:text-white text-[#E60023] z-20"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent card click if any
+                const url = encodeURIComponent('https://eternaportrait.com');
+                const media = encodeURIComponent(portrait.src);
+                const desc = encodeURIComponent(`Check out this custom pet portrait: ${portrait.title}`);
+                window.open(`https://pinterest.com/pin/create/button/?url=${url}&media=${media}&description=${desc}`, '_blank');
+              }}
+              title="Pin to Pinterest"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="0"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.399.165-1.487-.695-2.419-2.878-2.419-4.646 0-3.776 2.748-7.252 7.951-7.252 4.173 0 7.41 2.967 7.41 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 12.017 0z" />
+              </svg>
+            </motion.button>
           </motion.div>
         ))}
       </motion.div>
