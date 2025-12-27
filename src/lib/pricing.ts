@@ -82,6 +82,25 @@ export const PRODUCT_PRICES = {
         ]
     },
 
+    wood_print: {
+        basePrice: 179,
+        name: 'Wood Print',
+        plan: 'masterpiece',
+        image: '/products/Luxury Print/Wood Print/Gemini_Generated_Image_wood.png',
+        gallery: [
+            '/products/Luxury Print/Wood Print/Gemini_Generated_Image_wood.png',
+        ]
+    },
+    foam_print: {
+        basePrice: 99,
+        name: 'Foam Print',
+        plan: 'classic',
+        image: '/products/Fine art/Foam Print/Gemini_Generated_Image_foam.png',
+        gallery: [
+            '/products/Fine art/Foam Print/Gemini_Generated_Image_foam.png',
+        ]
+    },
+
     // Gift Plan
     gift_card: {
         basePrice: 1, // Multiplier for denomination
