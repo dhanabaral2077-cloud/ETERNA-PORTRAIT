@@ -125,10 +125,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // ... imports
-    import { gelatoClient } from '@/lib/gelato/client';
-    import { getGelatoProductUid } from '@/lib/gelato/mapper';
-    import { GelatoOrderCreateRequest } from '@/lib/gelato/types';
+
 
     // ... existing code ...
 
