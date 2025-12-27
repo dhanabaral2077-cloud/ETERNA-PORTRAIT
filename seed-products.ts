@@ -3,14 +3,20 @@ import { PRODUCT_PRICES } from './src/lib/pricing';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load .env from current directory
+// Load .env and .env.local
 dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env.local') });
+
+// Debug
+console.log('Searching for credentials in:', __dirname);
+console.log('NEXT_PUBLIC_SUPABASE_URL found:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log('SUPABASE_SERVICE_ROLE_KEY found:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials in .env');
+    console.error('Error: Missing Supabase credentials. Please check .env or .env.local');
     process.exit(1);
 }
 
