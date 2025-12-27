@@ -20,6 +20,39 @@ import { useProducts } from "@/hooks/use-products";
 
 type StyleOption = "artist" | "renaissance" | "classic_oil" | "watercolor" | "modern_minimalist";
 
+export const SUPPORTED_COUNTRIES = [
+    { code: 'US', name: 'United States' },
+    { code: 'DZ', name: 'Algeria' },
+    { code: 'AO', name: 'Angola' },
+    { code: 'AR', name: 'Argentina' },
+    { code: 'AU', name: 'Australia' },
+    { code: 'AT', name: 'Austria' },
+    { code: 'BH', name: 'Bahrain' },
+    { code: 'BD', name: 'Bangladesh' },
+    { code: 'BY', name: 'Belarus' },
+    { code: 'BE', name: 'Belgium' },
+    { code: 'BR', name: 'Brazil' },
+    { code: 'CA', name: 'Canada' },
+    { code: 'FR', name: 'France' },
+    { code: 'DE', name: 'Germany' },
+    { code: 'GR', name: 'Greece' },
+    { code: 'HU', name: 'Hungary' },
+    { code: 'IN', name: 'India' },
+    { code: 'IT', name: 'Italy' },
+    { code: 'NL', name: 'Netherlands' },
+    { code: 'NZ', name: 'New Zealand' },
+    { code: 'PL', name: 'Poland' },
+    { code: 'PT', name: 'Portugal' },
+    { code: 'RO', name: 'Romania' },
+    { code: 'RU', name: 'Russia' },
+    { code: 'SK', name: 'Slovakia' },
+    { code: 'ES', name: 'Spain' },
+    { code: 'SE', name: 'Sweden' },
+    { code: 'AE', name: 'United Arab Emirates' },
+    { code: 'GB', name: 'United Kingdom' },
+    { code: 'ZW', name: 'Zimbabwe' },
+];
+
 // --- Visual Selector Components ---
 
 interface VisualOptionProps {
@@ -138,6 +171,12 @@ export function OrderForm() {
 
     const [step, setStep] = useState(0); // 0: Form, 1: Success
 
+
+
+    if (productsLoading) {
+        return <div className="flex justify-center items-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
+
     const selectedPlan = searchParams.get('plan') || 'signature';
 
     // Convert PRODUCT_PRICES object to array for UI
@@ -173,6 +212,36 @@ export function OrderForm() {
         rushProcessing: false,
         digitalBackup: false,
     });
+
+    const [shippingEstimate, setShippingEstimate] = useState<string | null>(null);
+
+    // Fetch shipping estimate when country changes
+    useEffect(() => {
+        const fetchShipping = async () => {
+            if (!formData.country || formData.country.length < 2) return;
+
+            try {
+                const res = await fetch(`/api/shipping-methods?country=${formData.country}`);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                // Gelato V1 response has shipment_methods array
+                const methods = data.shipment_methods || [];
+                if (methods.length > 0) {
+                    // Find standard or cheapest
+                    const standard = methods.find((m: any) => m.name.toLowerCase().includes('standard')) || methods[0];
+                    if (standard && standard.delivery_days) {
+                        setShippingEstimate(`${standard.delivery_days.min}-${standard.delivery_days.max} business days`);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch shipping", error);
+            }
+        };
+
+        const timeoutId = setTimeout(fetchShipping, 500); // Debounce
+        return () => clearTimeout(timeoutId);
+    }, [formData.country]);
 
     const [errors, setErrors] = useState<Record<string, string | null>>({
         name: null,
@@ -786,13 +855,14 @@ export function OrderForm() {
                                         {errors.city && <p className="text-destructive text-sm">{errors.city}</p>}
                                     </div>
                                     <div>
-                                        <Input
-                                            value={formData.country}
-                                            onChange={(e) => handleChange('country', e.target.value)}
-                                            placeholder="Country"
-                                            required
-                                            className="rounded-xl h-12 glass-input"
-                                        />
+                                        <Select value={formData.country} onValueChange={(value) => handleChange('country', value)}>
+                                            <SelectTrigger className="rounded-xl h-12 glass-input"><SelectValue placeholder="Country" /></SelectTrigger>
+                                            <SelectContent>
+                                                {SUPPORTED_COUNTRIES.map((c) => (
+                                                    <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         {errors.country && <p className="text-destructive text-sm">{errors.country}</p>}
                                     </div>
                                 </div>
@@ -884,7 +954,9 @@ export function OrderForm() {
                                 )}
                                 <div className="flex justify-between">
                                     <span>Shipping</span>
-                                    <span className="text-green-600 font-semibold">Free</span>
+                                    <span className="text-green-600 font-semibold">
+                                        Free {shippingEstimate && <span className="text-xs text-muted-foreground ml-1">({shippingEstimate})</span>}
+                                    </span>
                                 </div>
                                 {formData.rushProcessing && (
                                     <div className="flex justify-between">
