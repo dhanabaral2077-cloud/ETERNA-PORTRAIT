@@ -1,7 +1,7 @@
 export const PRODUCT_PRICES = {
     // Classic Plan
     fine_art_poster: {
-        basePrice: 59, // 12x16 base
+        basePrice: 45, // Was 59
         name: 'Fine Art Poster',
         plan: 'classic',
         image: '/products/Fine art/fine art poster/Gemini_Generated_Image_l3jkakl3jkakl3jk.png',
@@ -13,7 +13,7 @@ export const PRODUCT_PRICES = {
         ]
     },
     framed_poster_wood: {
-        basePrice: 119,
+        basePrice: 89, // Was 119
         name: 'Wooden Framed Poster',
         plan: 'classic',
         image: '/products/Fine art/wooden Framed/Gemini_Generated_Image_x4nystx4nystx4ny.png',
@@ -24,7 +24,7 @@ export const PRODUCT_PRICES = {
         ]
     },
     framed_poster_metal: {
-        basePrice: 129,
+        basePrice: 99, // Was 129
         name: 'Metal Framed Poster',
         plan: 'classic',
         image: '/products/Fine art/Metal Framed/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
@@ -38,7 +38,7 @@ export const PRODUCT_PRICES = {
 
     // Signature Plan
     canvas: {
-        basePrice: 129,
+        basePrice: 79, // Was 129
         name: 'Canvas',
         plan: 'signature',
         image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
@@ -48,7 +48,7 @@ export const PRODUCT_PRICES = {
         ]
     },
     framed_canvas: {
-        basePrice: 199,
+        basePrice: 149, // Was 199
         name: 'Framed Canvas',
         plan: 'signature',
         image: '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
@@ -62,7 +62,7 @@ export const PRODUCT_PRICES = {
 
     // Masterpiece Plan
     aluminum_print: {
-        basePrice: 189,
+        basePrice: 119, // Was 189
         name: 'Aluminum Print',
         plan: 'masterpiece',
         image: '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
@@ -72,7 +72,7 @@ export const PRODUCT_PRICES = {
         ]
     },
     acrylic_print: {
-        basePrice: 229,
+        basePrice: 139, // Was 229
         name: 'Acrylic Print',
         plan: 'masterpiece',
         image: '/products/Luxury Print/Acrylic Print/AcrylicPrint.png',
@@ -83,7 +83,7 @@ export const PRODUCT_PRICES = {
     },
 
     wood_print: {
-        basePrice: 179,
+        basePrice: 99, // Was 179
         name: 'Wood Print',
         plan: 'masterpiece',
         image: '/products/Luxury Print/Wood Print/Gemini_Generated_Image_wood.png',
@@ -92,7 +92,7 @@ export const PRODUCT_PRICES = {
         ]
     },
     foam_print: {
-        basePrice: 99,
+        basePrice: 59, // Was 99
         name: 'Foam Print',
         plan: 'classic',
         image: '/products/Fine art/Foam Print/Gemini_Generated_Image_foam.png',
