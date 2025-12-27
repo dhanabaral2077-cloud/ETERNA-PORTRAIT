@@ -86,18 +86,22 @@ export const PRODUCT_PRICES = {
         basePrice: 99, // Was 179
         name: 'Wood Print',
         plan: 'masterpiece',
-        image: '/products/Luxury Print/Wood Print/Gemini_Generated_Image_wood.png',
+        image: '/products/Luxury Print/Wood Print/Gemini_Generated_Image_aegjaxaegjaxaegj.png',
         gallery: [
-            '/products/Luxury Print/Wood Print/Gemini_Generated_Image_wood.png',
+            '/products/Luxury Print/Wood Print/Gemini_Generated_Image_aegjaxaegjaxaegj.png',
+            '/products/Luxury Print/Wood Print/Gemini_Generated_Image_hf0rithf0rithf0r.png',
+            '/products/Luxury Print/Wood Print/Gemini_Generated_Image_vjfrc1vjfrc1vjfr.png',
         ]
     },
     foam_print: {
         basePrice: 59, // Was 99
         name: 'Foam Print',
         plan: 'classic',
-        image: '/products/Fine art/Foam Print/Gemini_Generated_Image_foam.png',
+        image: '/products/Fine art/Foam Print/Gemini_Generated_Image_4e5rr4e5rr4e5rr4.png',
         gallery: [
-            '/products/Fine art/Foam Print/Gemini_Generated_Image_foam.png',
+            '/products/Fine art/Foam Print/Gemini_Generated_Image_4e5rr4e5rr4e5rr4.png',
+            '/products/Fine art/Foam Print/Gemini_Generated_Image_dqjo0ddqjo0ddqjo.png',
+            '/products/Fine art/Foam Print/Gemini_Generated_Image_u0aogqu0aogqu0ao.png',
         ]
     },
 
