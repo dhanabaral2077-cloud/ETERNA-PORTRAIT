@@ -1,0 +1,303 @@
+{
+  "data": [
+    {
+      "catalogUid": "accordion-fold-brochures",
+      "title": "Accordion fold brochures",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "acrylic",
+      "title": "Acrylic Print",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "apparel",
+      "title": "Apparel",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "aprons",
+      "title": "Aprons",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "baby-clothing",
+      "title": "Baby Clothing",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "beanies",
+      "title": "Beanies",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "blank-envelopes",
+      "title": "Blank Envelopes",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "bottles",
+      "title": "Bottles",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "bucket-hat",
+      "title": "Bucket Hat",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "business-cards",
+      "title": "Business Cards",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "calendars",
+      "title": "Calendars",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "canvas",
+      "title": "Canvas",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "cards",
+      "title": "Cards",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "cards-eu",
+      "title": "Cards - RoW & EU",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "cards-us",
+      "title": "Cards - US",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "dad-hat",
+      "title": "Dad hat",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "default",
+      "title": "Default catalog",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "default-flat-prices",
+      "title": "Default catalog (Flat prices)",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "enterprise",
+      "title": "Enterprise",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "flyers",
+      "title": "Flyers",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "foam-print-product",
+      "title": "Foam Print Product",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "folded-cards",
+      "title": "Folded cards",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "folders",
+      "title": "Folders",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "framed-canvas",
+      "title": "Framed canvas",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "framed-posters",
+      "title": "Framed posters",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "frames",
+      "title": "Frames",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "hangers",
+      "title": "Hangers",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "hard-cover-photobooks",
+      "title": "Hard cover Photobooks",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "hoodies",
+      "title": "Hoodies",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "kids-apparel",
+      "title": "Kids Apparel",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "letterheads",
+      "title": "Letterheads",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "metallic",
+      "title": "Metallic Print",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "mounted-framed-posters",
+      "title": "Mounted Framed Poster",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "mugs",
+      "title": "Mugs",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "multipage-brochures",
+      "title": "Multipage Brochures",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "notebooks",
+      "title": "Notebooks",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "pack-of-cards",
+      "title": "Pack of Cards (2-sided)",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "pack-of-cards-envelopes",
+      "title": "Pack of cards (2-sided, Envelopes incl)",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "pack-of-cards-folded-envelopes",
+      "title": "Pack of Cards (folded, Envelopes included)",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "pack-of-cards-folded",
+      "title": "Pack of Cards (folded, no envelopes)",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "pack-of-cards-general",
+      "title": "Pack of cards - General",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "phone-cases",
+      "title": "Phone cases",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "polos",
+      "title": "Polos",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "poster-hangers",
+      "title": "Poster & Hanger",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "hanging-posters",
+      "title": "Poster+Hanger",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "posters",
+      "title": "Posters",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "roll-folded-brochures",
+      "title": "Roll folded brochures",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "roll-ups",
+      "title": "Roll ups",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "single-fold-brochures",
+      "title": "Single fold brochures",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "snapback",
+      "title": "Snapback",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "soft-cover-photobooks",
+      "title": "Soft cover Photobooks",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "sweatshirts",
+      "title": "Sweatshirts",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "tank-tops",
+      "title": "Tank Tops",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "tote-bags",
+      "title": "Tote Bags",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "trucker-hat",
+      "title": "Trucker Hat",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "t-shirts",
+      "title": "T-shirts",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "wallpaper",
+      "title": "Wallpaper",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "wallpaper-sample",
+      "title": "Wallpaper Sample",
+      "productAttributes": []
+    },
+    {
+      "catalogUid": "wood-prints",
+      "title": "Wood Prints",
+      "productAttributes": []
+    }
+  ],
+  "pagination": {
+    "total": 59,
+    "offset": 59
+  }
+}

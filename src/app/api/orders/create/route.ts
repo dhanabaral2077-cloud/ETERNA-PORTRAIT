@@ -1,8 +1,10 @@
-
 // src/app/api/orders/create/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { calculatePrice, ProductType, SizeType } from '@/lib/pricing';
+import { gelatoClient } from '@/lib/gelato/client';
+import { getGelatoProductUid } from '@/lib/gelato/mapper';
+import { GelatoOrderCreateRequest } from '@/lib/gelato/types';
 
 // Initialize Supabase Admin client
 export async function POST(req: Request) {
@@ -17,7 +19,6 @@ export async function POST(req: Request) {
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 
   try {
     const body = await req.json();
@@ -124,6 +125,13 @@ export async function POST(req: Request) {
       }
     }
 
+    // ... imports
+    import { gelatoClient } from '@/lib/gelato/client';
+    import { getGelatoProductUid } from '@/lib/gelato/mapper';
+    import { GelatoOrderCreateRequest } from '@/lib/gelato/types';
+
+    // ... existing code ...
+
     // --- 2. Create Order ---
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -154,11 +162,88 @@ export async function POST(req: Request) {
       meta: { source: 'paypal', paypal_order_id: paypalOrderId, price_validated: true },
     });
 
+    // --- 4. Submit to Gelato (NEW) ---
+    let gelatoOrderId = null;
+    let gelatoStatus = 'failed_submission';
 
-    return NextResponse.json({ success: true, orderId: order.id });
+    try {
+      // Map product
+      const gelatoProductUid = getGelatoProductUid(printType, size);
+
+      if (gelatoProductUid && addressLine1 && city && country && photoUrls.length > 0) {
+        // Construct Gelato Payload
+        const gelatoOrderData: GelatoOrderCreateRequest = {
+          orderType: 'order', // Direct order
+          orderReferenceId: order.id,
+          customer: {
+            firstName: name.split(' ')[0],
+            lastName: name.split(' ').slice(1).join(' ') || '.', // Fallback if single name
+            email: email,
+          },
+          shippingAddress: {
+            companyName: name, // Optional
+            firstName: name.split(' ')[0],
+            lastName: name.split(' ').slice(1).join(' ') || '.',
+            addressLine1: addressLine1,
+            addressLine2: addressLine2 || '',
+            city: city,
+            postCode: postalCode,
+            state: stateProvinceRegion,
+            country: country, // ISO code expected
+            email: email
+          },
+          items: [
+            {
+              itemReferenceId: `item_${Date.now()}`,
+              productUid: gelatoProductUid,
+              quantity: 1,
+              files: [
+                {
+                  type: 'default',
+                  url: photoUrls[0] // Use the first uploaded photo as the print file. 
+                  // NOTE: In reality, you probably want to process the photo (AI gen) BEFORE sending to Gelato.
+                  // If so, you might want to set orderType to 'draft' or hold this step until the artwork is ready.
+                  // For this integration, we send the source photo as requested for "automation".
+                }
+              ]
+            }
+          ]
+        };
+
+        console.log('Submitting to Gelato:', JSON.stringify(gelatoOrderData, null, 2));
+        const gelatoResponse = await gelatoClient.createOrder(gelatoOrderData);
+
+        gelatoOrderId = gelatoResponse.id;
+        gelatoStatus = 'submitted_to_gelato';
+
+        // Update Metadata with Gelato ID
+        await supabase.from('orders').update({
+          metadata: {
+            gelato_order_id: gelatoOrderId,
+            gelato_reference_id: gelatoResponse.orderReferenceId
+          },
+          status: 'Processing' // Update status to reflect working on it
+        }).eq('id', order.id);
+
+      } else {
+        console.warn('Skipping Gelato submission: Missing product mapping or address data.');
+      }
+
+    } catch (gelatoError: any) {
+      console.error('Failed to submit to Gelato:', gelatoError);
+      // Do not fail the request to the client! The user PAID. We just log and handle manually.
+      await supabase.from('order_events').insert({
+        order_id: order.id,
+        type: 'gelato_submission_failed',
+        meta: { error: gelatoError.message }
+      });
+    }
+
+    return NextResponse.json({ success: true, orderId: order.id, gelatoOrderId });
 
   } catch (err: any) {
     console.error('Order creation failed:', err);
     return NextResponse.json({ error: err.message || 'An unknown error occurred' }, { status: 500 });
   }
 }
+

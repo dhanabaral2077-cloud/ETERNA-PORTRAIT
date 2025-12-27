@@ -1,0 +1,22 @@
+{
+  "acrylic": {
+    "12x16": "acrylic_12x16-inch-300x400-mm_4-mm_4-0_hor",
+    "18x24": "acrylic_18x24-inch-450x600-mm_4-mm_4-0_hor",
+    "24x36": "acrylic_24x36-inch-600x900-mm_4-mm_4-0_hor"
+  },
+  "metallic": {
+    "12x16": "metallic_12x16-inch-300x400-mm_3-mm-silver-brushed_hor-grain_4-0_hor",
+    "18x24": "metallic_18x24-inch-450x600-mm_3-mm-silver-brushed_hor-grain_4-0_hor",
+    "24x36": "metallic_24x36-inch-600x900-mm_3-mm-silver-brushed_hor-grain_4-0_hor"
+  },
+  "wood-prints": {
+    "12x16": "wood_12x16-inch-300x400-mm_lined-plywood_10-mm_hor-grain_4-0_hor",
+    "18x24": "wood_18x24-inch-450x600-mm_lined-plywood_10-mm_hor-grain_4-0_hor",
+    "24x36": "wood_24x36-inch-600x900-mm_lined-plywood_10-mm_hor-grain_4-0_hor"
+  },
+  "foam-print-product": {
+    "12x16": "foam_12x16-inch-300x400-mm_5-mm_black_4-0_hor",
+    "18x24": "foam_18x24-inch-450x600-mm_5-mm_black_4-0_hor",
+    "24x36": "foam_24x36-inch-600x900-mm_5-mm_black_4-0_hor"
+  }
+}
