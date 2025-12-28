@@ -11,6 +11,7 @@ import { StickyCTA } from '@/components/layout/sticky-cta';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Snowfall } from '@/components/effects/snowfall';
 import { ChatWidget } from '@/components/chat/chat-widget';
+import { GoogleReviewsBadge } from '@/components/google-reviews-badge';
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -94,6 +95,7 @@ export default function RootLayout({
         <Toaster />
         <SpeedInsights />
         <Analytics />
+        <GoogleReviewsBadge />
       </body>
     </html>
   );
