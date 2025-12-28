@@ -58,7 +58,11 @@ export const SUPPORTED_COUNTRIES = [
 interface VisualOptionProps {
     id: string;
     title: string;
-    description?: string;
+    id: string;
+    title: string;
+    description?: React.ReactNode;
+    price?: string;
+
     price?: string;
     selected: boolean;
     onClick: () => void;
@@ -786,6 +790,8 @@ export function OrderForm() {
                                 </div>
                                 <input
                                     type="file"
+                                    id="file-upload"
+                                    name="photos"
                                     ref={fileInputRef}
                                     onChange={(e) => handleFileChange(e.target.files)}
                                     accept="image/jpeg,image/png,image/webp"
