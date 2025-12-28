@@ -52,6 +52,8 @@ export function Footer() {
             <form onSubmit={handleSubscribe} className="flex gap-2">
               <Input
                 type="email"
+                id="newsletter-email"
+                name="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
