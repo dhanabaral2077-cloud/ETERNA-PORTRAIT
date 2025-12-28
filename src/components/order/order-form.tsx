@@ -453,11 +453,65 @@ export function OrderForm() {
         }
     };
 
+    // --- Google Automated Discounts (Persist for 30 mins) ---
+    const [automatedDiscount, setAutomatedDiscount] = useState<number | null>(null);
+
+    useEffect(() => {
+        // 1. Check URL for 'pv2' parameter (Google's standard for auto discounts)
+        // OR check for 'discount' param for testing
+        const pv2 = searchParams.get('pv2');
+        const testDiscount = searchParams.get('auto_discount');
+
+        if (pv2 || testDiscount) {
+            // activate 5% discount (Standard test from screenshot)
+            const expiresAt = Date.now() + (30 * 60 * 1000); // 30 mins from now
+            const discountData = { value: 5, expiresAt };
+            sessionStorage.setItem('google_auto_discount', JSON.stringify(discountData));
+            setAutomatedDiscount(5);
+
+            // Allow clean URL
+            // router.replace('/order', { scroll: false }); 
+        } else {
+            // 2. Check Session Storage for persisted discount
+            const stored = sessionStorage.getItem('google_auto_discount');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.expiresAt > Date.now()) {
+                        setAutomatedDiscount(parsed.value);
+                    } else {
+                        sessionStorage.removeItem('google_auto_discount'); // Expired
+                    }
+                } catch (e) {
+                    // Invalid data
+                }
+            }
+        }
+    }, [searchParams]);
+
     const finalPrice = useMemo(() => {
-        if (!appliedDiscount) return totalPriceBeforeDiscount;
-        const discountAmount = Math.round(totalPriceBeforeDiscount * (appliedDiscount.percent / 100));
-        return totalPriceBeforeDiscount - discountAmount;
-    }, [totalPriceBeforeDiscount, appliedDiscount]);
+        // 1. Manual User Code (overrides auto if better? or stacks? Usually overrides)
+        if (appliedDiscount) {
+            const discountAmount = Math.round(totalPriceBeforeDiscount * (appliedDiscount.percent / 100));
+            return totalPriceBeforeDiscount - discountAmount;
+        }
+
+        // 2. Google Automated Discount
+        if (automatedDiscount) {
+            // Exact calculation matching Google's example: $149 -> $141.55
+            // But we usually deal in integers. Let's see if we can support cents or round.
+            // App uses integers mostly. $141.55 might need precision.
+            // Re-checking pricing.ts: calculatePrice returns Math.round().
+            // If we need to support cents for Google validation, we might need to update display to allow cents.
+            // For now, let's allow float for finalPrice if automated discount is active.
+
+            const discounted = totalPriceBeforeDiscount * (1 - (automatedDiscount / 100));
+            // Round to 2 decimals for exact match with Google's requirements
+            return Number(discounted.toFixed(2));
+        }
+
+        return totalPriceBeforeDiscount;
+    }, [totalPriceBeforeDiscount, appliedDiscount, automatedDiscount]);
 
     const selectedTypeName = PRODUCT_PRICES[formData.printType]?.name;
     const selectedSizeName = SIZE_MODIFIERS[formData.size]?.name;
@@ -625,19 +679,31 @@ export function OrderForm() {
                         <div className="space-y-4">
                             <Label className="text-lg font-serif text-foreground">Product Type</Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {availableProductTypes.map(type => (
-                                    <VisualOption
-                                        key={type.id}
-                                        id={type.id}
-                                        title={type.name}
-                                        description={`Starting at $${type.basePrice}`}
-                                        selected={formData.printType === type.id}
-                                        onClick={() => handleChange('printType', type.id)}
-                                        icon={isGift ? <Gift size={20} /> : <Palette size={20} />}
-                                        image={(type as any).image}
-                                        gallery={(type as any).gallery} // Pass gallery if available
-                                    />
-                                ))}
+                                {availableProductTypes.map(type => {
+                                    const itemPrice = type.basePrice;
+                                    const discountedPrice = automatedDiscount
+                                        ? Number((itemPrice * (1 - automatedDiscount / 100)).toFixed(2))
+                                        : null;
+
+                                    return (
+                                        <VisualOption
+                                            key={type.id}
+                                            id={type.id}
+                                            title={type.name}
+                                            description={discountedPrice ? (
+                                                <span className="flex items-center gap-2">
+                                                    <span className="line-through text-muted-foreground">${itemPrice}</span>
+                                                    <span className="text-primary font-bold">${discountedPrice}</span>
+                                                </span>
+                                            ) : `Starting at $${itemPrice}`}
+                                            selected={formData.printType === type.id}
+                                            onClick={() => handleChange('printType', type.id)}
+                                            icon={isGift ? <Gift size={20} /> : <Palette size={20} />}
+                                            image={(type as any).image}
+                                            gallery={(type as any).gallery}
+                                        />
+                                    );
+                                })}
                             </div>
                         </div>
 

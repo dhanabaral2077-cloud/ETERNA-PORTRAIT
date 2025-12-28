@@ -25,16 +25,29 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 async function seedProducts() {
     console.log('Seeding products...');
 
-    const products = Object.entries(PRODUCT_PRICES).map(([key, product]) => ({
-        id: key,
-        name: product.name,
-        base_price: product.basePrice,
-        plan: product.plan,
-        image: (product as any).image,
-        gallery: (product as any).gallery || [],
-        is_active: true,
-        updated_at: new Date().toISOString()
-    }));
+    const products = Object.entries(PRODUCT_PRICES).map(([key, product]) => {
+        // Calculate default automated pricing limits for the base size (12x16 for most)
+        // Note: In a real scenario, you'd want rows for each variant, but Supabase schema seems to be product-level.
+        // We'll use the base price calculation for the main record.
+        const basePrice = product.basePrice;
+
+        // Default Logic: COGS = 40%, Min = 85%
+        const cost_of_goods_sold = Number((basePrice * 0.40).toFixed(2));
+        const auto_pricing_min_price = Number((basePrice * 0.85).toFixed(2));
+
+        return {
+            id: key,
+            name: product.name,
+            base_price: basePrice,
+            plan: product.plan,
+            image: (product as any).image,
+            gallery: (product as any).gallery || [],
+            is_active: true,
+            cost_of_goods_sold,
+            auto_pricing_min_price,
+            updated_at: new Date().toISOString()
+        };
+    });
 
     for (const p of products) {
         const { error } = await supabase

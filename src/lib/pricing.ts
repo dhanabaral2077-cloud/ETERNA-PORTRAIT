@@ -110,7 +110,8 @@ export const PRODUCT_PRICES = {
         basePrice: 1, // Multiplier for denomination
         name: 'Eterna Gift Card',
         plan: 'gift',
-        image: '/portfolio/eterna_logo_santa_hat.png', // Fallback or specific gift card image
+        image: '/portfolio/eterna_logo_santa_hat.png',
+        cogs: 0.8, // 80% cost (high margin loss for gift cards usually, unlikely to discount)
     },
 } as const;
 
@@ -150,11 +151,11 @@ export const ART_STYLES = {
 export const SIZE_MODIFIERS = {
     '5x7': {
         name: '13x18 cm / 5x7"',
-        modifier: 0.8, // Slightly cheaper than base
+        modifier: 0.8,
     },
     '12x16': {
         name: '30x40 cm / 12x16"',
-        modifier: 1.0, // Base size
+        modifier: 1.0,
     },
     '18x24': {
         name: '45x60 cm / 18x24"',
@@ -196,6 +197,22 @@ export function calculatePrice(type: ProductType, size: SizeType): number {
 
     // Calculate and round to nearest whole dollar for clean pricing
     return Math.round(product.basePrice * sizeMod.modifier);
+}
+
+// Helper to get Automated Discount Limits
+export function getAutomatedPricingLimits(type: ProductType, size: SizeType) {
+    const price = calculatePrice(type, size);
+
+    // Default logic:
+    // COGS = ~40% of price (Healthy margin)
+    // Min Price = ~85% of price (Allow up to 15% automated discount)
+
+    // Specific overrides can be added to PRODUCT_PRICES if needed, e.g. (product as any).cogsBaseline
+
+    const cogs = Number((price * 0.40).toFixed(2));
+    const minPrice = Number((price * 0.85).toFixed(2));
+
+    return { cogs, minPrice };
 }
 
 export function getProductDetails(type: ProductType, size: SizeType) {
