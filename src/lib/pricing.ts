@@ -38,38 +38,44 @@ export const PRODUCT_PRICES = {
 
     // Signature Plan
     canvas: {
-        basePrice: 79, // Was 129
-        name: 'Canvas',
-        plan: 'signature',
-        image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_fhahnkfhahnkfhah.png',
+        id: 'canvas',
+        name: 'Standard Canvas',
+        basePrice: 59,
+        description: 'Gallery-quality canvas print, professionally wrapped around a sturdy wooden frame. Ready to hang.',
+        image: '/products/canvas-mockup.png',
         gallery: [
-            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
-            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_kfntyjkfntyjkfnt.png',
-        ]
+            '/products/gelato_canvas_wrapped_mockup_1767017575513.png',
+            '/products/canvas-mockup.png',
+            '/portfolio/The_Craftsman_Hero.png'
+        ],
+        plan: 'canvas',
     },
-    framed_canvas: {
-        basePrice: 149, // Was 199
+    'framed-canvas': {
+        id: 'framed-canvas',
         name: 'Framed Canvas',
-        plan: 'signature',
-        image: '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
+        basePrice: 89,
+        description: 'Our premium canvas print accented with a sleek floating frame for a museum-quality look.',
+        image: '/products/framed-canvas-mockup.png',
         gallery: [
-            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
-            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_a19y0va19y0va19y.png',
-            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_bskpjpbskpjpbskp.png',
-            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_w6a8s7w6a8s7w6a8.png',
-        ]
+            '/products/gelato_style_framed_canvas_mockup_1766668155063.png',
+            '/products/framed-canvas-mockup.png',
+            '/portfolio/collector1.png'
+        ],
+        plan: 'framed_canvas',
     },
 
     // Masterpiece Plan
     aluminum_print: {
-        basePrice: 119, // Was 189
+        id: 'aluminum',
         name: 'Aluminum Print',
-        plan: 'masterpiece',
-        image: '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
+        basePrice: 79,
+        description: 'Modern and sleek. Your pet\'s portrait printed directly onto a high-grade aluminum sheet for a stunning metallic finish.',
+        image: '/products/aluminum-mockup.png',
         gallery: [
-            '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_vlvqunvlvqunvlvq.png',
-            '/products/Luxury Print/Aluminum Print/Gemini_Generated_Image_tsomwttsomwttsom.png',
-        ]
+            '/products/gelato_aluminum_print_mockup_1767017590157.png',
+            '/products/aluminum-mockup.png'
+        ],
+        plan: 'aluminum',
     },
     acrylic_print: {
         basePrice: 139, // Was 229

@@ -30,17 +30,17 @@ export default function RefundsPage() {
               Please inspect your order upon reception and contact us immediately if the item is defective, damaged or if you receive the wrong item, so that we can evaluate the issue and make it right.
             </p>
 
-            <h2 className="font-headline text-2xl md:text-3xl text-foreground pt-6">Exceptions / Non-returnable items</h2>
+            <h2 className="font-headline text-2xl md:text-3xl text-foreground pt-6">Satisfaction Guarantee (Change of Mind)</h2>
             <p>
-              Certain types of items cannot be returned, like custom products (such as special orders or personalized items like our Custom Pet Portraits). Please get in touch if you have questions or concerns about your specific item.
+              We want you to love your one-of-a-kind art. Even though our products are custom-made, we offer a <strong>100% Satisfaction Guarantee</strong>.
             </p>
-            <p>
-              <strong>Satisfaction Guarantee:</strong> While custom art is typically non-returnable, we want you to be 100% happy. If there is an issue with your specific portrait, please contact us so we can work on a solution, potentially including a reprint or correction.
+            <p className="mt-2">
+              If you are not happy with your portrait for any reason (including change of mind or dissatisfaction with the likeness), please contact us within <strong>30 days</strong> of receiving your order. We will work with you to approve a replacement, free revision, or a full refund upon return of the item.
             </p>
 
             <h2 className="font-headline text-2xl md:text-3xl text-foreground pt-6">Refunds</h2>
             <p>
-              We will notify you once we’ve received and inspected your return, and let you know if the refund was approved or not. If approved, you’ll be automatically refunded on your original payment method within 10 business days. Please remember it can take some time for your bank or credit card company to process and post the refund too.
+              We will notify you once we’ve received and inspected your return. If approved, you’ll be automatically refunded on your original payment method within 5-10 business days.
             </p>
 
             <h2 className="font-headline text-2xl md:text-3xl text-foreground pt-6">Cancellations</h2>
