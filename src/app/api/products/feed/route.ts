@@ -52,7 +52,9 @@ ${product.gallery && Array.isArray(product.gallery) ? product.gallery.map((img: 
   <g:service>Standard</g:service>
   <g:price>0.00 USD</g:price>
 </g:shipping>
-${['GB', 'CA', 'AU', 'NZ', 'DE', 'FR', 'IT', 'ES', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'CH', 'BE', 'AT', 'JP', 'SG', 'HK', 'KR', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'ZA', 'AE', 'SA', 'TR', 'PL', 'CZ', 'HU', 'RO', 'GR', 'PT', 'IL', 'MY', 'TH', 'VN', 'PH', 'ID', 'IN', 'TW', 'DZ', 'AO', 'BH', 'BD', 'BY', 'RU', 'SK', 'ZW'].map(country => `
+${[
+        'AE', 'AO', 'AR', 'AT', 'AU', 'BD', 'BE', 'BH', 'BR', 'BY', 'CA', 'CH', 'CI', 'CL', 'CM', 'CO', 'CR', 'CZ', 'DE', 'DK', 'DO', 'DZ', 'EC', 'EG', 'ES', 'ET', 'FI', 'FR', 'GB', 'GE', 'GH', 'GR', 'GT', 'HK', 'HU', 'ID', 'IE', 'IL', 'IN', 'IT', 'JO', 'JP', 'KE', 'KH', 'KR', 'KW', 'LB', 'LK', 'MA', 'MG', 'MM', 'MU', 'MX', 'MY', 'MZ', 'NG', 'NI', 'NL', 'NO', 'NP', 'NZ', 'OM', 'PA', 'PE', 'PH', 'PK', 'PL', 'PR', 'PT', 'PY', 'RO', 'RU', 'SA', 'SE', 'SG', 'SK', 'SN', 'SV', 'TH', 'TN', 'TR', 'TW', 'TZ', 'UA', 'UG', 'UY', 'UZ', 'VE', 'VN', 'ZA', 'ZM', 'ZW'
+      ].map((country) => `
 <g:shipping>
   <g:country>${country}</g:country>
   <g:service>International</g:service>
