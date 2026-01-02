@@ -48,7 +48,7 @@ export const PRODUCT_PRICES = {
             '/products/canvas-mockup.png',
             '/portfolio/The_Craftsman_Hero.png'
         ],
-        plan: 'canvas',
+        plan: 'signature',
     },
     'framed-canvas': {
         id: 'framed-canvas',
@@ -61,7 +61,7 @@ export const PRODUCT_PRICES = {
             '/products/framed-canvas-mockup.png',
             '/portfolio/collector1.png'
         ],
-        plan: 'framed_canvas',
+        plan: 'signature',
     },
 
     // Masterpiece Plan
