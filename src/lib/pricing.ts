@@ -42,11 +42,10 @@ export const PRODUCT_PRICES = {
         name: 'Standard Canvas',
         basePrice: 59,
         description: 'Gallery-quality canvas print, professionally wrapped around a sturdy wooden frame. Ready to hang.',
-        image: '/products/canvas-mockup.png',
+        image: '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
         gallery: [
-            '/products/gelato_canvas_wrapped_mockup_1767017575513.png',
-            '/products/canvas-mockup.png',
-            '/portfolio/The_Craftsman_Hero.png'
+            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_4msi914msi914msi.png',
+            '/products/Premium Canvas/Canvas/Gemini_Generated_Image_kfntyjkfntyjkfnt.png',
         ],
         plan: 'signature',
     },
@@ -55,11 +54,12 @@ export const PRODUCT_PRICES = {
         name: 'Framed Canvas',
         basePrice: 89,
         description: 'Our premium canvas print accented with a sleek floating frame for a museum-quality look.',
-        image: '/products/framed-canvas-mockup.png',
+        image: '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
         gallery: [
-            '/products/gelato_style_framed_canvas_mockup_1766668155063.png',
-            '/products/framed-canvas-mockup.png',
-            '/portfolio/collector1.png'
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_4yh4vm4yh4vm4yh4.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_a19y0va19y0va19y.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_bskpjpbskpjpbskp.png',
+            '/products/Premium Canvas/Framed Canvas/Gemini_Generated_Image_w6a8s7w6a8s7w6a8.png',
         ],
         plan: 'signature',
     },
