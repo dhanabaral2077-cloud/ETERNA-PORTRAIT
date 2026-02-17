@@ -65,4 +65,10 @@ async function seedProducts() {
     console.log('Done.');
 }
 
-seedProducts();
+seedProducts().then(() => {
+    console.log('Seed script finished successfully');
+    process.exit(0);
+}).catch(err => {
+    console.error('Unhandled error in seedProducts:', err);
+    process.exit(1);
+});
